@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "value_conventions": {
+    "weight": "Relative selection weight. The default weights total 1.0.",
+    "percentages": "Decimal fractions: 0.50 means 50%; -1.0 means -100%.",
+    "item_rolls": "Each roll independently chooses one enabled registered item type."
+  },
+  "settings": {
+    "zombie_max_health": 10000,
+    "zombie_minimum_attack_damage": 100,
+    "zombie_attack_speed": 4,
+    "breakthrough_effect_bonus": 0.50,
+    "health_halving_threshold": 0.50,
+    "health_multiplier_above_threshold": 0.50,
+    "fallback_health": 1,
+    "all_skill_enhancement_attribute_penalty": -0.30,
+    "random_item_rolls": 3,
+    "damage_reduction_penalty": -1.00,
+    "skill_enhancement_charges_min": 1,
+    "skill_enhancement_charges_max": 10
+  },
+  "outcomes": [
+    { "id": "hostile_zombie", "enabled": true, "weight": 0.05 },
+    { "id": "breakthrough_effect", "enabled": true, "weight": 0.10 },
+    { "id": "divine_punishment", "enabled": true, "weight": 0.20 },
+    { "id": "all_skill_penalty", "enabled": true, "weight": 0.25 },
+    { "id": "random_items", "enabled": true, "weight": 0.10 },
+    { "id": "damage_reduction_penalty", "enabled": true, "weight": 0.20 },
+    { "id": "skill_enhancement_charges", "enabled": true, "weight": 0.10 }
+  ]
+}

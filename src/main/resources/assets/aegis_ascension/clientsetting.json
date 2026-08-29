@@ -1,0 +1,17 @@
+{
+  "rememberLastPosition": true,
+  "cardWidth": 120,
+  "cardHeight": 180,
+  "drawerOpacity": 1.0,
+  "backgroundOpacity": 0.9,
+  "rememberCollapsedTabs": true,
+  "instantDiscardAll": false,
+  "inventoryMode": "ORIGINAL",
+  "selectionExpanded": true,
+  "collectionExpanded": true,
+  "miscellaneousExpanded": true,
+  "showShieldHud": true,
+  "shieldHudAnchor": "TOP_RIGHT",
+  "shieldHudOffsetX": -5,
+  "shieldHudOffsetY": 5
+}

@@ -1,0 +1,555 @@
+package com.whatever.aegis_ascension.perk;
+
+/**
+ * Stable identifiers shared by runtime code and the data-driven talent catalog.
+ * Keep field values unchanged to preserve saved-player and JSON compatibility.
+ */
+public final class TalentConstants {
+    private TalentConstants() {
+    }
+
+    // Perk IDs
+    public static final String R_HEALING_MAGIC = "r_healing_magic";
+    public static final String R_MUNDANE_STROLL = "r_mundane_stroll";
+    public static final String R_LUCKY_ARROW = "r_lucky_arrow";
+    public static final String R_INK_DYED_SAKURA = "r_ink_dyed_sakura";
+    public static final String R_HALF_HUMAN_HALF_PHANTOM_GARDENER = "r_half_human_half_phantom_gardener";
+    public static final String R_CRIMSON_YOUNG_MOON = "r_crimson_young_moon";
+    public static final String R_LAEVATEIN = "r_laevatein";
+    public static final String R_CIRNO = "r_cirno";
+    public static final String R_NAGISA_LEISURE_TIME = "r_nagisa_leisure_time";
+    public static final String R_LUNAR_GODDESSS_BLESSING = "r_lunar_goddesss_blessing";
+    public static final String R_ALYA = "r_alya";
+    public static final String R_DIVINE_SAKURA_POWER = "r_divine_sakura_power";
+    public static final String R_BOUNDARY_OF_LIFE_AND_DEATH = "r_boundary_of_life_and_death";
+    public static final String R_FLICKERING_LIGHT = "r_flickering_light";
+    public static final String R_WHITE_STAR_OBSIDIAN = "r_white_star_obsidian";
+    public static final String R_ALICE = "r_alice";
+    public static final String R_SHIROKO = "r_shiroko";
+    public static final String R_HAYASE_YUKA = "r_hayase_yuka";
+    public static final String R_OTOGI_NOAH = "r_otogi_noah";
+    public static final String R_SKILL_DAMAGE_CONVERSION = "r_skill_damage_conversion";
+    public static final String R_CASHBACK = "r_cashback";
+    public static final String R_SILENT_DAWN = "r_silent_dawn";
+    public static final String R_TSUKIYUKI_MIYAKO = "r_tsukiyuki_miyako";
+    public static final String R_TOLD_YOU_ITS_MAGIC = "r_told_you_its_magic";
+    public static final String R_NOELLE = "r_noelle";
+    public static final String R_ARONA = "r_arona";
+    public static final String R_MATTER_TO_MAGIC_CONVERSION = "r_matter_to_magic_conversion";
+    public static final String R_MYSTERIOUS_DOLL = "r_mysterious_doll";
+    public static final String R_CLEAR_MIND_STATE = "r_clear_mind_state";
+    public static final String R_MAGIC_CONVERSION = "r_magic_conversion";
+    public static final String R_KOKONA = "r_kokona";
+    public static final String R_SUNOHARA_SHUN = "r_sunohara_shun";
+    public static final String R_MAGIC_BLADE = "r_magic_blade";
+    public static final String R_BARRAGE_CONTROL_MAGIC = "r_barrage_control_magic";
+    public static final String R_MOMO = "r_momo";
+    public static final String R_MIDORI = "r_midori";
+    public static final String R_CONGYU_CIALLO = "r_congyu_ciallo";
+    public static final String R_YOSHINO_CIALLO = "r_yoshino_ciallo";
+    public static final String R_SHIZURU_CIALLO = "r_shizuru_ciallo";
+    public static final String R_NINGNING_CIALLO = "r_ningning_ciallo";
+    public static final String R_NANAMI_CIALLO = "r_nanami_ciallo";
+    public static final String R_ROLLING_IN_WEALTH = "r_rolling_in_wealth";
+    public static final String R_ENIGMA = "r_enigma";
+    public static final String R_AQUAS_BLESSING = "r_aquas_blessing";
+    public static final String R_SHRINE_MAIDEN_DANCE = "r_shrine_maiden_dance";
+    public static final String R_FRENZY = "r_frenzy";
+    public static final String R_HANAKOS_BLESSING = "r_hanakos_blessing";
+    public static final String R_KISAKIS_BLESSING = "r_kisakis_blessing";
+    public static final String R_KOHARUS_BLESSING = "r_koharus_blessing";
+    public static final String R_PERFECT_AND_ELEGANT_SERVANT =
+            "r_perfect_and_elegant_servant";
+    public static final String R_SUSPENSION_OF_DISBELIEF =
+            "r_suspension_of_disbelief";
+    public static final String R_TEAM_STAR = "r_team_star";
+    public static final String SR_MASTER_SPARK = "sr_master_spark";
+    public static final String SR_FOCUSED_SHOT = "sr_focused_shot";
+    public static final String SR_METEOR_SPARKLE = "sr_meteor_sparkle";
+    public static final String SR_BEATER = "sr_beater";
+    public static final String SR_YURIZONO_SEIA = "sr_yurizono_seia";
+    public static final String SR_FRIEREN = "sr_frieren";
+    public static final String SR_FERN = "sr_fern";
+    public static final String SR_WIND_ARROW = "sr_wind_arrow";
+    public static final String SR_PRINCESS_OF_EGRET = "sr_princess_of_egret";
+    public static final String SR_I_SHALL_INTERPRET_THE_RADIANCE = "sr_i_shall_interpret_the_radiance";
+    public static final String SR_RIGHTEOUS_KNIGHT = "sr_righteous_knight";
+    public static final String SR_BLAZING_FEATHER_STARWEAVER = "sr_blazing_feather_starweaver";
+    public static final String SR_NECROMANCER = "sr_necromancer";
+    public static final String SR_GRIM_REAPERS_CONTRACT = "sr_grim_reapers_contract";
+    public static final String SR_KOHARU_SPRITE = "sr_koharu_sprite";
+    public static final String SR_MIKA = "sr_mika";
+    public static final String SR_FAIR_TRADE = "sr_fair_trade";
+    public static final String SR_GLASS_CANNON = "sr_glass_cannon";
+    public static final String SR_COLLECTOR = "sr_collector";
+    public static final String SR_FLOWER_FAIRY = "sr_flower_fairy";
+    public static final String SR_SHARED_FORTUNE = "sr_shared_fortune";
+    public static final String SR_GREAT_FAIRY = "sr_great_fairy";
+    public static final String SR_SACRED_ELF = "sr_sacred_elf";
+    public static final String SR_BUTTERFLYS_GENTLE_TOUCH = "sr_butterflys_gentle_touch";
+    public static final String SR_RIPPLES_OF_THE_PAST = "sr_ripples_of_the_past";
+    public static final String SR_COMMANDER = "sr_commander";
+    public static final String SR_PLANA = "sr_plana";
+    public static final String SR_ZEPHYRS_CARE = "sr_zephyrs_care";
+    public static final String SR_ILLUSION_BUBBLE = "sr_illusion_bubble";
+    public static final String SR_SWISS_ROLL_MOMENT = "sr_swiss_roll_moment";
+    public static final String SR_GANYUS_BLESSING = "sr_ganyus_blessing";
+    public static final String SR_HOMURAS_BLESSING = "sr_homuras_blessing";
+    public static final String SR_KARYLS_BLESSING = "sr_karyls_blessing";
+    public static final String SR_KOKKOROS_BLESSING = "sr_kokkoros_blessing";
+    public static final String SR_KONATAS_BLESSING = "sr_konatas_blessing";
+    public static final String SR_MURASAMES_BLESSING = "sr_murasames_blessing";
+    public static final String SR_PECORINES_BLESSING = "sr_pecorines_blessing";
+    public static final String SSR_INNATE_DREAM = "ssr_innate_dream";
+    public static final String SSR_SEVEN_COLORED_MAGICIAN = "ssr_seven_colored_magician";
+    public static final String SSR_FIREFLY_FLAME = "ssr_firefly_flame";
+    public static final String SSR_PEERLESS_CALCULATION = "ssr_peerless_calculation";
+    public static final String SSR_STARLIGHT_INTERTWINED_BENEDICTION = "ssr_starlight_intertwined_benediction";
+    public static final String SSR_LAW_OF_THE_CYCLE = "ssr_law_of_the_cycle";
+    public static final String SSR_BECAUSE_YOU_EXIST_AS_I_WRITE = "ssr_because_you_exist_as_i_write";
+    public static final String SSR_LONGHUA_FEIXIAO = "ssr_longhua_feixiao";
+    public static final String SSR_TOP_PLAYER = "ssr_top_player";
+    public static final String SSR_BLESSING_OF_THE_WORLD_TREE = "ssr_blessing_of_the_world_tree";
+    public static final String SSR_PLATEAU_WITCH = "ssr_plateau_witch";
+    public static final String SSR_TEACHER_FOX = "ssr_teacher_fox";
+    public static final String SSR_WORLD_IS_MINE = "ssr_world_is_mine";
+    public static final String SSR_REINHARDT = "ssr_reinhardt";
+    public static final String SSR_TWIN_MAGIC_MIRROR = "ssr_twin_magic_mirror";
+    public static final String SSR_ET_OMNIA_VANITAS = "ssr_et_omnia_vanitas";
+    public static final String SSR_DOMINUS_LAPIDIS = "ssr_dominus_lapidis";
+
+    // Soul-Link IDs
+    public static final String SOUL_HAKUGYOKUROU =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_HAKUGYOKUROU;
+    public static final String SOUL_LOGISTICS_COMBO =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_LOGISTICS_COMBO;
+    public static final String SOUL_SCARLET_DEVIL_MANSION_SISTERS =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_SCARLET_DEVIL_MANSION_SISTERS;
+    public static final String SOUL_MILLENNIUM_ECHO =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_MILLENNIUM_ECHO;
+    public static final String SOUL_TRINITY_TEA_PARTY =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_TRINITY_TEA_PARTY;
+    public static final String SOUL_DEATH_GODS_AUTHORITY =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_DEATH_GODS_AUTHORITY;
+    public static final String SOUL_MAGICIAN_MASTER_AND_APPRENTICE =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_MAGICIAN_MASTER_AND_APPRENTICE;
+    public static final String SOUL_COMBO_TECHNIQUE =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_COMBO_TECHNIQUE;
+    public static final String SOUL_SHITTIM_CHEST =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_SHITTIM_CHEST;
+    public static final String SOUL_LOVE_AS_ETERNAL_AS_THIS_MOMENT =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_LOVE_AS_ETERNAL_AS_THIS_MOMENT;
+    public static final String SOUL_PLUM_BLOSSOM_GARDEN =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_PLUM_BLOSSOM_GARDEN;
+    public static final String SOUL_GAME_DEVELOPMENT_CLUB =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_GAME_DEVELOPMENT_CLUB;
+    public static final String SOUL_YUZUSOFT_FAN_LEVEL =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_YUZUSOFT_FAN_LEVEL;
+    public static final String SOUL_MARIPATCHY_GROUP =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_MARIPATCHY_GROUP;
+
+    // Perk, Soul-Link, persisted custom-stat, and UI stat keys
+    public static final String ADDITIONAL_HEAL_TRIGGERS = "additional_heal_triggers";
+    public static final String ADDITIONAL_RANDOM_TALENT_CHANCE = "additional_random_talent_chance";
+    public static final String ADDITIONAL_RANDOM_R_WEIGHT = "additional_random_r_weight";
+    public static final String ADDITIONAL_RANDOM_ONE_TALENT_WEIGHT = "additional_random_one_talent_weight";
+    public static final String ADDITIONAL_RANDOM_TWO_TALENTS_WEIGHT = "additional_random_two_talents_weight";
+    public static final String ADDITIONAL_RANDOM_THREE_TALENTS_WEIGHT = "additional_random_three_talents_weight";
+    public static final String ADDITIONAL_BREAKTHROUGH_CHANCE = "additional_breakthrough_chance";
+    public static final String ADDITIONAL_RANDOM_SR_WEIGHT = "additional_random_sr_weight";
+    public static final String ADDITIONAL_RANDOM_SSR_WEIGHT = "additional_random_ssr_weight";
+    public static final String ADDITIONAL_TALENT_SLOTS = "additional_talent_slots";
+    /** Data-driven slot bonus supplied directly by an owned talent. */
+    public static final String EXTRA_TALENT_SLOTS = "extra_talent_slots";
+    public static final String ADDITIONAL_TRIGGER_CHANCE = "additional_trigger_chance";
+    public static final String ADDITIONAL_TRIGGER_COUNT = "additional_trigger_count";
+    public static final String ALL_SKILL_ENHANCEMENT_ATTRIBUTE =
+            "all_skill_enhancement_attribute";
+    public static final String ARMOR = "armor";
+    public static final String ARMOR_IGNORE = "armor_ignore";
+    public static final String ARMOR_PIERCE = "armor_pierce";
+    public static final String ARMOR_SHRED = "armor_shred";
+    public static final String PHYSICAL_ARMOR_IGNORE = "physical_armor_ignore";
+    public static final String ARONA_BREAKTHROUGH_PRIMARY_ATTRIBUTE_FLAT_BONUS = "arona_breakthrough_primary_attribute_flat_bonus";
+    /** Unscaled Primary points accumulated by Arona's Breakthrough effect. */
+    public static final String ARONA_PRIMARY_FLAT = "arona_primary_flat";
+    public static final String ARROW_DAMAGE = "arrow_damage";
+    public static final String ARROW_VELOCITY = "arrow_velocity";
+    public static final String ATTACK_DAMAGE = "attack_damage";
+    public static final String ATTACK_DAMAGE_AMPLIFICATION = "attack_damage_amplification";
+    public static final String ATTACK_DAMAGE_AMPLIFICATION_CAP = "attack_damage_amplification_cap";
+    public static final String ATTACK_DAMAGE_AMPLIFICATION_PER_STACK = "attack_damage_amplification_per_stack";
+    public static final String ATTACK_DAMAGE_PER_STACK = "attack_damage_per_stack";
+    public static final String ATTACK_MULTIPLIER = "attack_multiplier";
+    public static final String ATTACK_MULTIPLIER_PER_OWNED_TALENT = "attack_multiplier_per_owned_talent";
+    public static final String ATTACK_RANGE = "attack_range";
+    public static final String ATTACK_RANGE_FLAT = "attack_range_flat";
+    public static final String ATTACK_RANGE_PER_SUMMON = "attack_range_per_summon";
+    public static final String ATTACK_SPEED_FLAT = "attack_speed_flat";
+    public static final String ATTACK_SPEED_FLAT_CAP = "attack_speed_flat_cap";
+    public static final String ATTACK_SPEED_FLAT_PER_STACK =
+            "attack_speed_flat_per_stack";
+    public static final String ATTACK_SPEED_MULTIPLIER = "attack_speed_multiplier";
+    public static final String ATTACK_SPEED = "attack_speed";
+    public static final String DISPLAY_FLAT_PREFIX = "__display_flat.";
+    public static final String DISPLAY_PERCENT_PREFIX = "__display_percent.";
+    public static final String ATTACKS_PER_STACK = "attacks_per_stack";
+    public static final String BASE_TRIGGER_CHANCE = "base_trigger_chance";
+    public static final String BLAZING_REVIVE_USED = "blazing_revive_used";
+    public static final String BLAZING_BREAKTHROUGH_DAMAGE = "blazing_breakthrough_damage";
+    public static final String BONUS_TRUE_DAMAGE_ATTACK_MULTIPLIER = "bonus_true_damage_attack_multiplier";
+    public static final String BONUS_TRUE_DAMAGE_CHANCE = "bonus_true_damage_chance";
+    public static final String COLD_DAMAGE = "cold_damage";
+    public static final String COOLDOWN_REDUCTION = "cooldown_reduction";
+    public static final String COOLDOWN_SECONDS = "cooldown_seconds";
+    public static final String CIALLO_ATTACK_MULTIPLIER =
+            "ciallo_attack_multiplier";
+    public static final String CIALLO_COOLDOWN_REDUCTION =
+            "ciallo_cooldown_reduction";
+    public static final String CIALLO_FINAL_DAMAGE = "ciallo_final_damage";
+    public static final String CIALLO_LUCK = "ciallo_luck";
+    public static final String CIALLO_MAX_HEALTH_MULTIPLIER =
+            "ciallo_max_health_multiplier";
+    public static final String CIALLO_PHYSICAL_DAMAGE_AMPLIFICATION =
+            "ciallo_physical_damage_amplification";
+    public static final String CIALLO_SPELL_DAMAGE_AMPLIFICATION =
+            "ciallo_spell_damage_amplification";
+    public static final String COPY_TALENT_CHANCE = "copy_talent_chance";
+    public static final String SHARED_FORTUNE_FALLBACK_SKILL_ENHANCEMENT_CHARGES =
+            "fallback_skill_enhancement_charges";
+    public static final String SHARED_FORTUNE_REBIND_COOLDOWN_SECONDS =
+            "rebind_cooldown_seconds";
+    public static final String CRIT_CHANCE = "crit_chance";
+    public static final String CRIT_DAMAGE = "crit_damage";
+    public static final String CRITICAL_CHANCE = "critical_chance";
+    public static final String CRITICAL_DAMAGE = "critical_damage";
+    public static final String GARDENER_CRITICAL_DAMAGE = "gardener_critical_damage";
+    public static final String INNATE_CRITICAL_DAMAGE = "innate_critical_damage";
+    public static final String CRITICAL_DAMAGE_PER_ELITE_KILL = "critical_damage_per_elite_kill";
+    public static final String CRITICAL_DAMAGE_PER_OVERFLOW_STEP = "critical_damage_per_overflow_step";
+    public static final String CRITICAL_DAMAGE_MAX_TRIGGER_COUNT =
+            "critical_damage_max_trigger_count";
+    public static final String CRITICAL_DAMAGE_PER_TRIGGER = "critical_damage_per_trigger";
+    public static final String CRITICAL_DAMAGE_STEP = "critical_damage_step";
+    public static final String CURRENT_HP_DAMAGE = "current_hp_damage";
+    public static final String DAMAGE_BONUS = "damage_bonus";
+    public static final String DAMAGE_BONUS_PER_ELITE_KILL = "damage_bonus_per_elite_kill";
+    public static final String DAMAGE_BONUS_PER_KILL = "damage_bonus_per_kill";
+    public static final String DAMAGE_BONUS_PER_TRADE = "damage_bonus_per_trade";
+    public static final String DAMAGE_BONUS_CAP = "damage_bonus_cap";
+    public static final String DAMAGE_BONUS_MAX_TRIGGER_COUNT =
+            "damage_bonus_max_trigger_count";
+    public static final String DAMAGE_BONUS_PER_TRIGGER = "damage_bonus_per_trigger";
+    public static final String DAMAGE_MULTIPLIER_CAP = "damage_multiplier_cap";
+    public static final String DAMAGE_MULTIPLIER_PER_STACK = "damage_multiplier_per_stack";
+    public static final String DAMAGE_REDUCTION = "damage_reduction";
+    public static final String DAMAGE_REDUCTION_PER_KILL = "damage_reduction_per_kill";
+    public static final String DAMAGE_BONUS_PER_SHIELD_STEP =
+            "damage_bonus_per_shield_step";
+    public static final String DOMINUS_SHIELD_DAMAGE_BONUS =
+            "dominus_shield_damage_bonus";
+    public static final String DISTANCE_PER_STACK = "distance_per_stack";
+    public static final String DODGE_CHANCE = "dodge_chance";
+    public static final String DOUBLE_DAMAGE_CHANCE = "double_damage_chance";
+    public static final String DOUBLE_DAMAGE_MULTIPLIER = "double_damage_multiplier";
+    public static final String DOUBLE_BREAKTHROUGH_CHANCE = "double_breakthrough_chance";
+    public static final String DOUBLE_BREAKTHROUGH_MULTIPLIER = "double_breakthrough_multiplier";
+    public static final String DRAW_SPEED = "draw_speed";
+    public static final String DURATION_SECONDS = "duration_seconds";
+    public static final String ENIGMA_TRIGGER_CHANCE = "enigma_trigger_chance";
+    public static final String ENIGMA_TRIGGER_MULTIPLIER = "enigma_trigger_multiplier";
+    public static final String ENIGMA_FAILURE_MULTIPLIER = "enigma_failure_multiplier";
+    public static final String ELITE_EXECUTE_HEALTH_FRACTION = "elite_execute_health_fraction";
+    public static final String ELITE_MAX_HEALTH_THRESHOLD = "elite_max_health_threshold";
+    public static final String ALICE_LUCK = "alice_luck";
+    public static final String ALICE_LUCK_TRIGGERS = "alice_luck_triggers";
+    public static final String ALICE_OFFER_BONUS = "alice_offer_bonus";
+    public static final String FAIR_TRADE_SUCCESSFUL_TRADES =
+            "fair_trade_successful_trades";
+    public static final String BREAKTHROUGH_ATTACK_RANGE_FLAT = "breakthrough_attack_range_flat";
+    public static final String BREAKTHROUGH_ALL_SKILL_ENHANCEMENT_ATTRIBUTE =
+            "breakthrough_all_skill_enhancement_attribute";
+    public static final String BREAKTHROUGH_ATTACK_MULTIPLIER =
+            "breakthrough_attack_multiplier";
+    public static final String BREAKTHROUGH_COOLDOWN_REDUCTION =
+            "breakthrough_cooldown_reduction";
+    public static final String BREAKTHROUGH_CRITICAL_CHANCE = "breakthrough_critical_chance";
+    public static final String BREAKTHROUGH_CRITICAL_CHANCE_PER_RANK = "breakthrough_critical_chance_per_rank";
+    public static final String BREAKTHROUGH_CRITICAL_DAMAGE = "breakthrough_critical_damage";
+    public static final String BREAKTHROUGH_EFFECT = "breakthrough_effect";
+    public static final String BREAKTHROUGH_EFFECT_MULTIPLIER_BONUS = "breakthrough_effect_multiplier_bonus";
+    public static final String BREAKTHROUGH_EXPERIENCE = "breakthrough_experience";
+    public static final String BREAKTHROUGH_FINAL_DAMAGE = "breakthrough_final_damage";
+    public static final String BREAKTHROUGH_LUCK_FLAT = "breakthrough_luck_flat";
+    public static final String BREAKTHROUGH_HEALING_POWER = "breakthrough_healing_power";
+    public static final String BREAKTHROUGH_INDEPENDENT_DAMAGE_AMPLIFICATION = "breakthrough_independent_damage_amplification";
+    public static final String BREAKTHROUGH_LEVEL_GAIN = "breakthrough_level_gain";
+    public static final String BREAKTHROUGH_MAX_HEALTH_MULTIPLIER = "breakthrough_max_health_multiplier";
+    public static final String BREAKTHROUGH_PRIMARY_ATTRIBUTE_FLAT = "breakthrough_primary_attribute_flat";
+    public static final String BREAKTHROUGH_PHYSICAL_DAMAGE_AMPLIFICATION =
+            "breakthrough_physical_damage_amplification";
+    public static final String BREAKTHROUGH_RANGE_PER_STACK = "breakthrough_range_per_stack";
+    public static final String BREAKTHROUGH_SELECTION_CHARGES = "breakthrough_selection_charges";
+    public static final String BREAKTHROUGH_SKILL_ENHANCEMENT_CHARGES = "breakthrough_skill_enhancement_charges";
+    public static final String BREAKTHROUGH_INDEPENDENT_SKILL_AREA =
+            "breakthrough_independent_skill_area";
+    public static final String BREAKTHROUGH_INDEPENDENT_SKILL_DAMAGE =
+            "breakthrough_independent_skill_damage";
+    public static final String BREAKTHROUGH_SUMMON_POWER = "breakthrough_summon_power";
+    public static final String BREAKTHROUGH_SPELL_DAMAGE_AMPLIFICATION =
+            "breakthrough_spell_damage_amplification";
+    public static final String BREAKTHROUGH_SWISS_ROLLS = "breakthrough_swiss_rolls";
+    public static final String BREAKTHROUGH_TRUE_DAMAGE = "breakthrough_true_damage";
+    public static final String BREAKTHROUGH_ATTACK_RANGE = "breakthrough_attack_range";
+    public static final String EVASION_FLAT = "evasion_flat";
+    public static final String EXECUTE_HEALTH_FRACTION = "execute_health_fraction";
+    public static final String EXPERIENCE_GAINED = "experience_gained";
+    public static final String EXPERIENCE_PER_ELITE_KILL = "experience_per_elite_kill";
+    public static final String FERN_TRIGGER_CHANCE_BONUS = "fern_trigger_chance_bonus";
+    public static final String FRIEREN_PRIMARY_ATTRIBUTE_FLAT_PER_STEP =
+            "frieren_primary_attribute_flat_per_step";
+    public static final String FRIEREN_MAX_MANA_PER_STEP =
+            "frieren_max_mana_per_step";
+    public static final String FINAL_DAMAGE = "final_damage";
+    public static final String FINAL_DAMAGE_ABOVE_THRESHOLD = "final_damage_above_threshold";
+    public static final String FINAL_DAMAGE_AFTER_REVIVE = "final_damage_after_revive";
+    public static final String FINAL_DAMAGE_ON_TRIGGER = "final_damage_on_trigger";
+    public static final String FINAL_DAMAGE_PER_OWNED_TALENT = "final_damage_per_owned_talent";
+    public static final String FINAL_DAMAGE_PER_STEP = "final_damage_per_step";
+    public static final String FINAL_DAMAGE_STEP = "final_damage_step";
+    public static final String FULL_HEALTH_FINAL_DAMAGE = "full_health_final_damage";
+    public static final String PECORINE_ACTIVE_FINAL_DAMAGE =
+            "pecorine_active_final_damage";
+    public static final String FIRE_DAMAGE = "fire_damage";
+    public static final String FIXED_CRITICAL_CHANCE = "fixed_critical_chance";
+    public static final String FIXED_CRITICAL_DAMAGE = "fixed_critical_damage";
+    public static final String FIXED_MAX_HEALTH = "fixed_max_health";
+    public static final String FROSTBITE_DAMAGE = "frostbite_damage";
+    public static final String FROSTBITE_DAMAGE_TAKEN = "frostbite_damage_taken";
+    public static final String GAIN_ALL_SSR_CHANCE = "gain_all_ssr_chance";
+    public static final String GHOST_HEALTH = "ghost_health";
+    public static final String HEALING_POWER = "healing_power";
+    public static final String HEALING_RECEIVED = "healing_received";
+    public static final String HEALTH_REGENERATION = "health_regeneration";
+    public static final String HEALTH_RESTORE_PER_SECOND = "health_restore_per_second";
+    public static final String IGNORE_DAMAGE_CHANCE = "ignore_damage_chance";
+    public static final String IGNORE_NEGATIVE_EFFECTS = "ignore_negative_effects";
+    public static final String IMMEDIATE_LEVEL_GAIN = "immediate_level_gain";
+    public static final String INDEPENDENT_DAMAGE_AMPLIFICATION = "independent_damage_amplification";
+    public static final String INNATE_DAMAGE = "innate_damage";
+    public static final String INNATE_DAMAGE_TRIGGER_COUNT = "innate_damage_trigger_count";
+    public static final String INNATE_SKILL_DAMAGE = "innate_skill_damage";
+    public static final String INNATE_SKILL_DAMAGE_TRIGGER_COUNT =
+            "innate_skill_damage_trigger_count";
+    public static final String INNATE_CRITICAL_DAMAGE_TRIGGER_COUNT =
+            "innate_critical_damage_trigger_count";
+    public static final String INTELLIGENCE_MULTIPLIER = "intelligence_multiplier";
+    public static final String INTERVAL_SECONDS = "interval_seconds";
+    public static final String DISTANCE_DAMAGE_OFFSET = "distance_damage_offset";
+    public static final String MINIMUM_DAMAGE_DISTANCE = "minimum_damage_distance";
+    public static final String DAMAGE_MULTIPLIER_PER_DISTANCE =
+            "damage_multiplier_per_distance";
+    public static final String INVULNERABILITY_DURATION_SECONDS = "invulnerability_duration_seconds";
+    public static final String INVULNERABILITY_TICKS = "invulnerability_ticks";
+    public static final String KILL_TRIGGER_CHANCE = "kill_trigger_chance";
+    public static final String KNIGHT_ATTACKS = "knight_attacks";
+    public static final String KNIGHT_ATTACK_SPEED_FLAT = "knight_attack_speed_flat";
+    public static final String KNIGHT_DAMAGE = "knight_damage";
+    public static final String LAEVATEIN_HEALTH = "laevatein_health";
+    public static final String LAEVATEIN_TRIGGER_COUNT = "laevatein_trigger_count";
+    public static final String LEVEL_1_BONUS = "level_1_bonus";
+    public static final String LEVEL_2_BONUS = "level_2_bonus";
+    public static final String LEVEL_3_BONUS = "level_3_bonus";
+    public static final String LEVEL_4_BONUS = "level_4_bonus";
+    public static final String LEVEL_5_BONUS = "level_5_bonus";
+    public static final String LEVEL_COUNT = "level_count";
+    public static final String LIFE_STEAL = "life_steal";
+    public static final String LUCK_FLAT = "luck_flat";
+    public static final String LUCK = "luck";
+    public static final String LUCK_FLAT_IF_ABOVE = "luck_flat_if_above";
+    public static final String LUCK_GAIN_TRIGGER_LIMIT = "luck_gain_trigger_limit";
+    public static final String LUCK_THRESHOLD = "luck_threshold";
+    public static final String LUCKY_STRIKE = "lucky_strike";
+    public static final String LUCKY_STRIKE_CAP = "lucky_strike_cap";
+    public static final String LUCKY_STRIKE_ON_SKILL = "lucky_strike_on_skill";
+    public static final String LUCKY_STRIKE_OVERFLOW_STEP = "lucky_strike_overflow_step";
+    public static final String LUCKY_STRIKE_PER_REVIVE = "lucky_strike_per_revive";
+    public static final String LUCKY_STRIKE_PER_STACK = "lucky_strike_per_stack";
+    public static final String LUCKY_STRIKE_PER_STEP = "lucky_strike_per_step";
+    public static final String LUCKY_STRIKE_THRESHOLD = "lucky_strike_threshold";
+    public static final String LUNAR_DAMAGE = "lunar_damage";
+    public static final String MAGIC_DAMAGE = "magic_damage";
+    public static final String MAGIC_DAMAGE_PER_MAX_MANA = "magic_damage_per_max_mana";
+    public static final String MAGIC_CONVERSION_MAX_MANA = "magic_conversion_max_mana";
+    public static final String MAGIC_CONVERSION_TRIGGER_COUNT =
+            "magic_conversion_trigger_count";
+    public static final String MANA_PER_PRIMARY_STAT = "mana_per_primary_stat";
+    public static final String MANA_REGENERATION = "mana_regeneration";
+    public static final String MANA_REGENERATION_MULTIPLIER =
+            "mana_regeneration_multiplier";
+    public static final String MANA_RESTORE_PER_SECOND = "mana_restore_per_second";
+    public static final String MAX_HEALTH_FLAT_PER_DAMAGE = "max_health_flat_per_damage";
+    public static final String MAX_HEALTH_TO_BASE_DAMAGE = "max_health_to_base_damage";
+    public static final String MAX_HEALTH_MULTIPLIER = "max_health_multiplier";
+    public static final String MAX_HEALTH_PER_MAX_MANA = "max_health_per_max_mana";
+    public static final String MAX_HEALTH_PER_STACK = "max_health_per_stack";
+    public static final String MAX_MANA_FLAT_PER_DAMAGE = "max_mana_flat_per_damage";
+    public static final String MAX_MANA_RESTORE_PER_ATTACK = "max_mana_restore_per_attack";
+    public static final String MAX_TRIGGER_COUNT = "max_trigger_count";
+    public static final String MIDORI_MOMO_STAT_MULTIPLIER_BONUS = "midori_momo_stat_multiplier_bonus";
+    public static final String MINING_SPEED = "mining_speed";
+    public static final String MISSING_HEALTH_RESTORE = "missing_health_restore";
+    public static final String MYSTERIOUS_DOLL_REWARD_SOURCE_PREFIX = "mysterious_doll_reward.";
+    public static final String NEARBY_SPAWN_RADIUS = "nearby_spawn_radius";
+    public static final String SPAWNED_MOB_MAX_HEALTH_MULTIPLIER =
+            "spawned_mob_max_health_multiplier";
+    public static final String MOVEMENT_SPEED_MULTIPLIER = "movement_speed_multiplier";
+    public static final String OFFER_BONUS = "offer_bonus";
+    public static final String ONE_EXTRA_ROLL_CHANCE = "one_extra_roll_chance";
+    public static final String ONE_EXTRA_ROLL_COUNT = "one_extra_roll_count";
+    public static final String OVERFLOW_CRITICAL_CHANCE_STEP = "overflow_critical_chance_step";
+    public static final String OVERHEAL = "overheal";
+    public static final String PHYSICAL_DAMAGE_AMPLIFICATION = "physical_damage_amplification";
+    public static final String PHYSICAL_DAMAGE_AMPLIFICATION_PER_SOUL_LINK = "physical_damage_amplification_per_soul_link";
+    public static final String PHYSICAL_DAMAGE_AMPLIFICATION_PER_TRIGGER = "physical_damage_amplification_per_trigger";
+    public static final String PLANA_LOGIC_CORRECTION_MULTIPLIER_BONUS = "plana_logic_correction_multiplier_bonus";
+    public static final String PRIMARY_ATTRIBUTE_FLAT = "primary_attribute_flat";
+    public static final String PRIMARY_ATTRIBUTE_FLAT_PER_ELITE_KILL = "primary_attribute_flat_per_elite_kill";
+    public static final String PRIMARY_ATTRIBUTE_FLAT_PER_TRIGGER = "primary_attribute_flat_per_trigger";
+    public static final String PRIMARY_ATTRIBUTE_GAIN_CHANCE_PER_BARRAGE = "primary_attribute_gain_chance_per_barrage";
+    public static final String PRIMARY_ATTRIBUTE_MULTIPLIER = "primary_attribute_multiplier";
+    public static final String PERK_REFRESH_CHARGE_PER_CHARGE =
+            "perk_refresh_charge_per_charge";
+    public static final String PRIMARY_FLAT = "primary_flat";
+    public static final String MAGICIAN_PRIMARY_ATTRIBUTE_FLAT =
+            "magician_primary_attribute_flat";
+    public static final String PROTECTION_PIERCE = "protection_pierce";
+    public static final String PROTECTION_SHRED = "protection_shred";
+    public static final String RANDOM_EFFECT_COUNT = "random_effect_count";
+    public static final String RANDOM_PERK_MIN = "random_perk_min";
+    public static final String RANDOM_PERK_MAX = "random_perk_max";
+    public static final String SUSPENSION_OF_DISBELIEF_USED =
+            "suspension_of_disbelief_used";
+    public static final String RANDOM_AEGIS_COUNT = "random_aegis_count";
+    public static final String RANDOM_SSR_MAX = "random_ssr_max";
+    public static final String RANDOM_SSR_MIN = "random_ssr_min";
+    public static final String RESTORE_COOLDOWN_SECONDS = "restore_cooldown_seconds";
+    public static final String RESET_SPELL_COOLDOWN_CHANCE =
+            "reset_spell_cooldown_chance";
+    public static final String REVIVE_DELAY_SECONDS = "revive_delay_seconds";
+    public static final String REVIVE_HEALTH_FRACTION = "revive_health_fraction";
+    public static final String REVIVE_LUCK = "revive_luck";
+    public static final String REVIVE_USES = "revive_uses";
+    public static final String RADIANCE_TRIGGER_COUNT = "radiance_trigger_count";
+    public static final String REVIVES_PER_BREAKTHROUGH = "revives_per_breakthrough";
+    public static final String REVIVES_REMAINING = "revives_remaining";
+    public static final String BREAKTHROUGH_COUNT = "breakthrough_count";
+    public static final String ROYAL_FLAME_MULTIPLIER_BONUS = "royal_flame_multiplier_bonus";
+    public static final String SELECTION_CHARGES_GRANTED = "selection_charges_granted";
+    public static final String SHIELD_GAIN = "shield_gain";
+    public static final String SHIELD_GAIN_MULTIPLIER = "shield_gain_multiplier";
+    public static final String SHIELD_GAIN_PER_LEVEL = "shield_gain_per_level";
+    public static final String SHIELD_PER_DAMAGE_BONUS_STEP =
+            "shield_per_damage_bonus_step";
+    public static final String SHIELD_DAMAGE_BONUS_INTERVAL_SECONDS =
+            "shield_damage_bonus_interval_seconds";
+
+    // Divine Sakura Power constellations (Fox God's Aegis wards).
+    /** Per-player accumulated constellation count for Divine Sakura Power. */
+    public static final String DIVINE_SAKURA_CONSTELLATIONS = "divine_sakura_constellations";
+    /** Experience consumed per click to unlock the next constellation. */
+    public static final String CONSTELLATION_XP_COST = "constellation_xp_cost";
+    /** Highest constellation index the talent grants (effects cap here). */
+    public static final String MAX_CONSTELLATIONS = "max_constellations";
+    /** C0: ward effect (damage/heal) multiplier bonus. */
+    public static final String CONSTELLATION_EFFECT_BASE = "constellation_effect_base";
+    /** C1: ward effect range multiplier bonus. */
+    public static final String CONSTELLATION_RANGE = "constellation_range";
+    /** C2: ward duration bonus, in seconds. */
+    public static final String CONSTELLATION_DURATION_SECONDS = "constellation_duration_seconds";
+    /** C3: ward effect multiplier bonus. */
+    public static final String CONSTELLATION_EFFECT = "constellation_effect";
+    /** C4: Ward Type II trigger-interval reduction, as a 0-1 fraction. */
+    public static final String CONSTELLATION_WARD_II_INTERVAL_REDUCTION =
+            "constellation_ward_ii_interval_reduction";
+    /** C5: additional Ward Type I count. */
+    public static final String CONSTELLATION_WARD_I_COUNT = "constellation_ward_i_count";
+    /** C6: additional ward range multiplier bonus. */
+    public static final String CONSTELLATION_RANGE_BONUS = "constellation_range_bonus";
+    /** C6: additional ward effect multiplier bonus. */
+    public static final String CONSTELLATION_EFFECT_BONUS = "constellation_effect_bonus";
+    public static final String SHIELD_PER_STACK = "shield_per_stack";
+    public static final String INDEPENDENT_SKILL_AREA = "independent_skill_area";
+    public static final String INDEPENDENT_SKILL_DAMAGE = "independent_skill_damage";
+    public static final String SKILL_DAMAGE = "skill_damage";
+    public static final String SKILL_DAMAGE_PER_EVASION = "skill_damage_per_evasion";
+    public static final String SKILL_DAMAGE_PER_LUCKY_STRIKE = "skill_damage_per_lucky_strike";
+    public static final String SKILL_DAMAGE_PER_OWNED_TALENT = "skill_damage_per_owned_talent";
+    public static final String SKILL_DAMAGE_PER_STACK = "skill_damage_per_stack";
+    public static final String SKILL_DAMAGE_PER_STEP = "skill_damage_per_step";
+    public static final String SKILL_DAMAGE_MAX_TRIGGER_COUNT =
+            "skill_damage_max_trigger_count";
+    public static final String SKILL_DAMAGE_PER_TRIGGER = "skill_damage_per_trigger";
+    public static final String MAGIC_DAMAGE_TRIGGER_CHANCE = "magic_damage_trigger_chance";
+    public static final String SKILL_ENHANCEMENT_CHARGES_GRANTED = "skill_enhancement_charges_granted";
+    public static final String SKILL_ENHANCEMENT_OPTION_BONUS = "skill_enhancement_option_bonus";
+    public static final String SPELL_DAMAGE_AMPLIFICATION = "spell_damage_amplification";
+    public static final String SPELL_DAMAGE_AMPLIFICATION_PER_SOUL_LINK = "spell_damage_amplification_per_soul_link";
+    public static final String SPELL_DAMAGE_AMPLIFICATION_PER_TRIGGER = "spell_damage_amplification_per_trigger";
+    public static final String SUMMON_COUNT = "summon_count";
+    public static final String SUMMON_POWER = "summon_power";
+    public static final String SUMMON_POWER_PER_SUMMON = "summon_power_per_summon";
+    public static final String UNSPENT_SKILL_ENHANCEMENT_CHARGES_PER_STACK =
+            "unspent_skill_enhancement_charges_per_stack";
+    public static final String UNLOCKS_PRIMARY_SKILL_ENHANCEMENT_CONVERSION =
+            "unlocks_primary_skill_enhancement_conversion";
+    public static final String SWISS_ROLLS = "swiss_rolls";
+    public static final String TALENT_OPTION_BONUS = "talent_option_bonus";
+    public static final String TALENT_OPTION_BONUS_IF_BELOW = "talent_option_bonus_if_below";
+    public static final String TEAM_DAMAGE_BONUS = "team_damage_bonus";
+    public static final String TEAM_DAMAGE_BONUS_MAX_STACKS =
+            "team_damage_bonus_max_stacks";
+    public static final String TEAM_DAMAGE_BONUS_ACTIVE =
+            "team_damage_bonus_active";
+    public static final String TEACHER_HEALTH_MULTIPLIER = "teacher_health_multiplier";
+    public static final String TOP_CRITICAL_DAMAGE = "top_critical_damage";
+    public static final String TOP_DAMAGE = "top_damage";
+    public static final String TRADE_MATERIAL_REFUND_FRACTION =
+            "trade_material_refund_fraction";
+    public static final String TRIGGER_CHANCE_PER_BREAKTHROUGH = "trigger_chance_per_breakthrough";
+    public static final String TRUE_SHOT_DAMAGE_MULTIPLIER =
+            "true_shot_damage_multiplier";
+    public static final String TRUE_SHOT_TRIGGER_CHANCE =
+            "true_shot_trigger_chance";
+    public static final String TRIPLE_DAMAGE_CHANCE = "triple_damage_chance";
+    public static final String TRIPLE_DAMAGE_MULTIPLIER = "triple_damage_multiplier";
+    public static final String TRIPLE_BREAKTHROUGH_CHANCE = "triple_breakthrough_chance";
+    public static final String TRIPLE_BREAKTHROUGH_MULTIPLIER = "triple_breakthrough_multiplier";
+    public static final String TRUE_DAMAGE = "true_damage";
+    public static final String TWO_EXTRA_ROLL_CHANCE = "two_extra_roll_chance";
+    public static final String TWO_EXTRA_ROLL_COUNT = "two_extra_roll_count";
+    public static final String UNIQUE_HERO_ENHANCEMENTS = "unique_hero_enhancements";
+    public static final String PERFECTION_STACKS = "perfection_stacks";
+    public static final String PERFECTION_EXPIRES_AT_TICK =
+            "perfection_expires_at_tick";
+    public static final String PERFECTION_MAX_STACKS = "perfection_max_stacks";
+    public static final String PERFECTION_DURATION_SECONDS =
+            "perfection_duration_seconds";
+    public static final String PERFECTION_CRITICAL_CHANCE_PER_STACK =
+            "perfection_critical_chance_per_stack";
+    public static final String PERFECTION_CRITICAL_DAMAGE_PER_STACK =
+            "perfection_critical_damage_per_stack";
+    public static final String PERFECTION_FINAL_DAMAGE_PER_STACK =
+            "perfection_final_damage_per_stack";
+    public static final String WALK_DAMAGE = "walk_damage";
+    public static final String WALK_DISTANCE = "walk_distance";
+    public static final String WALK_INITIALIZED = "walk_initialized";
+    public static final String WALK_LAST_X = "walk_last_x";
+    public static final String WALK_LAST_Y = "walk_last_y";
+    public static final String WALK_LAST_Z = "walk_last_z";
+    public static final String AEGIS_MAX_HEALTH_MULTIPLIER = "aegis_max_health_multiplier";
+    public static final String AEGIS_ATTACK_MULTIPLIER = "aegis_attack_multiplier";
+    public static final String AEGIS_ATTACK_SPEED_MULTIPLIER = "aegis_attack_speed_multiplier";
+    public static final String AEGIS_ATTACK_RANGE = "aegis_attack_range";
+    public static final String AEGIS_OPTION_BONUS = "aegis_option_bonus";
+}

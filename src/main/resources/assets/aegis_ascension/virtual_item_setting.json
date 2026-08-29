@@ -1,0 +1,91 @@
+{
+  "items": [
+    {
+      "id": "hp_stat_book",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_book_0.png",
+      "name": "virtual_item.aegis_ascension.hp_stat_book.name",
+      "description": "virtual_item.aegis_ascension.hp_stat_book.description",
+      "effect": "MAX_HEALTH",
+      "amount": 2.0,
+      "maxUses": 20,
+      "tier": "SR",
+      "requiresConfirmation": false
+    },
+    {
+      "id": "primary_stat_book",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_book_1.png",
+      "name": "virtual_item.aegis_ascension.primary_stat_book.name",
+      "description": "virtual_item.aegis_ascension.primary_stat_book.description",
+      "effect": "PRIMARY_STAT",
+      "amount": 1.0,
+      "maxUses": 10,
+      "tier": "SR",
+      "requiresConfirmation": false
+    },
+    {
+      "id": "atk_stat_book",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_book_2.png",
+      "name": "virtual_item.aegis_ascension.atk_stat_book.name",
+      "description": "virtual_item.aegis_ascension.atk_stat_book.description",
+      "effect": "ATTACK_DAMAGE",
+      "amount": 1.0,
+      "maxUses": 5,
+      "tier": "SR",
+      "requiresConfirmation": false
+    },
+    {
+      "id": "expand_inventory_book",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_expand_inventory_0.png",
+      "name": "virtual_item.aegis_ascension.expand_inventory_book.name",
+      "description": "virtual_item.aegis_ascension.expand_inventory_book.description",
+      "effect": "STORAGE_SLOTS",
+      "amount": 2.0,
+      "maxUses": 30,
+      "tier": "SR",
+      "requiresConfirmation": false
+    },
+    {
+      "id": "swiss_roll",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_swiss_roll.png",
+      "name": "virtual_item.aegis_ascension.swiss_roll.name",
+      "description": "virtual_item.aegis_ascension.swiss_roll.description",
+      "effect": "COMPOSITE_STATS",
+      "amount": 0.0,
+      "maxUses": 0,
+      "tier": "SSR",
+      "appearsInShop": true,
+      "requiresConfirmation": false,
+      "bonuses": {
+        "attack_damage": 5.0,
+        "attack_speed_multiplier": 0.05,
+        "max_health_multiplier": 0.05,
+        "primary_attribute_flat": 5.0,
+        "all_skill_enhancement_attribute": 0.03,
+        "damage_bonus": 0.05,
+        "final_damage": 0.05
+      }
+    },
+    {
+      "id": "devour_reset_book",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_reset.png",
+      "name": "virtual_item.aegis_ascension.devour_reset_book.name",
+      "description": "virtual_item.aegis_ascension.devour_reset_book.description",
+      "effect": "RESET_DEVOURED",
+      "amount": 0.0,
+      "maxUses": 0,
+      "tier": "SSR",
+      "requiresConfirmation": true
+    },
+    {
+      "id": "lethes_river_water",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_lethes_river_water.png",
+      "name": "virtual_item.aegis_ascension.lethes_river_water.name",
+      "description": "virtual_item.aegis_ascension.lethes_river_water.description",
+      "effect": "RESET_PROGRESSION",
+      "tier": "SSR",
+      "amount": 0.0,
+      "maxUses": 0,
+      "requiresConfirmation": true
+    }
+  ]
+}

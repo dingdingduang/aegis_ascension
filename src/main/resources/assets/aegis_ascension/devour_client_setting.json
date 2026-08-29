@@ -1,0 +1,6 @@
+{
+  "rMinAttributes": 5,
+  "srMinAttributes": 10,
+  "ssrMinAttributes": 15,
+  "devourSortMode": "NAME_ASC"
+}

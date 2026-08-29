@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "value_conventions": {
+    "weight": "Relative selection weight. Defaults total 1.0, but any positive total is normalized.",
+    "percent_amount": "Decimal fractions: 0.15 means +15%; -0.50 means -50%.",
+    "count_amount": "For random rewards, amount is rounded to a non-negative whole number."
+  },
+  "supported_types": {
+    "custom_stat": "Adds amount to the player custom stat named by stat.",
+    "random_aegis": "Grants amount random enabled, unowned Aegises.",
+    "random_item": "Grants amount of one random enabled registered item.",
+    "random_talent": "Grants amount random available talents from tier R, SR, or SSR."
+  },
+  "outcomes": [
+    {
+      "id": "random_aegis",
+      "type": "random_aegis",
+      "enabled": true,
+      "weight": 0.02,
+      "amount": 1,
+      "format": "number"
+    },
+    {
+      "id": "random_item",
+      "type": "random_item",
+      "enabled": true,
+      "weight": 0.03,
+      "amount": 1,
+      "format": "number"
+    },
+    {
+      "id": "all_skill_enhancement_attribute",
+      "type": "custom_stat",
+      "enabled": true,
+      "stat": "all_skill_enhancement_attribute",
+      "weight": 0.10,
+      "amount": 0.20,
+      "format": "percent"
+    },
+    {
+      "id": "cooldown_reduction",
+      "type": "custom_stat",
+      "enabled": true,
+      "stat": "cooldown_reduction",
+      "weight": 0.20,
+      "amount": 0.15,
+      "format": "percent"
+    },
+    {
+      "id": "random_ssr",
+      "type": "random_talent",
+      "enabled": true,
+      "tier": "SSR",
+      "weight": 0.10,
+      "amount": 1,
+      "format": "number"
+    },
+    {
+      "id": "negative_damage_reduction",
+      "type": "custom_stat",
+      "enabled": true,
+      "stat": "damage_reduction",
+      "weight": 0.20,
+      "amount": -0.50,
+      "format": "percent"
+    },
+    {
+      "id": "primary_stat_flat",
+      "type": "custom_stat",
+      "enabled": true,
+      "stat": "primary_flat",
+      "weight": 0.35,
+      "amount": 3,
+      "format": "number"
+    }
+  ]
+}

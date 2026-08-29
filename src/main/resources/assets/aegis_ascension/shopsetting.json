@@ -1,0 +1,189 @@
+{
+  "autoRefreshIntervalMinutes": 60,
+  "maxManualRefreshes": 3,
+  "manualRefreshExperienceCost": 200,
+  "minimumSlots": 3,
+  "maximumSlots": 16,
+  "additionalSlotChance": 0.3,
+  "sequentialSlotUnlock": false,
+  "blacklistMode": true,
+  "filteredItems": [
+    "minecraft:bedrock",
+    "minecraft:command_block",
+    "minecraft:barrier"
+  ],
+  "guaranteedItems": [
+    {
+      "item": "minecraft:leather",
+      "count": 4,
+      "experienceCost": 40
+    },
+    {
+      "item": "minecraft:emerald",
+      "count": 2,
+      "experienceCost": 120
+    },
+    {
+      "item": "minecraft:diamond",
+      "count": 1,
+      "experienceCost": 300
+    },
+    {
+      "item": "minecraft:stone",
+      "count": 32,
+      "experienceCost": 20
+    }
+  ],
+  "randomItems": [
+    {
+      "item": "minecraft:iron_ingot",
+      "weight": 20,
+      "minCount": 2,
+      "maxCount": 8,
+      "experienceCost": 60,
+      "tier": "R"
+    },
+    {
+      "item": "minecraft:gold_ingot",
+      "weight": 15,
+      "minCount": 2,
+      "maxCount": 6,
+      "experienceCost": 90,
+      "tier": "R"
+    },
+    {
+      "item": "minecraft:redstone",
+      "weight": 18,
+      "minCount": 4,
+      "maxCount": 16,
+      "experienceCost": 45,
+      "tier": "R"
+    },
+    {
+      "item": "minecraft:lapis_lazuli",
+      "weight": 14,
+      "minCount": 4,
+      "maxCount": 12,
+      "experienceCost": 55,
+      "tier": "R"
+    },
+    {
+      "item": "minecraft:coal",
+      "weight": 22,
+      "minCount": 8,
+      "maxCount": 24,
+      "experienceCost": 25,
+      "tier": "R"
+    },
+    {
+      "item": "minecraft:ender_pearl",
+      "weight": 8,
+      "minCount": 1,
+      "maxCount": 3,
+      "experienceCost": 180,
+      "tier": "R"
+    },
+    {
+      "item": "minecraft:blaze_rod",
+      "weight": 6,
+      "minCount": 1,
+      "maxCount": 3,
+      "experienceCost": 220,
+      "tier": "R"
+    },
+    {
+      "item": "minecraft:diamond",
+      "weight": 4,
+      "minCount": 1,
+      "maxCount": 2,
+      "experienceCost": 320,
+      "tier": "SR"
+    },
+    {
+      "item": "minecraft:netherite_scrap",
+      "weight": 1,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 900,
+      "tier": "SR"
+    },
+    {
+      "item": "minecraft:golden_apple",
+      "weight": 5,
+      "minCount": 1,
+      "maxCount": 2,
+      "experienceCost": 400,
+      "tier": "SR"
+    },
+    {
+      "item": "minecraft:enchanted_golden_apple",
+      "weight": 5,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 4000,
+      "tier": "SSR"
+    },
+    {
+      "item": "minecraft:experience_bottle",
+      "weight": 10,
+      "minCount": 4,
+      "maxCount": 12,
+      "experienceCost": 150,
+      "tier": "R"
+    },
+    {
+      "virtualId": "primary_stat_book",
+      "weight": 3,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 800
+    },
+    {
+      "virtualId": "hp_stat_book",
+      "weight": 4,
+      "minCount": 1,
+      "maxCount": 2,
+      "experienceCost": 500
+    },
+    {
+      "virtualId": "atk_stat_book",
+      "weight": 2,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 1200
+    },
+    {
+      "virtualId": "expand_inventory_book",
+      "weight": 5,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 600
+    },
+    {
+      "virtualId": "devour_reset_book",
+      "weight": 3,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 450
+    },
+    {
+      "virtualId": "lethes_river_water",
+      "weight": 2,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 1500
+    },
+    {
+      "virtualId": "swiss_roll",
+      "weight": 1,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 2500
+    }
+  ],
+  "rarityWeights": {
+    "R": 88,
+    "SR": 10,
+    "SSR": 2
+  }
+}

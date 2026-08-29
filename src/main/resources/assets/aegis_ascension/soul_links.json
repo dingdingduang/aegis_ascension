@@ -1,0 +1,292 @@
+{
+  "schema_version": 1,
+  "soul_links": [
+    {
+      "id": "soul_hakugyokurou",
+      "required_perks": ["r_ink_dyed_sakura", "r_half_human_half_phantom_gardener"],
+      "synergy_name": "combination.aegis_ascension.soul_hakugyokurou.name",
+      "description": "combination.aegis_ascension.soul_hakugyokurou.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_hakugyokurou.png",
+      "bonus_stats": {
+        "critical_damage_step": 1,
+        "skill_damage_per_step": 0.5
+      },
+      "enabled": true,
+      "source_row": 132
+    },
+    {
+      "id": "soul_logistics_combo",
+      "required_perks": ["r_hayase_yuka", "r_otogi_noah"],
+      "synergy_name": "combination.aegis_ascension.soul_logistics_combo.name",
+      "description": "combination.aegis_ascension.soul_logistics_combo.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_logistics_combo.png",
+      "bonus_stats": {"breakthrough_independent_skill_area": 0.1},
+      "enabled": true,
+      "source_row": 133
+    },
+    {
+      "id": "soul_scarlet_devil_mansion_sisters",
+      "required_perks": ["r_crimson_young_moon", "r_laevatein"],
+      "synergy_name": "combination.aegis_ascension.soul_scarlet_devil_mansion_sisters.name",
+      "description": "combination.aegis_ascension.soul_scarlet_devil_mansion_sisters.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_scarlet_devil_mansion_sisters.png",
+      "bonus_stats": {
+        "max_health_per_stack": 200,
+        "skill_damage_per_stack": 0.01
+      },
+      "enabled": true,
+      "source_row": 134
+    },
+    {
+      "id": "soul_millennium_echo",
+      "required_perks": ["r_boundary_of_life_and_death", "r_ink_dyed_sakura"],
+      "synergy_name": "combination.aegis_ascension.soul_millennium_echo.name",
+      "description": "combination.aegis_ascension.soul_millennium_echo.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_millennium_echo.png",
+      "bonus_stats": {
+        "breakthrough_critical_chance": 0.1,
+        "overflow_critical_chance_step": 0.01,
+        "critical_damage_per_overflow_step": 0.02
+      },
+      "enabled": true,
+      "source_row": 135
+    },
+    {
+      "id": "soul_trinity_tea_party",
+      "required_perks": ["sr_mika", "sr_yurizono_seia", "r_nagisa_leisure_time"],
+      "synergy_name": "combination.aegis_ascension.soul_trinity_tea_party.name",
+      "description": "combination.aegis_ascension.soul_trinity_tea_party.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_trinity_tea_party.png",
+      "bonus_stats": {"breakthrough_swiss_rolls": 1},
+      "enabled": true,
+      "source_row": 136
+    },
+    {
+      "id": "soul_death_gods_authority",
+      "required_perks": ["sr_grim_reapers_contract", "sr_necromancer"],
+      "synergy_name": "combination.aegis_ascension.soul_death_gods_authority.name",
+      "description": "combination.aegis_ascension.soul_death_gods_authority.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_death_gods_authority.png",
+      "bonus_stats": {
+        "additional_trigger_chance": 0.75,
+        "additional_trigger_count": 1
+      },
+      "enabled": true,
+      "source_row": 138
+    },
+    {
+      "id": "soul_magician_master_and_apprentice",
+      "required_perks": ["sr_frieren", "sr_fern"],
+      "synergy_name": "combination.aegis_ascension.soul_magician_master_and_apprentice.name",
+      "description": "combination.aegis_ascension.soul_magician_master_and_apprentice.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_magician_master_and_apprentice.png",
+      "bonus_stats": {
+        "fern_trigger_chance_bonus": 0.1,
+        "frieren_primary_attribute_flat_per_step": 1,
+        "frieren_max_mana_per_step": 10
+      },
+      "enabled": true,
+      "source_row": 139
+    },
+    {
+      "id": "soul_combo_technique",
+      "required_perks": ["sr_beater", "r_flickering_light"],
+      "synergy_name": "combination.aegis_ascension.soul_combo_technique.name",
+      "description": "combination.aegis_ascension.soul_combo_technique.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_combo_technique.png",
+      "bonus_stats": {
+        "attack_multiplier": 0.15,
+        "attack_damage_amplification": 0.33
+      },
+      "enabled": true,
+      "source_row": 140
+    },
+    {
+      "id": "soul_shittim_chest",
+      "required_perks": ["r_arona", "sr_plana"],
+      "synergy_name": "combination.aegis_ascension.soul_shittim_chest.name",
+      "description": "combination.aegis_ascension.soul_shittim_chest.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_shittim_chest.png",
+      "bonus_stats": {
+        "arona_breakthrough_primary_attribute_flat_bonus": 3,
+        "plana_logic_correction_multiplier_bonus": 0.5
+      },
+      "enabled": true,
+      "source_row": 142
+    },
+    {
+      "id": "soul_love_as_eternal_as_this_moment",
+      "required_perks": ["sr_ripples_of_the_past", "ssr_because_you_exist_as_i_write"],
+      "synergy_name": "combination.aegis_ascension.soul_love_as_eternal_as_this_moment.name",
+      "description": "combination.aegis_ascension.soul_love_as_eternal_as_this_moment.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_love_as_eternal_as_this_moment.png",
+      "bonus_stats": {"breakthrough_independent_damage_amplification": 0.05},
+      "enabled": true,
+      "source_row": 143
+    },
+    {
+      "id": "soul_plum_blossom_garden",
+      "required_perks": ["r_kokona", "r_sunohara_shun"],
+      "synergy_name": "combination.aegis_ascension.soul_plum_blossom_garden.name",
+      "description": "combination.aegis_ascension.soul_plum_blossom_garden.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_plum_blossom_garden.png",
+      "bonus_stats": {
+        "random_ssr_min": 1,
+        "random_ssr_max": 3,
+        "gain_all_ssr_chance": 0.01
+      },
+      "enabled": true,
+      "source_row": 144
+    },
+    {
+      "id": "soul_game_development_club",
+      "required_perks": ["r_momo", "r_midori", "r_alice"],
+      "synergy_name": "combination.aegis_ascension.soul_game_development_club.name",
+      "description": "combination.aegis_ascension.soul_game_development_club.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_game_development_club.png",
+      "bonus_stats": {
+        "lucky_strike": 0.2,
+        "midori_momo_stat_multiplier_bonus": 0.5
+      },
+      "enabled": true,
+      "source_row": 145
+    },
+    {
+      "id": "soul_yuzusoft_fan_level",
+      "required_perks": ["r_congyu_ciallo"],
+      "rank_perks": [
+        "r_congyu_ciallo",
+        "r_yoshino_ciallo",
+        "r_shizuru_ciallo",
+        "r_ningning_ciallo",
+        "r_nanami_ciallo"
+      ],
+      "synergy_name": "combination.aegis_ascension.soul_yuzusoft_fan_level.name",
+      "description": "combination.aegis_ascension.soul_yuzusoft_fan_level.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_yuzusoft_fan_level.png",
+      "bonus_stats": {
+        "level_1_bonus": 0.1,
+        "level_2_bonus": 0.2,
+        "level_3_bonus": 0.4,
+        "level_4_bonus": 0.8,
+        "level_5_bonus": 1.5
+      },
+      "enabled": true,
+      "source_row": 146
+    },
+    {
+      "id": "soul_maripatchy_group",
+      "required_perks": ["sr_master_spark", "ssr_seven_colored_magician"],
+      "synergy_name": "combination.aegis_ascension.soul_maripatchy_group.name",
+      "description": "combination.aegis_ascension.soul_maripatchy_group.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_maripatchy_group.png",
+      "bonus_stats": {
+        "movement_speed_multiplier": 0.05,
+        "breakthrough_effect_multiplier_bonus": 0.5,
+        "royal_flame_multiplier_bonus": 1,
+        "double_damage_chance": 0.75,
+        "double_damage_multiplier": 2,
+        "triple_damage_chance": 0.25,
+        "triple_damage_multiplier": 3
+      },
+      "enabled": true,
+      "source_row": 147
+    },
+    {
+      "id": "soul_team_radiance",
+      "required_perks": ["r_team_star"],
+      "synergy_name": "combination.aegis_ascension.soul_team_radiance.name",
+      "description": "combination.aegis_ascension.soul_team_radiance.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_team_star.png",
+      "bonus_stats": {
+        "rank_cap": 5,
+        "talent_option_unlock_rank": 2,
+        "talent_option_bonus": 1,
+        "breakthrough_effect_unlock_rank": 3,
+        "breakthrough_effect_multiplier_bonus": 0.5,
+        "all_skill_enhancement_unlock_rank": 4,
+        "all_skill_enhancement_attribute": 0.25,
+        "final_damage_unlock_rank": 5,
+        "final_damage": 0.5
+      },
+      "enabled": true,
+      "source_row": 0
+    },
+    {
+      "id": "soul_gourmet_guild",
+      "required_perks": ["sr_pecorines_blessing", "sr_karyls_blessing", "sr_kokkoros_blessing"],
+      "synergy_name": "combination.aegis_ascension.soul_gourmet_guild.name",
+      "description": "combination.aegis_ascension.soul_gourmet_guild.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_gourmet_guild.png",
+      "bonus_stats": {
+        "food_skill_charge_chance": 1.0,
+        "food_skill_charge_amount": 1,
+        "food_skill_charge_trigger_limit": 500
+      },
+      "enabled": true,
+      "source_row": 0
+    },
+    {
+      "id": "soul_misty_lake",
+      "required_perks": ["r_cirno", "sr_great_fairy"],
+      "synergy_name": "combination.aegis_ascension.soul_misty_lake.name",
+      "description": "combination.aegis_ascension.soul_misty_lake.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_misty_lake.png",
+      "bonus_stats": {
+        "cirno_breakthrough_primary_attribute_flat_bonus": 1,
+        "great_fairy_effect_multiplier": 1.5
+      },
+      "enabled": true,
+      "source_row": 0
+    },
+    {
+      "id": "soul_shrine_maiden_team",
+      "required_perks": ["r_barrage_control_magic", "r_shrine_maiden_dance"],
+      "synergy_name": "combination.aegis_ascension.soul_shrine_maiden_team.name",
+      "description": "combination.aegis_ascension.soul_shrine_maiden_team.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_shrine_maiden_team.png",
+      "bonus_stats": {"random_aegis_count": 1},
+      "enabled": true,
+      "source_row": 0
+    },
+    {
+      "id": "soul_make_up_work_club",
+      "required_perks": ["sr_collector", "r_koharus_blessing", "r_hanakos_blessing", "ssr_et_omnia_vanitas"],
+      "synergy_name": "combination.aegis_ascension.soul_make_up_work_club.name",
+      "description": "combination.aegis_ascension.soul_make_up_work_club.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_make_up_work_club.png",
+      "bonus_stats": {
+        "collector_effect_multiplier": 2.0,
+        "hanako_effect_multiplier": 2.0,
+        "negate_koharu_critical_penalty": 1,
+        "armor_shred_per_stack": 10,
+        "armor_shred_max_stacks": 100,
+        "armor_shred_duration_seconds": 10,
+        "force_zero_armor_at_max_stacks": 1
+      },
+      "enabled": true,
+      "source_row": 0
+    },
+    {
+      "id": "soul_madoka_with_homura",
+      "required_perks": ["ssr_law_of_the_cycle", "sr_homuras_blessing"],
+      "synergy_name": "combination.aegis_ascension.soul_madoka_with_homura.name",
+      "description": "combination.aegis_ascension.soul_madoka_with_homura.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_madoka_with_homura.png",
+      "bonus_stats": {
+        "flat_penalty_conversion_multiplier": 1.0,
+        "percentage_penalty_conversion_multiplier": 1.0,
+        "damage_reduction_conversion_multiplier": 0.1,
+        "fixed_max_health_multiplier_bonus": 1.0,
+        "nonnumeric_perk_refresh_weight": 1,
+        "nonnumeric_perk_charge_weight": 1,
+        "nonnumeric_skill_charge_weight": 1,
+        "nonnumeric_perk_refresh_amount": 1,
+        "nonnumeric_perk_charge_amount": 1,
+        "nonnumeric_skill_charge_amount": 1
+      },
+      "enabled": true,
+      "source_row": 0
+    }
+  ]
+}
