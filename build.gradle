@@ -136,7 +136,7 @@ dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
     // Every JAR in externalLib is optional: available for compilation, never
-    // bundled into Perk Selection, and not added to the development runtime.
+    // bundled into Aegis Ascension, and not added to the development runtime.
     // Replace JARs in that folder to update integrations without editing Gradle.
     fileTree(dir: "externalLib", include: ["*.jar"]).files.sort().each { optionalModJar ->
         def nameParts = optionalModJar.name =~ /^(.+)-([0-9][A-Za-z0-9+_.-]*)\.jar$/

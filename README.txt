@@ -1,4 +1,4 @@
-Perk Selection (Minecraft 1.20.1 / Forge 47)
+Aegis Ascension (Minecraft 1.20.1 / Forge 47)
 ================================================
 
 Gameplay
@@ -6,11 +6,11 @@ Gameplay
 - A player receives one perk selection charge at each absolute 10-level milestone.
   Milestones are awarded only once: after reaching 34, the next reward is at level 40
   even if the player loses all XP; after reaching 999, the next reward is at 1000.
-- Press K (configurable in Controls > Key Binds > Perk Selection) to request an offer.
+- Press K (configurable in Controls > Key Binds > Aegis Ascension) to request an offer.
 - Press O (also configurable) to open the paginated Talent Collection. Owned Talents,
   Soul Links, and Custom Stats have separate tabs. Custom Stats are authoritative server
   totals. They refresh when opened; the server can optionally permit once-per-second live
-  refresh through config/perkselection-common.toml.
+  refresh through config/aegis_ascension-common.toml.
 - The server rolls each card using the workbook rarities: R 90%, SR 8%, SSR 2%.
   Offers contain 3 distinct eligible talents plus one option per whole point of the
   player's vanilla Luck attribute. Luck I therefore shows 4 and Luck II shows 5.
@@ -23,7 +23,7 @@ Gameplay
 Workbook talent pool
 --------------------
 - 40 R talents, 32 SR talents, and 12 SSR talents are loaded from the editable
-  config/perkselection/talents.json file. The bundled default is copied there on
+  config/aegis_ascension/talents.json file. The bundled default is copied there on
   first launch. Restart Minecraft after editing it.
 - 14 soul links are evaluated automatically from their prerequisite talents and are
   not rolled as cards. Plum Blossom Garden activates from Kokona and Sunohara Shun,
@@ -48,15 +48,15 @@ JSON talent configuration
   description, icon, bonus_stats, enabled state, and source_row for every Soul Link.
 - All workbook balance numbers are exposed as JSON numbers. Percentages are decimal
   fractions: 0.20 means 20%. Durations use seconds unless a key ends in `_ticks`.
-- English text lives in assets/perkselection/lang/en_us.json. Add another Minecraft
+- English text lives in assets/aegis_ascension/lang/en_us.json. Add another Minecraft
   language JSON with the same keys to translate talent and combination text.
 - Run `node scripts/validate_talent_catalog.mjs` after editing the bundled default to
   check IDs, tiers, numeric stats, translation keys, icons, and prerequisites.
 
 Implementation map
 ------------------
-- assets/perkselection/talents.json: bundled default perk/combination config
-- assets/perkselection/lang/en_us.json: English talent/combination translations
+- assets/aegis_ascension/talents.json: bundled default perk/combination config
+- assets/aegis_ascension/lang/en_us.json: English talent/combination translations
 - perk/TalentConstants.java: centralized perk, Soul-Link, and stat string constants
 - perk/Perk.java: external JSON loader and R/SR/SSR catalog
 - perk/TalentEffects.java: JSON-driven acquisition, Breakthrough, attribute, and combat events
@@ -76,7 +76,7 @@ The distributable JAR is produced under build/libs/.
 
 Configuration
 -------------
-Forge generates config/perkselection-common.toml after the mod starts. Set:
+Forge generates config/aegis_ascension-common.toml after the mod starts. Set:
 
   resetPerksOnDeath = true
 
@@ -100,11 +100,11 @@ to permit clients to request a Custom Stats refresh once per second while that t
 open. It defaults to false. The permission is synchronized to clients, and the server
 rate-limits both live and manual stat-sync requests.
 
-The mod also generates config/perkselection/talents.json on first launch. That file
+The mod also generates config/aegis_ascension/talents.json on first launch. That file
 contains editable rarity weights, perk stats, max ranks, manual toggles, and Soul Link
 requirements/bonuses. Existing balance edits are preserved. The Shun update appends its
 missing entry and upgrades the legacy empty Plum Blossom Garden requirements; before doing
-so it creates config/perkselection/talents.pre-shun-migration.json as a one-time backup.
+so it creates config/aegis_ascension/talents.pre-shun-migration.json as a one-time backup.
 
 The apothic_attribute_mappings array maps stat keys to registered attributes when Apothic
 Attributes is installed. Each mapped value includes the player's persisted custom stat,
@@ -122,8 +122,8 @@ in the Soul Link's bonus_stats object.
 Custom icon textures
 --------------------
 Perk icons are texture ResourceLocations, not Item instances. Talent icons are under
-assets/perkselection/textures/gui/talents/. A custom texture can be referenced with:
+assets/aegis_ascension/textures/gui/talents/. A custom texture can be referenced with:
 
   ResourceLocation.fromNamespaceAndPath(
-      "perkselection", "textures/gui/talents/my_perk.png"
+      "aegis_ascension", "textures/gui/talents/my_perk.png"
   )
