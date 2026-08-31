@@ -39,7 +39,7 @@ public final class AegisAscensionConfig {
             HIDDEN_TALENT_IDS = BUILDER
             .comment(
                     "Talent IDs hidden and disabled by the server, for example:",
-                    "hiddenTalentIds = [\"r_skill_damage_conversion\", \"sr_plana\"]",
+                    "hiddenTalentIds = [\"perk_skill_damage_conversion\", \"perk_plana\"]",
                     "Hidden talents are removed from offer pools and collection screens and",
                     "do not provide effects, use talent slots, or satisfy prerequisites.",
                     "Existing ranks remain saved and become active again if the ID is removed.",
@@ -71,8 +71,8 @@ public final class AegisAscensionConfig {
     public static final ForgeConfigSpec.BooleanValue LIVE_CUSTOM_STATS_REFRESH = BUILDER
             .comment(
                     "Server-side permission for live Custom Stats updates.",
-                    "If true, clients may request a fresh stat snapshot once per second while",
-                    "the Custom Stats tab is open. The server rate-limits these requests.",
+                    "If true, clients may request fresh stat snapshots while the Custom Stats",
+                    "tab is open. packetCooldowns.livePerkDataSeconds controls the rate limit.",
                     "If false, stats update only when the collection or tab is opened."
             )
             .define("liveCustomStatsRefresh", false);
@@ -237,6 +237,56 @@ public final class AegisAscensionConfig {
             )
             .define("devourConvertFlatAttackSpeedToPercentage", true);
 
+    static {
+        BUILDER.push("progression");
+    }
+
+    public static final ForgeConfigSpec.BooleanValue USE_MINECRAFT_DEFAULT_LEVEL = BUILDER
+            .comment(
+                    "If true, Aegis Ascension progression uses Minecraft's normal experience level.",
+                    "If false, Perks, Aegises, Skill Enhancements, and Breakthrough milestones use",
+                    "the separate Aegis Ascension Experience rank instead. Vanilla XP remains usable",
+                    "for enchanting, anvils, and other vanilla systems; mod costs may optionally",
+                    "use Gold Currency through useGoldCurrency."
+            )
+            .define("useMinecraftDefaultLevel", false);
+
+    public static final ForgeConfigSpec.BooleanValue USE_GOLD_CURRENCY = BUILDER
+            .comment(
+                    "If true, Aegis Ascension's shop, paid refreshes, storage sales,",
+                    "challenge deposits, and quest rewards use the mod's persisted Gold",
+                    "Currency in addition to Aegis Ascension Experience. If false, all",
+                    "of those systems keep their existing XP behavior. Vanilla villager",
+                    "trades and vanilla experience remain unchanged."
+            )
+            .define("useGoldCurrency", true);
+
+    public static final ForgeConfigSpec.LongValue AEGIS_ASCENSION_BASE_XP = BUILDER
+            .comment(
+                    "Aegis Ascension Experience required to advance from Rank 1 to Rank 2.",
+                    "The next-rank requirement is BaseXP * (GrowthRate ^ (CurrentRank - 1))."
+            )
+            .defineInRange("aegisAscensionBaseXP", 100L, 1L, 100_000_000L);
+
+    public static final ForgeConfigSpec.DoubleValue AEGIS_ASCENSION_GROWTH_RATE = BUILDER
+            .comment(
+                    "Exponential growth factor for Aegis Ascension Experience requirements.",
+                    "Values near 1.01 are recommended for the 1000-rank cap; the bounded range",
+                    "keeps the calculated long-valued requirements practical."
+            )
+            .defineInRange("aegisAscensionGrowthRate", 1.01D, 1.0D, 1.02D);
+
+    public static final ForgeConfigSpec.IntValue AEGIS_ASCENSION_MAXIMUM_RANK = BUILDER
+            .comment(
+                    "Highest Aegis Ascension rank a player can reach. The server supports at most",
+                    "rank 1000 as requested; lowering this only affects future rank-ups."
+            )
+            .defineInRange("aegisAscensionMaximumRank", 1000, 1, 1000);
+
+    static {
+        BUILDER.pop();
+    }
+
     public static final ForgeConfigSpec.ConfigValue<List<? extends String>>
             DEVOUR_ATTRIBUTE_BLACKLIST = BUILDER
             .comment(
@@ -250,6 +300,90 @@ public final class AegisAscensionConfig {
                     value -> value instanceof String id
                             && ResourceLocation.tryParse(id.trim()) != null
             );
+
+    static {
+        BUILDER.push("packetCooldowns");
+    }
+
+    public static final ForgeConfigSpec.DoubleValue STORAGE_MUTATION_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment(
+                            "Cooldown in seconds shared by storage deposits, extraction, use,",
+                            "sale, discard, and inventory-slot storage packets. 0 disables it."
+                    )
+                    .defineInRange("storageMutationSeconds", 0.5D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue STORAGE_VIEW_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment(
+                            "Cooldown in seconds for storage sync and integrated-inventory open",
+                            "requests. Each request type has its own bucket. 0 disables it."
+                    )
+                    .defineInRange("storageViewSeconds", 0.5D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue TOGGLE_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment(
+                            "Cooldown in seconds shared by talent/Aegis toggles, constellation",
+                            "unlocks, primary-skill selection, and shop purchases. 0 disables it."
+                    )
+                    .defineInRange("toggleAndPurchaseSeconds", 1.0D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue REFRESH_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment(
+                            "Cooldown in seconds shared by Perk, Aegis, Skill Enhancement, and",
+                            "shop manual-refresh packets. 0 disables it."
+                    )
+                    .defineInRange("refreshSeconds", 0.5D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue DEVOUR_ITEM_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment("Cooldown in seconds for Devour-item requests. 0 disables it.")
+                    .defineInRange("devourItemSeconds", 0.25D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue DEVOUR_DATA_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment("Cooldown in seconds for Devour-data sync requests. 0 disables it.")
+                    .defineInRange("devourDataSeconds", 0.5D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue DISCARD_DEVOUR_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment("Cooldown in seconds for discarding Devoured bonuses. 0 disables it.")
+                    .defineInRange("discardDevouredSeconds", 0.5D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue PERK_DATA_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment(
+                            "Cooldown in seconds for ordinary Perk/stat data requests.",
+                            "0 disables it."
+                    )
+                    .defineInRange("perkDataSeconds", 0.25D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue LIVE_PERK_DATA_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment(
+                            "Cooldown in seconds for live Custom Stats data requests.",
+                            "0 disables it; liveCustomStatsRefresh must still be enabled."
+                    )
+                    .defineInRange("livePerkDataSeconds", 0.5D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue SHARED_FORTUNE_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment(
+                            "Cooldown in seconds for Shared Fortune bind/unbind packets.",
+                            "This is separate from the talent's gameplay rebind cooldown."
+                    )
+                    .defineInRange("sharedFortuneSeconds", 0.5D, 0.0D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue QUEST_PROGRESS_SYNC_INTERVAL_SECONDS =
+            BUILDER.comment(
+                            "Interval in seconds for batching ordinary quest progress updates.",
+                            "Completions and structural quest changes still synchronize immediately.",
+                            "The minimum of 0.05 seconds limits progress traffic to once per tick."
+                    )
+                    .defineInRange("questProgressSyncIntervalSeconds", 0.5D, 0.05D, 60.0D);
+
+    public static final ForgeConfigSpec.DoubleValue QUEST_VIEW_PACKET_COOLDOWN_SECONDS =
+            BUILDER.comment(
+                            "Cooldown in seconds for client requests for the full Quest Center",
+                            "snapshot. Quest actions use the separate toggle/action limiter."
+                    )
+                    .defineInRange("questViewSeconds", 0.5D, 0.0D, 60.0D);
+
+    static {
+        BUILDER.pop();
+    }
 
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 

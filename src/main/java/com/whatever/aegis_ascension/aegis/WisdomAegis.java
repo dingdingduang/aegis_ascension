@@ -34,13 +34,14 @@ public final class WisdomAegis {
             }
 
             Aegis wisdom = Aegis.byId(AegisConstants.WISDOM).orElseThrow();
-            int extraCasts = rollExtraCasts(player, wisdom);
-            if (extraCasts == 0) {
+            String spellId = event.getSpellId();
+            if (wisdom.excludesExtraCast(spellId)
+                    || SpellRegistry.getSpell(spellId) == SpellRegistry.none()) {
                 return;
             }
 
-            String spellId = event.getSpellId();
-            if (SpellRegistry.getSpell(spellId) == SpellRegistry.none()) {
+            int extraCasts = rollExtraCasts(player, wisdom);
+            if (extraCasts == 0) {
                 return;
             }
 

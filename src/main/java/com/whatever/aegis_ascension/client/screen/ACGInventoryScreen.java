@@ -1,7 +1,6 @@
 package com.whatever.aegis_ascension.client.screen;
 
 import static com.whatever.aegis_ascension.util.GeneralClientMethods.drawCenteredString;
-import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
 import com.whatever.aegis_ascension.client.ClientLifecycle;
 import com.whatever.aegis_ascension.client.ClientSettings;
@@ -16,6 +15,7 @@ import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.network.StorageActionPacket;
 import com.whatever.aegis_ascension.network.StoreInventorySlotPacket;
 import com.whatever.aegis_ascension.storage.StoredItem;
+import com.whatever.aegis_ascension.util.GeneralTextMethods;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.EditBox;
@@ -139,7 +139,7 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
                 topPos + CURIOS_PAGE_BUTTON_Y,
                 17,
                 18,
-                Component.literal("<"),
+                GeneralTextMethods.getLiteralString("<"),
                 button -> changeCurioPage(-1)
         ).style(ACGButton.Style.PLAIN);
         addRenderableWidget(previousCurioPage);
@@ -149,7 +149,7 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
                 topPos + CURIOS_PAGE_BUTTON_Y,
                 17,
                 18,
-                Component.literal(">"),
+                GeneralTextMethods.getLiteralString(">"),
                 button -> changeCurioPage(1)
         ).style(ACGButton.Style.PLAIN);
         addRenderableWidget(nextCurioPage);
@@ -247,10 +247,10 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
                     topPos + 8,
                     searchWidth,
                     20,
-                    getTranslatableString("screen.aegis_ascension.acg.storage.search")
+                    GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.storage.search")
             );
             storageSearchBox.setMaxLength(256);
-            storageSearchBox.setHint(getTranslatableString(
+            storageSearchBox.setHint(GeneralTextMethods.getTranslatableString(
                     "screen.aegis_ascension.acg.storage.search_hint"));
             storageSearchBox.setValue(storageSearch);
             storageSearchBox.setResponder(this::onStorageSearchChanged);
@@ -263,14 +263,14 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
 
         if (showPageButtons) {
             ACGButton previous = new ACGButton(
-                    storageRight - 54, topPos + 8, 24, 20, Component.literal("<"),
+                    storageRight - 54, topPos + 8, 24, 20, GeneralTextMethods.getLiteralString("<"),
                     button -> changeStoragePage(-1)
             ).style(ACGButton.Style.PLAIN);
             previous.active = storagePage > 0;
             addRenderableWidget(previous);
 
             ACGButton next = new ACGButton(
-                    storageRight - 24, topPos + 8, 24, 20, Component.literal(">"),
+                    storageRight - 24, topPos + 8, 24, 20, GeneralTextMethods.getLiteralString(">"),
                     button -> changeStoragePage(1)
             ).style(ACGButton.Style.PLAIN);
             next.active = storagePage + 1 < pageCount;
@@ -321,7 +321,7 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
         boolean virtual = selected != null && selected.isVirtual();
         boolean confirmationRequired = virtual
                 && requiresUseConfirmation(selected.virtualId());
-        Component primaryLabel = getTranslatableString(confirmationRequired
+        Component primaryLabel = GeneralTextMethods.getTranslatableString(confirmationRequired
                 ? "screen.aegis_ascension.acg.inventory_mode.manage_original"
                 : virtual
                 ? "screen.aegis_ascension.acg.storage.use"
@@ -355,7 +355,7 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
         ACGButton sorting = new ACGButton(
                 actionButtonX.applyAsInt(1), actionButtonY.applyAsInt(1),
                 actionWidth, STORAGE_ACTION_HEIGHT,
-                getTranslatableString(switch (ClientStorageState.getSortMode()) {
+                GeneralTextMethods.getTranslatableString(switch (ClientStorageState.getSortMode()) {
                     case NAME_DESC ->
                             "screen.aegis_ascension.acg.storage.sort_descending";
                     case RARITY ->
@@ -374,7 +374,7 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
                 actionButtonX.applyAsInt(2), actionButtonY.applyAsInt(2),
                 actionWidth,
                 STORAGE_ACTION_HEIGHT,
-                getTranslatableString(scrollMode
+                GeneralTextMethods.getTranslatableString(scrollMode
                         ? "screen.aegis_ascension.acg.storage.view_scroll"
                         : "screen.aegis_ascension.acg.storage.view_paged"),
                 button -> toggleStorageView()
@@ -384,7 +384,7 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
         ACGButton sell = new ACGButton(
                 actionButtonX.applyAsInt(3), actionButtonY.applyAsInt(3),
                 actionWidth, STORAGE_ACTION_HEIGHT,
-                getTranslatableString("screen.aegis_ascension.acg.storage.sell"),
+                GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.storage.sell"),
                 button -> performStorageAction(StorageActionPacket.Action.SELL)
         ).style(ACGButton.Style.PLAIN);
         sell.active = selected != null && !virtual;
@@ -393,7 +393,7 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
         ACGButton discard = new ACGButton(
                 actionButtonX.applyAsInt(4), actionButtonY.applyAsInt(4),
                 actionWidth, STORAGE_ACTION_HEIGHT,
-                getTranslatableString("screen.aegis_ascension.acg.storage.discard"),
+                GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.storage.discard"),
                 button -> performStorageAction(StorageActionPacket.Action.DISCARD)
         ).style(ACGButton.Style.TEAL);
         discard.active = selected != null;
@@ -728,14 +728,12 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
         graphics.fill(0, ACGPerkSelectionScreen.TOP_BAR_HEIGHT - 1,
                 width, ACGPerkSelectionScreen.TOP_BAR_HEIGHT, ACGTheme.GOLD_DIM);
         drawCenteredString(graphics, font,
-                ACGTheme.asHeader(getTranslatableString(
+                ACGTheme.asHeader(GeneralTextMethods.getTranslatableString(
                         "screen.aegis_ascension.acg.title")),
                 width / 2, (ACGPerkSelectionScreen.TOP_BAR_HEIGHT - 9) / 2,
                 ACGTheme.TEXT_PRIMARY);
         if (minecraft != null && minecraft.player != null) {
-            Component level = getTranslatableString(
-                    "screen.aegis_ascension.acg.level",
-                    minecraft.player.experienceLevel);
+            Component level = ACGPerkSelectionScreen.progressionLabel();
             graphics.drawString(font, level, width - font.width(level) - 12,
                     (ACGPerkSelectionScreen.TOP_BAR_HEIGHT - 8) / 2,
                     ACGTheme.CYAN_ACCENT, false);
@@ -774,11 +772,11 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
 
         String translationKey = "curios.identifier." + info.identifier();
         Component slotType = I18n.exists(translationKey)
-                ? Component.translatable(translationKey)
-                : Component.literal(humanizeIdentifier(info.identifier()));
+                ? GeneralTextMethods.getTranslatableString(translationKey)
+                : GeneralTextMethods.getLiteralString(humanizeIdentifier(info.identifier()));
         graphics.renderComponentTooltip(
                 font,
-                List.of(getTranslatableString(
+                List.of(GeneralTextMethods.getTranslatableString(
                         "screen.aegis_ascension.acg.inventory_workbench.curio_slot",
                         slotType,
                         info.handlerIndex() + 1
@@ -813,25 +811,25 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
                     0xCC18151A, ACGTheme.GOLD_DIM);
         }
         // Crafting arrow between the 3x3 grid and result slot.
-        graphics.drawString(font, Component.literal("→"),
+        graphics.drawString(font, GeneralTextMethods.getLiteralString("→"),
                 leftPos + 128, topPos + 57, ACGTheme.GOLD_BRIGHT, false);
     }
 
     @Override
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY) {
         graphics.drawString(font,
-                getTranslatableString("screen.aegis_ascension.acg.inventory_workbench.storage",
+                GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.inventory_workbench.storage",
                         ClientStorageState.getRowCount(), ClientStorageState.getMaxItemTypes()),
                 storageX, -10, ACGTheme.GOLD_BRIGHT, false);
         graphics.drawString(font,
-                getTranslatableString("screen.aegis_ascension.acg.inventory_workbench.crafting"),
+                GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.inventory_workbench.crafting"),
                 49, 22, ACGTheme.GOLD_BRIGHT, false);
         if (menu.hasCurios()) {
             graphics.drawString(font,
-                    getTranslatableString("screen.aegis_ascension.acg.inventory_workbench.curios"),
+                    GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.inventory_workbench.curios"),
                     CURIOS_GRID_X, 22, ACGTheme.GOLD_BRIGHT, false);
             if (menu.curioPageCount() > 1) {
-                Component page = getTranslatableString(
+                Component page = GeneralTextMethods.getTranslatableString(
                         "screen.aegis_ascension.acg.inventory_workbench.curios_page",
                         curioPage + 1,
                         menu.curioPageCount()
@@ -856,7 +854,7 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
         int pages = isStorageScrollMode() ? 1 : Math.max(1,
                 (visible.size() + storagePageSize - 1)
                         / storagePageSize);
-        Component pageLabel = getTranslatableString(
+        Component pageLabel = GeneralTextMethods.getTranslatableString(
                 "screen.aegis_ascension.acg.inventory_workbench.page",
                 storagePage + 1,
                 pages
@@ -866,7 +864,7 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
                 ACGTheme.TEXT_MUTED, false);
 
         if (visible.isEmpty()) {
-            Component emptyLabel = getTranslatableString(
+            Component emptyLabel = GeneralTextMethods.getTranslatableString(
                     ClientStorageState.getRowCount() > 0
                             ? "screen.aegis_ascension.acg.storage.no_matches"
                             : "screen.aegis_ascension.acg.storage.empty");

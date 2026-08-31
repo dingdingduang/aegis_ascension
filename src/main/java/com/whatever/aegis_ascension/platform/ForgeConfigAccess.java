@@ -157,4 +157,89 @@ public final class ForgeConfigAccess implements ConfigAccess {
         }
         return false;
     }
+
+    @Override
+    public boolean useMinecraftDefaultLevel() {
+        return AegisAscensionConfig.USE_MINECRAFT_DEFAULT_LEVEL.get();
+    }
+
+    @Override
+    public boolean useGoldCurrency() {
+        return AegisAscensionConfig.USE_GOLD_CURRENCY.get();
+    }
+
+    @Override
+    public long aegisAscensionBaseXp() {
+        return AegisAscensionConfig.AEGIS_ASCENSION_BASE_XP.get();
+    }
+
+    @Override
+    public double aegisAscensionGrowthRate() {
+        return AegisAscensionConfig.AEGIS_ASCENSION_GROWTH_RATE.get();
+    }
+
+    @Override
+    public int aegisAscensionMaximumRank() {
+        return AegisAscensionConfig.AEGIS_ASCENSION_MAXIMUM_RANK.get();
+    }
+
+    @Override
+    public double storageMutationPacketCooldownSeconds() {
+        return AegisAscensionConfig.STORAGE_MUTATION_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double storageViewPacketCooldownSeconds() {
+        return AegisAscensionConfig.STORAGE_VIEW_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double togglePacketCooldownSeconds() {
+        return AegisAscensionConfig.TOGGLE_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double refreshPacketCooldownSeconds() {
+        return AegisAscensionConfig.REFRESH_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double devourItemPacketCooldownSeconds() {
+        return AegisAscensionConfig.DEVOUR_ITEM_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double devourDataPacketCooldownSeconds() {
+        return AegisAscensionConfig.DEVOUR_DATA_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double discardDevourPacketCooldownSeconds() {
+        return AegisAscensionConfig.DISCARD_DEVOUR_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double perkDataPacketCooldownSeconds() {
+        return AegisAscensionConfig.PERK_DATA_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double livePerkDataPacketCooldownSeconds() {
+        return AegisAscensionConfig.LIVE_PERK_DATA_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double sharedFortunePacketCooldownSeconds() {
+        return AegisAscensionConfig.SHARED_FORTUNE_PACKET_COOLDOWN_SECONDS.get();
+    }
+
+    @Override
+    public double questProgressSyncIntervalSeconds() {
+        return AegisAscensionConfig.QUEST_PROGRESS_SYNC_INTERVAL_SECONDS.get();
+    }
+
+    @Override
+    public double questViewPacketCooldownSeconds() {
+        return AegisAscensionConfig.QUEST_VIEW_PACKET_COOLDOWN_SECONDS.get();
+    }
 }

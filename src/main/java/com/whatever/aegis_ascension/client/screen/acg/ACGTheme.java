@@ -5,6 +5,7 @@ import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.util.GeneralConstants;
 import com.whatever.aegis_ascension.util.GeneralClientMethods;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.whatever.aegis_ascension.util.GeneralTextMethods;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -35,9 +36,9 @@ public final class ACGTheme {
 
     /** Per-rarity/Aegis card art. Each is a standalone, non-atlased texture. */
     public static final ResourceLocation AEGIS_CARD = rl("textures/gui/acg/aegis_card.png");
-    public static final ResourceLocation R_CARD = rl("textures/gui/acg/r_card.png");
-    public static final ResourceLocation SR_CARD = rl("textures/gui/acg/sr_card.png");
-    public static final ResourceLocation SSR_CARD = rl("textures/gui/acg/ssr_card.png");
+    public static final ResourceLocation PERK_R_CARD = rl("textures/gui/acg/perk_r_card.png");
+    public static final ResourceLocation PERK_SR_CARD = rl("textures/gui/acg/perk_sr_card.png");
+    public static final ResourceLocation PERK_SSR_CARD = rl("textures/gui/acg/perk_ssr_card.png");
     public static final ResourceLocation REFRESH_BUTTON = rl("textures/gui/acg/refreshbutton.png");
 
     /**
@@ -333,7 +334,7 @@ public final class ACGTheme {
 
     /** The drawer's active-selection marker; the spec calls for a literal "◆" glyph. */
     public static Component activeDiamond() {
-        return Component.literal("◆").withStyle(style ->
+        return GeneralTextMethods.getLiteralString("◆").withStyle(style ->
                 style.withColor(SELECTED_RED_DIAMOND));
     }
 

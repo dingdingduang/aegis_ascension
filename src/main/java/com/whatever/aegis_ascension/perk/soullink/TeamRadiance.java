@@ -50,7 +50,7 @@ public final class TeamRadiance {
     }
 
     public static int rank(PlayerPerkData data) {
-        if (!data.owns(R_TEAM_STAR)) {
+        if (!data.owns(PERK_TEAM_STAR)) {
             return 0;
         }
         return cachedRank(data);
@@ -64,12 +64,12 @@ public final class TeamRadiance {
     }
 
     public static int liveRank(ServerPlayer player, PlayerPerkData data) {
-        if (!data.owns(R_TEAM_STAR)) {
+        if (!data.owns(PERK_TEAM_STAR)) {
             return 0;
         }
         int owners = 0;
         for (ServerPlayer online : player.getServer().getPlayerList().getPlayers()) {
-            if (PerkData.get(online).map(onlineData -> onlineData.owns(R_TEAM_STAR))
+            if (PerkData.get(online).map(onlineData -> onlineData.owns(PERK_TEAM_STAR))
                     .orElse(false)) {
                 owners++;
             }

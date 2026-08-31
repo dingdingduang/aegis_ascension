@@ -14,7 +14,7 @@ public final class PerfectAndElegantServant {
 
     public static void onDamageDealt(ServerPlayer player, PlayerPerkData data,
                                      float damage) {
-        if (damage <= 0.0F || !data.owns(R_PERFECT_AND_ELEGANT_SERVANT)) {
+        if (damage <= 0.0F || !data.owns(PERK_PERFECT_AND_ELEGANT_SERVANT)) {
             return;
         }
         Perk perk = perk();
@@ -50,7 +50,7 @@ public final class PerfectAndElegantServant {
         if (data.getCustomStat(PERFECTION_STACKS) <= 0.0D) {
             return;
         }
-        if (!data.owns(R_PERFECT_AND_ELEGANT_SERVANT)
+        if (!data.owns(PERK_PERFECT_AND_ELEGANT_SERVANT)
                 || player.level().getGameTime()
                 >= (long) data.getCustomStat(PERFECTION_EXPIRES_AT_TICK)) {
             clear(player, data);
@@ -70,7 +70,7 @@ public final class PerfectAndElegantServant {
     }
 
     private static double perStack(PlayerPerkData data, String stat) {
-        if (!data.owns(R_PERFECT_AND_ELEGANT_SERVANT)) {
+        if (!data.owns(PERK_PERFECT_AND_ELEGANT_SERVANT)) {
             return 0.0D;
         }
         return Math.max(0.0D, data.getCustomStat(PERFECTION_STACKS))
@@ -88,6 +88,6 @@ public final class PerfectAndElegantServant {
     }
 
     private static Perk perk() {
-        return Perk.byId(R_PERFECT_AND_ELEGANT_SERVANT).orElseThrow();
+        return Perk.byId(PERK_PERFECT_AND_ELEGANT_SERVANT).orElseThrow();
     }
 }

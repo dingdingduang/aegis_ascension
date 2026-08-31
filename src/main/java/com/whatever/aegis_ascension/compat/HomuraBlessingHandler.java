@@ -19,10 +19,10 @@ public final class HomuraBlessingHandler {
             return;
         }
         PerkData.get(player).ifPresent(data -> {
-            if (!data.owns(SR_HOMURAS_BLESSING)) {
+            if (!data.owns(PERK_HOMURAS_BLESSING)) {
                 return;
             }
-            double chance = Perk.byId(SR_HOMURAS_BLESSING)
+            double chance = Perk.byId(PERK_HOMURAS_BLESSING)
                     .orElseThrow()
                     .stat(RESET_SPELL_COOLDOWN_CHANCE);
             if (player.getRandom().nextDouble()

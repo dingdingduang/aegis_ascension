@@ -19,12 +19,14 @@ import com.whatever.aegis_ascension.client.screen.acg.ACGTheme;
 import com.whatever.aegis_ascension.client.screen.collectiontabs.CustomStats;
 import com.whatever.aegis_ascension.client.screen.collectiontabs.CustomStats.Breakdown;
 import com.whatever.aegis_ascension.client.screen.collectiontabs.CustomStats.Definition;
+import com.whatever.aegis_ascension.mechanic.GoldCurrency;
+import com.whatever.aegis_ascension.util.GeneralClientMethods;
 import com.whatever.aegis_ascension.network.OpenACGInventoryPacket;
-import com.whatever.aegis_ascension.network.RequestShopDataPacket;
 import com.whatever.aegis_ascension.network.RequestStorageDataPacket;
 import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.network.RequestPerkDataPacket;
 import com.whatever.aegis_ascension.network.RequestSkillEnhancementOffersPacket;
+import com.whatever.aegis_ascension.network.RequestQuestDataPacket;
 import com.whatever.aegis_ascension.perk.Perk;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -67,7 +69,9 @@ public final class ACGPerkSelectionScreen extends Screen {
         DEVOURED,
         PLAYER_CUSTOM_STAT,
         CUSTOM_SHOP,
+        QUEST_CENTER,
         STORAGE,
+        SERVER_SETTINGS,
         CLIENT_SETTINGS
     }
 
@@ -133,7 +137,8 @@ public final class ACGPerkSelectionScreen extends Screen {
     private final ACGPage storagePage = new ACGStoragePage();
     private final ACGPage devouredPage = new ACGDevouredPage();
     private final ACGPage clientSettingsPage = new ACGClientSettingsPage();
-    private final ACGPage shopPage = new ACGShopPage();
+    private final ACGPage serverSettingsPage = new ACGServerSettingsPage();
+    private final ACGShopPage shopPage = new ACGShopPage();
     private final ACGAegisSelectionPage aegisSelectionPage =
             new ACGAegisSelectionPage();
     private final ACGPerkSelectionPage perkSelectionPage =
@@ -144,6 +149,7 @@ public final class ACGPerkSelectionScreen extends Screen {
     private final ACGOwnedTalentsPage ownedTalentsPage = new ACGOwnedTalentsPage();
     private final ACGPage soulLinksPage = new ACGSoulLinksPage();
     private final ACGPage customStatsPage = new ACGCustomStatsPage();
+    private final ACGPage questPage = new ACGQuestCenterPage();
 
     public ACGPerkSelectionScreen() {
         this(initialModeFromSettings());
@@ -340,8 +346,21 @@ public final class ACGPerkSelectionScreen extends Screen {
             storagePage.onServerSync(pageContext);
         } else if (mode == UIMode.DEVOURED) {
             devouredPage.onServerSync(pageContext);
+        } else if (mode == UIMode.QUEST_CENTER) {
+            questPage.onServerSync(pageContext);
         }
         rebuildContent();
+    }
+
+    /** Quest progress is independent of the other pages; avoid rebuilding offer cards while it ticks. */
+    public void refreshQuestFromServer() {
+        if (mode == UIMode.QUEST_CENTER) {
+            questPage.onServerSync(pageContext);
+            rebuildContent();
+        } else if (mode == UIMode.SERVER_SETTINGS) {
+            serverSettingsPage.onServerSync(pageContext);
+            rebuildContent();
+        }
     }
 
     /** Called by {@code ClientPacketHandler} when the server pushes a new Aegis offer roll. */
@@ -378,8 +397,10 @@ public final class ACGPerkSelectionScreen extends Screen {
                     ModNetworking.sendToServer(new RequestSkillEnhancementOffersPacket());
             case OWNED_AEGIS, OWNED_PERKS, OWNED_SOUL_LINKS, DEVOURED, PLAYER_CUSTOM_STAT ->
                     ModNetworking.sendToServer(new RequestPerkDataPacket(false));
-            case CUSTOM_SHOP -> ModNetworking.sendToServer(new RequestShopDataPacket());
+            case CUSTOM_SHOP -> shopPage.requestSelectedShop();
+            case QUEST_CENTER -> ModNetworking.sendToServer(new RequestQuestDataPacket());
             case STORAGE -> ModNetworking.sendToServer(new RequestStorageDataPacket());
+            case SERVER_SETTINGS -> ModNetworking.sendToServer(new RequestQuestDataPacket());
             case CLIENT_SETTINGS -> {
                 // Purely client-side; nothing to request from the server.
             }
@@ -464,7 +485,9 @@ public final class ACGPerkSelectionScreen extends Screen {
             case DEVOURED -> devouredPage.init(pageContext);
             case PLAYER_CUSTOM_STAT -> customStatsPage.init(pageContext);
             case CUSTOM_SHOP -> shopPage.init(pageContext);
+            case QUEST_CENTER -> questPage.init(pageContext);
             case STORAGE -> storagePage.init(pageContext);
+            case SERVER_SETTINGS -> serverSettingsPage.init(pageContext);
             case CLIENT_SETTINGS -> clientSettingsPage.init(pageContext);
         }
     }
@@ -510,7 +533,11 @@ public final class ACGPerkSelectionScreen extends Screen {
                     pageContext, graphics, mouseX, mouseY, partialTick);
             case CUSTOM_SHOP -> shopPage.render(
                     pageContext, graphics, mouseX, mouseY, partialTick);
+            case QUEST_CENTER -> questPage.render(
+                    pageContext, graphics, mouseX, mouseY, partialTick);
             case STORAGE -> storagePage.render(pageContext, graphics, mouseX, mouseY, partialTick);
+            case SERVER_SETTINGS -> serverSettingsPage.render(
+                    pageContext, graphics, mouseX, mouseY, partialTick);
             case CLIENT_SETTINGS -> clientSettingsPage.render(
                     pageContext, graphics, mouseX, mouseY, partialTick);
         }
@@ -526,9 +553,39 @@ public final class ACGPerkSelectionScreen extends Screen {
         graphics.fill(0, TOP_BAR_HEIGHT - 1, width, TOP_BAR_HEIGHT, ACGTheme.GOLD_DIM);
         drawCenteredString(graphics, font, ACGTheme.asHeader(title), width / 2, (TOP_BAR_HEIGHT - 9) / 2, ACGTheme.TEXT_PRIMARY);
         if (minecraft != null && minecraft.player != null) {
-            Component level = getTranslatableString("screen.aegis_ascension.acg.level", minecraft.player.experienceLevel);
+            ClientSettings settings = ClientSettings.get();
+            if (settings.showGoldCurrency) {
+                final int iconSize = 16;
+                final int iconX = 10;
+                final int iconY = (TOP_BAR_HEIGHT - iconSize) / 2;
+                GeneralClientMethods.blitFittedTexture(graphics, GoldCurrency.ICON,
+                        iconX, iconY, iconSize, iconSize, 128);
+                Component gold = getTranslatableString(
+                        "screen.aegis_ascension.acg.owned_gold",
+                        ClientPerkState.getGoldCurrency());
+                graphics.drawString(font, gold, iconX + iconSize + 4,
+                        (TOP_BAR_HEIGHT - 8) / 2, ACGTheme.GOLD_BRIGHT, false);
+            }
+            Component level = progressionLabel();
             graphics.drawString(font, level, width - font.width(level) - 12, (TOP_BAR_HEIGHT - 8) / 2, ACGTheme.CYAN_ACCENT, false);
         }
+    }
+
+    static Component progressionLabel() {
+        if (ClientPerkState.usesMinecraftDefaultLevel()) {
+            return getTranslatableString("screen.aegis_ascension.acg.level",
+                    Minecraft.getInstance().player == null
+                            ? ClientPerkState.getProgressionLevel()
+                            : Minecraft.getInstance().player.experienceLevel);
+        }
+        int rank = ClientPerkState.getAegisAscensionRank();
+        long current = ClientPerkState.getAegisAscensionExperience();
+        long needed = ClientPerkState.getAegisAscensionExperienceToNextRank();
+        if (needed <= 0L || rank >= ClientPerkState.getAegisAscensionMaximumRank()) {
+            return getTranslatableString("screen.aegis_ascension.acg.aegis_rank_max", rank);
+        }
+        return getTranslatableString("screen.aegis_ascension.acg.aegis_rank_progress",
+                rank, current, needed);
     }
 
     /** Scroll thumb for whichever grid is currently scrollable; mirrors the drawer's. */
@@ -633,6 +690,10 @@ public final class ACGPerkSelectionScreen extends Screen {
                 && devouredPage.mouseScrolled(pageContext, mouseX, mouseY, delta)) {
             return true;
         }
+        if (mode == UIMode.QUEST_CENTER
+                && questPage.mouseScrolled(pageContext, mouseX, mouseY, delta)) {
+            return true;
+        }
         // Any mode whose grid overflows, not just the Inventory — gridMaxScroll is only
         // non-zero when the active grid actually scrolls, so this needs no mode list.
         if (mode != UIMode.STORAGE && gridMaxScroll > 0
@@ -702,7 +763,9 @@ public final class ACGPerkSelectionScreen extends Screen {
         if (minecraft == null || minecraft.player == null) {
             return;
         }
-        int level = minecraft.player.experienceLevel;
+        int level = ClientPerkState.usesMinecraftDefaultLevel()
+                ? minecraft.player.experienceLevel
+                : ClientPerkState.getProgressionLevel();
         int step = Math.max(1, interval);
         // Milestones land at step, 2*step, ... so the last one this track ever grants is
         // maxAwards * step.

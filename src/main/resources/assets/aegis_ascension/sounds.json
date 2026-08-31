@@ -1,0 +1,10 @@
+{
+  "quest_ui/quest_complete_sound": {
+    "sounds": [
+      {
+        "name": "aegis_ascension:quest_ui/quest_complete_sound",
+        "stream": false
+      }
+    ]
+  }
+}

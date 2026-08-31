@@ -10,7 +10,8 @@
   "filteredItems": [
     "minecraft:bedrock",
     "minecraft:command_block",
-    "minecraft:barrier"
+    "minecraft:barrier",
+    "minecraft:air"
   ],
   "guaranteedItems": [
     {
@@ -160,6 +161,27 @@
       "experienceCost": 600
     },
     {
+      "virtualId": "devour_aegis_core_i",
+      "weight": 3,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 1500
+    },
+    {
+      "virtualId": "devour_aegis_core_ii",
+      "weight": 2,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 3500
+    },
+    {
+      "virtualId": "devour_aegis_core_iii",
+      "weight": 1,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 7500
+    },
+    {
       "virtualId": "devour_reset_book",
       "weight": 3,
       "minCount": 1,
@@ -185,5 +207,71 @@
     "R": 88,
     "SR": 10,
     "SSR": 2
+  },
+  "discoveryShop": {
+    "enabled": true,
+    "autoRefreshIntervalMinutes": 60,
+    "maxManualRefreshes": 3,
+    "manualRefreshExperienceCost": 500,
+    "minimumSlots": 4,
+    "maximumSlots": 10,
+    "additionalSlotChance": 0.4,
+    "sequentialSlotUnlock": false,
+    "defaultMinCount": 1,
+    "defaultMaxCount": 1,
+    "defaultExperienceCost": 500,
+    "defaultTier": "R",
+    "rarityExperienceCosts": {
+      "R": 500,
+      "SR": 1500,
+      "SSR": 5000
+    },
+    "rarityWeights": {
+      "R": 88,
+      "SR": 10,
+      "SSR": 2
+    },
+    "autoClassifyEquipmentTier": true,
+    "srAttackDamageThreshold": 6.0,
+    "ssrAttackDamageThreshold": 8.0,
+    "srArmorThreshold": 5.0,
+    "ssrArmorThreshold": 9.0,
+    "highPowerFalloffExponent": 2.0,
+    "minimumHighPowerWeight": 0.001,
+    "blacklistMode": true,
+    "filteredItems": [
+      "minecraft:air",
+      "minecraft:bedrock",
+      "minecraft:barrier",
+      "minecraft:command_block",
+      "minecraft:chain_command_block",
+      "minecraft:repeating_command_block",
+      "minecraft:command_block_minecart",
+      "minecraft:structure_block",
+      "minecraft:structure_void",
+      "minecraft:jigsaw",
+      "minecraft:light",
+      "minecraft:debug_stick",
+      "minecraft:knowledge_book",
+      "minecraft:spawner",
+      "minecraft:end_portal_frame",
+      "#forge:technical_items"
+    ],
+    "rules": [
+      {
+        "match": "#forge:ingots",
+        "minCount": 2,
+        "maxCount": 8,
+        "experienceCost": 250,
+        "tier": "R"
+      },
+      {
+        "match": "minecraft:elytra",
+        "minCount": 1,
+        "maxCount": 1,
+        "experienceCost": 7500,
+        "tier": "SSR"
+      }
+    ]
   }
 }

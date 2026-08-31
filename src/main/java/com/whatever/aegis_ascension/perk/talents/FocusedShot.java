@@ -1,6 +1,6 @@
 package com.whatever.aegis_ascension.perk.talents;
 
-import static com.whatever.aegis_ascension.perk.TalentConstants.SR_FOCUSED_SHOT;
+import static com.whatever.aegis_ascension.perk.TalentConstants.PERK_FOCUSED_SHOT;
 import static com.whatever.aegis_ascension.perk.TalentConstants.TRUE_SHOT_DAMAGE_MULTIPLIER;
 import static com.whatever.aegis_ascension.perk.TalentConstants.TRUE_SHOT_TRIGGER_CHANCE;
 
@@ -33,7 +33,7 @@ public final class FocusedShot {
             PlayerPerkData data,
             DamageSource source
     ) {
-        if (!data.owns(SR_FOCUSED_SHOT)
+        if (!data.owns(PERK_FOCUSED_SHOT)
                 || !(source.getDirectEntity() instanceof AbstractArrow arrow)
                 || arrow instanceof ThrownTrident
                 || arrow.getOwner() != attacker) {
@@ -67,9 +67,9 @@ public final class FocusedShot {
     }
 
     private static Perk perk() {
-        return Perk.byId(SR_FOCUSED_SHOT).orElseThrow(() ->
+        return Perk.byId(PERK_FOCUSED_SHOT).orElseThrow(() ->
                 new IllegalStateException(
-                        "Missing configured perk: " + SR_FOCUSED_SHOT
+                        "Missing configured perk: " + PERK_FOCUSED_SHOT
                 ));
     }
 }

@@ -5,11 +5,13 @@ import com.whatever.aegis_ascension.compat.IronSpellsCompat;
 import com.whatever.aegis_ascension.config.ServerSettings;
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.network.ModNetworking;
+import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
 import com.whatever.aegis_ascension.perk.talents.ShrineMaidenDance;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.shop.ShopConfig;
 import com.whatever.aegis_ascension.storage.StorageConfig;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
+import com.whatever.aegis_ascension.quest.QuestConfig;
 import net.minecraft.server.MinecraftServer;
 
 /** Loader-neutral mod startup and common-config reload orchestration. */
@@ -32,6 +34,7 @@ public final class ModLifecycle {
         ShopConfig.get();
         StorageConfig.get();
         VirtualItems.all();
+        QuestConfig.get();
         ServerSettings.get();
         ShrineMaidenDance.initialize();
     }
@@ -44,6 +47,7 @@ public final class ModLifecycle {
         }
         server.execute(() -> server.getPlayerList().getPlayers().forEach(player ->
                 PerkData.get(player).ifPresent(data -> {
+                    AegisExperienceSystem.awardMilestones(player, data, false);
                     data.applyChosenPerks(player);
                     ModNetworking.syncTo(player);
                 })

@@ -29,7 +29,7 @@ public final class OwnedTalents {
                     perk.maxRank()
             );
             boolean unlocksConstellations =
-                    perk.id().equals(TalentConstants.R_DIVINE_SAKURA_POWER);
+                    perk.id().equals(TalentConstants.PERK_DIVINE_SAKURA_POWER);
             Component tooltip = getLiteralString("[" + perk.tier().name() + "] ")
                     .append(perk.title())
                     .append("\n\n")

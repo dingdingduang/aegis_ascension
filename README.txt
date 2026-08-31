@@ -94,17 +94,47 @@ The list is synchronized from the server and can be reloaded while the server is
 
 Set:
 
-  liveCustomStatsRefresh = true
+liveCustomStatsRefresh = true
 
-to permit clients to request a Custom Stats refresh once per second while that tab is
-open. It defaults to false. The permission is synchronized to clients, and the server
-rate-limits both live and manual stat-sync requests.
+to permit clients to request Custom Stats refreshes while that tab is open. It defaults to
+false. The permission is synchronized to clients, and the server rate-limits both live and
+manual stat-sync requests using the configurable packet cooldowns below.
 
 The mod also generates config/aegis_ascension/talents.json on first launch. That file
 contains editable rarity weights, perk stats, max ranks, manual toggles, and Soul Link
-requirements/bonuses. Existing balance edits are preserved. The Shun update appends its
-missing entry and upgrades the legacy empty Plum Blossom Garden requirements; before doing
-so it creates config/aegis_ascension/talents.pre-shun-migration.json as a one-time backup.
+requirements/bonuses. Existing balance edits are preserved.
+
+The shop is configured in config/aegis_ascension/shopsetting.json. Common Shop uses the
+configured item pools; Discovery Shop samples the live registry, including modded items.
+Discovery equipment is automatically classified as R, SR, or SSR from attack-damage and
+armor thresholds, with configurable rarity weights and a continuous high-power falloff.
+Set autoClassifyEquipmentTier to false, or add an ordered rules entry with tier, to override
+the automatic result. A rule's selectionWeightMultiplier can further raise, lower, or set to
+zero an item's chance.
+
+Quest rewards can select from those same shop pools without changing the player's current
+stock. In questsetting.json, use for example:
+
+  {"kind":"shop_item","source":"common","tier":"SR","count":4}
+  {"kind":"shop_item","source":"discovery","tier":"SSR","count":1,
+   "unique":true,"fallbackId":"minecraft:diamond"}
+
+Common rewards use real randomItems and their configured weights. Discovery rewards use
+the live item registry, including modded items, together with Discovery filters, tier rules,
+equipment thresholds, and high-power weighting. A unique item is excluded before rolling
+if it was already claimed or is reserved by another active quest. fallbackId is a guaranteed,
+non-unique consolation item when the requested tier has no eligible candidate. The legacy
+random_common and random_unique kinds remain supported as Common-tier and Discovery-SSR
+aliases respectively.
+
+Packet throttles live in the [packetCooldowns] section of
+config/aegis_ascension-common.toml. Values are seconds and 0 disables that bucket:
+storageMutationSeconds, storageViewSeconds, toggleAndPurchaseSeconds, refreshSeconds,
+devourItemSeconds, devourDataSeconds, discardDevouredSeconds, perkDataSeconds,
+livePerkDataSeconds, sharedFortuneSeconds, questViewSeconds, and
+questProgressSyncIntervalSeconds. The quest progress interval batches ordinary counter
+changes into compact delta packets; quest completion and structural changes still sync
+immediately.
 
 The apothic_attribute_mappings array maps stat keys to registered attributes when Apothic
 Attributes is installed. Each mapped value includes the player's persisted custom stat,
@@ -124,6 +154,6 @@ Custom icon textures
 Perk icons are texture ResourceLocations, not Item instances. Talent icons are under
 assets/aegis_ascension/textures/gui/talents/. A custom texture can be referenced with:
 
-  ResourceLocation.fromNamespaceAndPath(
+  GeneralClientMethods.fromNamespaceAndPath(
       "aegis_ascension", "textures/gui/talents/my_perk.png"
   )

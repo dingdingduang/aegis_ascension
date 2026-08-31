@@ -24,4 +24,23 @@ public final class ManaCompat {
         }
         return Math.max(0.0D, maximum);
     }
+
+    /** Restores the same fraction of every installed supported mana pool. */
+    public static void restoreFraction(Player player, PlayerPerkData data, double fraction) {
+        if (!Double.isFinite(fraction) || fraction <= 0.0D) {
+            return;
+        }
+        if (IronSpellsCompat.isLoaded()) {
+            IronSpellsCompat.restoreMana(
+                    player,
+                    IronSpellsCompat.maximumMana(player, data) * fraction
+            );
+        }
+        if (ArsNouveauCompat.isLoaded()) {
+            ArsNouveauCompat.restoreMana(
+                    player,
+                    ArsNouveauCompat.maximumMana(player, data) * fraction
+            );
+        }
+    }
 }

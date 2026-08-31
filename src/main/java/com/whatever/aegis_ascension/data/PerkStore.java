@@ -68,10 +68,11 @@ public final class PerkStore {
     /**
      * Discards a player's progression, for {@code resetPerksOnDeath}.
      *
-     * @param keepInventory when true, spares the banked storage, the current shop stock, and
-     *                      the virtual item use counts by resetting in place through
-     *                      {@link PlayerPerkData#resetAll()} - the same thing
-     *                      {@code /perk reset} does. When false, everything goes.
+     * @param keepInventory when true, spares ordinary banked storage, current shop stock,
+     *                      and ordinary virtual-item use counts by resetting in place
+     *                      through {@link PlayerPerkData#resetAll()} - the same thing
+     *                      {@code /perk reset} does. Devour Cores are progression and are
+     *                      removed in either mode. When false, everything goes.
      */
     public static void reset(UUID id, boolean keepInventory) {
         if (keepInventory) {

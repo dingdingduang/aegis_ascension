@@ -1,12 +1,11 @@
 package com.whatever.aegis_ascension.mechanic;
 
 import static com.whatever.aegis_ascension.mechanic.TalentStatService.*;
+import static com.whatever.aegis_ascension.mechanic.TalentDamageCalculations.*;
 import static com.whatever.aegis_ascension.perk.TalentConstants.*;
 
+import com.whatever.aegis_ascension.api.AegisSpellDamage;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
-import com.whatever.aegis_ascension.compat.ApothicAttributesCompat;
-import com.whatever.aegis_ascension.compat.ArsNouveauCompat;
-import com.whatever.aegis_ascension.compat.IronSpellsCompat;
 import com.whatever.aegis_ascension.compat.SummonCompat;
 import com.whatever.aegis_ascension.config.ServerSettings;
 import com.whatever.aegis_ascension.data.PerkData;
@@ -81,11 +80,10 @@ final class TrueDamageMechanic {
     private static HurtPlan prepare(ServerPlayer owner, PlayerPerkData data,
                                     LivingEntity target, DamageSource source,
                                     HurtCapture capture) {
-        boolean sevenColoredMagician = data.owns(SSR_SEVEN_COLORED_MAGICIAN);
-        boolean supportedSpell = IronSpellsCompat.isIronSpellDamage(source)
-                || ArsNouveauCompat.isArsSpellDamage(source);
-        boolean skillConversion = data.owns(R_SKILL_DAMAGE_CONVERSION)
-                && data.isTalentEnabled(R_SKILL_DAMAGE_CONVERSION)
+        boolean sevenColoredMagician = data.owns(PERK_SEVEN_COLORED_MAGICIAN);
+        boolean supportedSpell = AegisSpellDamage.isSpellDamage(source);
+        boolean skillConversion = data.owns(PERK_SKILL_DAMAGE_CONVERSION)
+                && data.isTalentEnabled(PERK_SKILL_DAMAGE_CONVERSION)
                 && supportedSpell;
         boolean fullConversion = sevenColoredMagician || skillConversion;
 
@@ -94,15 +92,13 @@ final class TrueDamageMechanic {
             return HurtPlan.NONE;
         }
 
-        double trueDamagePercent = data.getCustomStat(TRUE_DAMAGE)
-                + sumOwnedStat(data, TRUE_DAMAGE);
-        double commonMultiplier = Math.max(0.0D, 1.0D + trueDamagePercent);
+        double commonMultiplier = damageTrueCalculation(data);
         ServerSettings settings = ServerSettings.get();
         if (settings.trueDamageAffectedByCriticalDamage()) {
-            commonMultiplier *= criticalMultiplier(owner, data);
+            commonMultiplier *= damageCriticalDamageCalculationFromRaw(owner, data);
         }
         if (settings.trueDamageAffectedByLuckyStrike()) {
-            commonMultiplier *= luckyStrikeMultiplier(owner, data);
+            commonMultiplier *= damageLuckStrikeCalculation(owner, data);
         }
         if (settings.trueDamageAffectedByFinalDamage()) {
             commonMultiplier *= TalentCombatEffects.trueDamageFinalDamageMultiplier(
@@ -121,9 +117,9 @@ final class TrueDamageMechanic {
             double baseDamage = capture.rawAmount();
             // Commander's addition is explicitly applied before damage calculation,
             // so it is part of the base that is converted rather than a Damage Bonus.
-            if (source.getEntity() == owner && data.owns(SR_COMMANDER)) {
+            if (source.getEntity() == owner && data.owns(PERK_COMMANDER)) {
                 baseDamage += owner.getMaxHealth()
-                        * stat(SR_COMMANDER, MAX_HEALTH_TO_BASE_DAMAGE);
+                        * stat(PERK_COMMANDER, MAX_HEALTH_TO_BASE_DAMAGE);
             }
             convertedMain = safeDamage(baseDamage * commonMultiplier);
         }
@@ -196,10 +192,10 @@ final class TrueDamageMechanic {
     private static double princessTrueDamageBase(ServerPlayer owner,
                                                   PlayerPerkData data,
                                                   DamageSource source) {
-        if (source.getEntity() != owner || !data.owns(SR_PRINCESS_OF_EGRET)) {
+        if (source.getEntity() != owner || !data.owns(PERK_PRINCESS_OF_EGRET)) {
             return 0.0D;
         }
-        Perk princess = requiredPerk(SR_PRINCESS_OF_EGRET);
+        Perk princess = requiredPerk(PERK_PRINCESS_OF_EGRET);
         if (owner.getRandom().nextDouble() >= Mth.clamp(
                 princess.stat(BONUS_TRUE_DAMAGE_CHANCE), 0.0D, 1.0D
         )) {
@@ -210,54 +206,20 @@ final class TrueDamageMechanic {
                         * princess.stat(BONUS_TRUE_DAMAGE_ATTACK_MULTIPLIER));
     }
 
-    private static double criticalMultiplier(ServerPlayer owner, PlayerPerkData data) {
-        if (!ApothicAttributesCompat.handlesCriticalHits(owner)) {
-            double chance = Mth.clamp(criticalChance(data), 0.0D, 1.0D);
-            if (chance <= 0.0D || owner.getRandom().nextDouble() >= chance) {
-                return 1.0D;
-            }
-            double criticalDamage = criticalDamageBonus(data)
-                    + flameCriticalDamage(data, criticalChance(data))
-                    + millenniumOverflowCriticalDamage(data, criticalChance(data));
-            return Math.max(1.0D, 1.5D + criticalDamage);
-        }
-
-        // Match Apothic Attributes' recursive critical-hit behavior, including its
-        // 15% Critical Damage decay for each Crit Chance point above 100%.
-        double chance = Math.max(0.0D,
-                ApothicAttributesCompat.criticalChance(owner, criticalChance(data)));
-        double criticalDamage = Math.max(0.0D,
-                ApothicAttributesCompat.criticalDamage(
-                        owner,
-                        1.5D + criticalDamageBonus(data)
-                ));
-        double multiplier = 1.0D;
-        int safety = 0;
-        while (chance > 0.0D && criticalDamage > 1.0D && safety++ < 4096) {
-            if (owner.getRandom().nextDouble() > Math.min(1.0D, chance)) {
-                break;
-            }
-            multiplier = safeDamage(multiplier * criticalDamage);
-            chance -= 1.0D;
-            criticalDamage *= 0.85D;
-        }
-        return Math.max(1.0D, multiplier);
-    }
-
     private static double royalSacredFlameMultiplier(ServerPlayer owner,
                                                        PlayerPerkData data) {
-        if (!data.owns(SSR_SEVEN_COLORED_MAGICIAN)) {
+        if (!data.owns(PERK_SEVEN_COLORED_MAGICIAN)) {
             return 1.0D;
         }
 
-        double doubleChance = stat(SSR_SEVEN_COLORED_MAGICIAN, DOUBLE_DAMAGE_CHANCE);
+        double doubleChance = stat(PERK_SEVEN_COLORED_MAGICIAN, DOUBLE_DAMAGE_CHANCE);
         double doubleMultiplier = stat(
-                SSR_SEVEN_COLORED_MAGICIAN,
+                PERK_SEVEN_COLORED_MAGICIAN,
                 DOUBLE_DAMAGE_MULTIPLIER
         );
-        double tripleChance = stat(SSR_SEVEN_COLORED_MAGICIAN, TRIPLE_DAMAGE_CHANCE);
+        double tripleChance = stat(PERK_SEVEN_COLORED_MAGICIAN, TRIPLE_DAMAGE_CHANCE);
         double tripleMultiplier = stat(
-                SSR_SEVEN_COLORED_MAGICIAN,
+                PERK_SEVEN_COLORED_MAGICIAN,
                 TRIPLE_DAMAGE_MULTIPLIER
         );
         boolean maripatchy = data.hasActiveSoulLink(SOUL_MARIPATCHY_GROUP);

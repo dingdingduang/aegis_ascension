@@ -30,6 +30,14 @@ public final class ClientPerkState {
     private static int aegisSelectionCharges;
     private static int aegisRefreshCharges;
     private static boolean aegisOfferSessionActive;
+    private static boolean usesMinecraftDefaultLevel = true;
+    private static boolean usesGoldCurrency;
+    private static long goldCurrency;
+    private static int progressionLevel;
+    private static int aegisAscensionRank = 1;
+    private static long aegisAscensionExperience;
+    private static long aegisAscensionExperienceToNextRank;
+    private static int aegisAscensionMaximumRank = 1000;
     private static final Map<Perk, Integer> PERK_RANKS = new LinkedHashMap<>();
     private static final Map<SkillEnhancement, Integer> SKILL_ENHANCEMENT_RANKS =
             new LinkedHashMap<>();
@@ -111,6 +119,38 @@ public final class ClientPerkState {
 
     public static int getAegisRefreshCharges() {
         return aegisRefreshCharges;
+    }
+
+    public static boolean usesMinecraftDefaultLevel() {
+        return usesMinecraftDefaultLevel;
+    }
+
+    public static boolean usesGoldCurrency() {
+        return usesGoldCurrency;
+    }
+
+    public static long getGoldCurrency() {
+        return goldCurrency;
+    }
+
+    public static int getProgressionLevel() {
+        return progressionLevel;
+    }
+
+    public static int getAegisAscensionRank() {
+        return aegisAscensionRank;
+    }
+
+    public static long getAegisAscensionExperience() {
+        return aegisAscensionExperience;
+    }
+
+    public static long getAegisAscensionExperienceToNextRank() {
+        return aegisAscensionExperienceToNextRank;
+    }
+
+    public static int getAegisAscensionMaximumRank() {
+        return aegisAscensionMaximumRank;
     }
 
     public static boolean ownsAegis(Aegis aegis) {
@@ -299,6 +339,14 @@ public final class ClientPerkState {
                               int syncedAegisSelectionCharges,
                               int syncedAegisRefreshCharges,
                               boolean syncedLiveCustomStatsRefreshAllowed,
+                              boolean syncedUsesMinecraftDefaultLevel,
+                              boolean syncedUsesGoldCurrency,
+                              long syncedGoldCurrency,
+                              int syncedProgressionLevel,
+                              int syncedAegisAscensionRank,
+                              long syncedAegisAscensionExperience,
+                              long syncedAegisAscensionExperienceToNextRank,
+                              int syncedAegisAscensionMaximumRank,
                               UUID syncedSharedFortunePartnerId,
                               String syncedSharedFortunePartnerName,
                               int syncedSharedFortuneRebindCooldownSeconds,
@@ -329,6 +377,15 @@ public final class ClientPerkState {
         aegisSelectionCharges = Math.max(0, syncedAegisSelectionCharges);
         aegisRefreshCharges = Math.max(0, syncedAegisRefreshCharges);
         liveCustomStatsRefreshAllowed = syncedLiveCustomStatsRefreshAllowed;
+        usesMinecraftDefaultLevel = syncedUsesMinecraftDefaultLevel;
+        usesGoldCurrency = syncedUsesGoldCurrency;
+        goldCurrency = Math.max(0L, syncedGoldCurrency);
+        progressionLevel = Math.max(0, syncedProgressionLevel);
+        aegisAscensionRank = Math.max(1, syncedAegisAscensionRank);
+        aegisAscensionExperience = Math.max(0L, syncedAegisAscensionExperience);
+        aegisAscensionExperienceToNextRank = Math.max(
+                0L, syncedAegisAscensionExperienceToNextRank);
+        aegisAscensionMaximumRank = Math.max(1, syncedAegisAscensionMaximumRank);
         sharedFortunePartnerId = syncedSharedFortunePartnerId;
         sharedFortunePartnerName = syncedSharedFortunePartnerId == null
                 ? ""
@@ -376,6 +433,14 @@ public final class ClientPerkState {
         aegisSelectionCharges = 0;
         aegisRefreshCharges = 0;
         aegisOfferSessionActive = false;
+        usesMinecraftDefaultLevel = true;
+        usesGoldCurrency = false;
+        goldCurrency = 0L;
+        progressionLevel = 0;
+        aegisAscensionRank = 1;
+        aegisAscensionExperience = 0L;
+        aegisAscensionExperienceToNextRank = 0L;
+        aegisAscensionMaximumRank = 1000;
         HIDDEN_TALENT_IDS.clear();
         PERK_RANKS.clear();
         ENABLED_MANUAL_TALENTS.clear();

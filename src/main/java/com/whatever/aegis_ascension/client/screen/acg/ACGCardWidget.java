@@ -31,7 +31,7 @@ public final class ACGCardWidget extends AbstractButton implements ClippableWidg
     }
 
     public enum Presentation {
-        /** Full-bleed card art (aegis_card / r_card / sr_card / ssr_card), used for offers. */
+        /** Full-bleed card art (aegis_card / perk_card / perk_card / perk_card), used for offers. */
         BIG,
         /** Small icon + title + status row, used for collection grids. */
         COMPACT
@@ -204,7 +204,7 @@ public final class ACGCardWidget extends AbstractButton implements ClippableWidg
         if (hasArt) {
             // The art already paints its own border, so a flat accent-color rectangle on
             // top of it just reads as a stray colored box. Hover feedback instead swaps
-            // to a "_glow" sibling texture (e.g. ssr_card.png -> ssr_card_glow.png) when
+            // to a "_glow" sibling texture (e.g. perk_card.png -> perk_card_glow.png) when
             // one exists, falling back to the plain art if it doesn't.
             ResourceLocation texture = cardBackground;
             if (hovered) {

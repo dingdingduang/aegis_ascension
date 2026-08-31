@@ -11,7 +11,13 @@
   "collectionExpanded": true,
   "miscellaneousExpanded": true,
   "showShieldHud": true,
+  "showGoldCurrency": true,
   "shieldHudAnchor": "TOP_RIGHT",
   "shieldHudOffsetX": -5,
-  "shieldHudOffsetY": 5
+  "shieldHudOffsetY": 5,
+  "questTrackerScale": 1.0,
+  "questTrackerQuestLimit": 8,
+  "questTrackerHudAnchor": "TOP_RIGHT",
+  "questTrackerHudOffsetX": -8,
+  "questTrackerHudOffsetY": 8
 }

@@ -1,5 +1,5 @@
 {
-  "schema_version": 6,
+  "schema_version": 8,
   "aegises": [
     {
       "id": "fortune_aegis",
@@ -25,8 +25,9 @@
         "random_perk_one_chance": 0.7,
         "random_perk_two_chance": 0.2,
         "random_perk_three_chance": 0.1,
-        "ssr_per_perks_received": 6
+        "perk_per_perks_received": 6
       },
+      "manual_toggle": false,
       "enabled": true,
       "initial_selection_allowed": true
     },
@@ -64,7 +65,7 @@
       "icon": "aegis_ascension:textures/gui/aegis/authority.png",
       "stats": {
         "extra_talent_slots": 22,
-        "primary_stat_per_owned_talent": 0.5,
+        "primary_stat_per_owned_talent": 0.25,
         "select_all_max_uses": 3
       },
       "primary_stat_multipliers": {
@@ -120,6 +121,13 @@
       "name": "aegis.aegis_ascension.wisdom_aegis.name",
       "description": "aegis.aegis_ascension.wisdom_aegis.description",
       "icon": "aegis_ascension:textures/gui/aegis/wisdom.png",
+      "extra_cast_excluded_spells": [
+        "myweirdironspellbookaddon:fire_barrage",
+        "myweirdironspellbookaddon:lightning_barrage",
+        "myweirdironspellbookaddon:multi_target_barrage",
+        "myweirdironspellbookaddon:phoenix_barrage",
+        "myweirdironspellbookaddon:armor_shred_barrage"
+      ],
       "stats": {
         "breakthrough_skill_damage": 0.1,
         "breakthrough_skill_area": 0.1,
@@ -212,9 +220,9 @@
         "all_skill_enhancement_attribute": 0.05,
         "cooldown_reduction": 0.04,
         "final_damage": 0.02,
-        "r_talent_scaling": 0.2,
-        "sr_talent_scaling": 0.4,
-        "ssr_talent_scaling": 1.0
+        "perk_r_talent_scaling": 0.2,
+        "perk_sr_talent_scaling": 0.4,
+        "perk_ssr_talent_scaling": 1.0
       },
       "enabled": true,
       "initial_selection_allowed": true
@@ -232,7 +240,7 @@
       "manual_toggle": true,
       "enabled": true,
       "initial_selection_allowed": true,
-      "requires_mod": "irons_spellbooks"
+      "requires_mod": "myweirdironspellbookaddon"
     },
     {
       "id": "blessing_aegis",
@@ -240,8 +248,8 @@
       "description": "aegis.aegis_ascension.blessing_aegis.description",
       "icon": "aegis_ascension:textures/gui/aegis/blessing.png",
       "stats": {
-        "breakthrough_attack_multiplier": 0.12,
-        "breakthrough_attack_speed_multiplier": 0.15,
+        "breakthrough_attack_multiplier": 0.08,
+        "breakthrough_attack_speed_multiplier": 0.08,
         "breakthrough_attack_range": 0.1
       },
       "enabled": true,
@@ -277,7 +285,7 @@
       "manual_toggle": true,
       "enabled": true,
       "initial_selection_allowed": true,
-      "requires_mod": "irons_spellbooks"
+      "requires_mod": "myweirdironspellbookaddon"
     },
     {
       "id": "devour_aegis",
@@ -285,7 +293,11 @@
       "description": "aegis.aegis_ascension.devour_aegis.description",
       "icon": "aegis_ascension:textures/gui/aegis/devour.png",
       "stats": {
-        "devour_stat_inheritance": 1.0
+        "devour_stat_inheritance": 1.0,
+        "devour_item_limit_level_0": 15,
+        "devour_item_limit_level_1": 30,
+        "devour_item_limit_level_2": 45,
+        "devour_item_limit_level_3": 65535
       },
       "enabled": true,
       "initial_selection_allowed": true

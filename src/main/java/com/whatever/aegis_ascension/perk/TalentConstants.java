@@ -2,121 +2,120 @@ package com.whatever.aegis_ascension.perk;
 
 /**
  * Stable identifiers shared by runtime code and the data-driven talent catalog.
- * Keep field values unchanged to preserve saved-player and JSON compatibility.
  */
 public final class TalentConstants {
     private TalentConstants() {
     }
 
     // Perk IDs
-    public static final String R_HEALING_MAGIC = "r_healing_magic";
-    public static final String R_MUNDANE_STROLL = "r_mundane_stroll";
-    public static final String R_LUCKY_ARROW = "r_lucky_arrow";
-    public static final String R_INK_DYED_SAKURA = "r_ink_dyed_sakura";
-    public static final String R_HALF_HUMAN_HALF_PHANTOM_GARDENER = "r_half_human_half_phantom_gardener";
-    public static final String R_CRIMSON_YOUNG_MOON = "r_crimson_young_moon";
-    public static final String R_LAEVATEIN = "r_laevatein";
-    public static final String R_CIRNO = "r_cirno";
-    public static final String R_NAGISA_LEISURE_TIME = "r_nagisa_leisure_time";
-    public static final String R_LUNAR_GODDESSS_BLESSING = "r_lunar_goddesss_blessing";
-    public static final String R_ALYA = "r_alya";
-    public static final String R_DIVINE_SAKURA_POWER = "r_divine_sakura_power";
-    public static final String R_BOUNDARY_OF_LIFE_AND_DEATH = "r_boundary_of_life_and_death";
-    public static final String R_FLICKERING_LIGHT = "r_flickering_light";
-    public static final String R_WHITE_STAR_OBSIDIAN = "r_white_star_obsidian";
-    public static final String R_ALICE = "r_alice";
-    public static final String R_SHIROKO = "r_shiroko";
-    public static final String R_HAYASE_YUKA = "r_hayase_yuka";
-    public static final String R_OTOGI_NOAH = "r_otogi_noah";
-    public static final String R_SKILL_DAMAGE_CONVERSION = "r_skill_damage_conversion";
-    public static final String R_CASHBACK = "r_cashback";
-    public static final String R_SILENT_DAWN = "r_silent_dawn";
-    public static final String R_TSUKIYUKI_MIYAKO = "r_tsukiyuki_miyako";
-    public static final String R_TOLD_YOU_ITS_MAGIC = "r_told_you_its_magic";
-    public static final String R_NOELLE = "r_noelle";
-    public static final String R_ARONA = "r_arona";
-    public static final String R_MATTER_TO_MAGIC_CONVERSION = "r_matter_to_magic_conversion";
-    public static final String R_MYSTERIOUS_DOLL = "r_mysterious_doll";
-    public static final String R_CLEAR_MIND_STATE = "r_clear_mind_state";
-    public static final String R_MAGIC_CONVERSION = "r_magic_conversion";
-    public static final String R_KOKONA = "r_kokona";
-    public static final String R_SUNOHARA_SHUN = "r_sunohara_shun";
-    public static final String R_MAGIC_BLADE = "r_magic_blade";
-    public static final String R_BARRAGE_CONTROL_MAGIC = "r_barrage_control_magic";
-    public static final String R_MOMO = "r_momo";
-    public static final String R_MIDORI = "r_midori";
-    public static final String R_CONGYU_CIALLO = "r_congyu_ciallo";
-    public static final String R_YOSHINO_CIALLO = "r_yoshino_ciallo";
-    public static final String R_SHIZURU_CIALLO = "r_shizuru_ciallo";
-    public static final String R_NINGNING_CIALLO = "r_ningning_ciallo";
-    public static final String R_NANAMI_CIALLO = "r_nanami_ciallo";
-    public static final String R_ROLLING_IN_WEALTH = "r_rolling_in_wealth";
-    public static final String R_ENIGMA = "r_enigma";
-    public static final String R_AQUAS_BLESSING = "r_aquas_blessing";
-    public static final String R_SHRINE_MAIDEN_DANCE = "r_shrine_maiden_dance";
-    public static final String R_FRENZY = "r_frenzy";
-    public static final String R_HANAKOS_BLESSING = "r_hanakos_blessing";
-    public static final String R_KISAKIS_BLESSING = "r_kisakis_blessing";
-    public static final String R_KOHARUS_BLESSING = "r_koharus_blessing";
-    public static final String R_PERFECT_AND_ELEGANT_SERVANT =
-            "r_perfect_and_elegant_servant";
-    public static final String R_SUSPENSION_OF_DISBELIEF =
-            "r_suspension_of_disbelief";
-    public static final String R_TEAM_STAR = "r_team_star";
-    public static final String SR_MASTER_SPARK = "sr_master_spark";
-    public static final String SR_FOCUSED_SHOT = "sr_focused_shot";
-    public static final String SR_METEOR_SPARKLE = "sr_meteor_sparkle";
-    public static final String SR_BEATER = "sr_beater";
-    public static final String SR_YURIZONO_SEIA = "sr_yurizono_seia";
-    public static final String SR_FRIEREN = "sr_frieren";
-    public static final String SR_FERN = "sr_fern";
-    public static final String SR_WIND_ARROW = "sr_wind_arrow";
-    public static final String SR_PRINCESS_OF_EGRET = "sr_princess_of_egret";
-    public static final String SR_I_SHALL_INTERPRET_THE_RADIANCE = "sr_i_shall_interpret_the_radiance";
-    public static final String SR_RIGHTEOUS_KNIGHT = "sr_righteous_knight";
-    public static final String SR_BLAZING_FEATHER_STARWEAVER = "sr_blazing_feather_starweaver";
-    public static final String SR_NECROMANCER = "sr_necromancer";
-    public static final String SR_GRIM_REAPERS_CONTRACT = "sr_grim_reapers_contract";
-    public static final String SR_KOHARU_SPRITE = "sr_koharu_sprite";
-    public static final String SR_MIKA = "sr_mika";
-    public static final String SR_FAIR_TRADE = "sr_fair_trade";
-    public static final String SR_GLASS_CANNON = "sr_glass_cannon";
-    public static final String SR_COLLECTOR = "sr_collector";
-    public static final String SR_FLOWER_FAIRY = "sr_flower_fairy";
-    public static final String SR_SHARED_FORTUNE = "sr_shared_fortune";
-    public static final String SR_GREAT_FAIRY = "sr_great_fairy";
-    public static final String SR_SACRED_ELF = "sr_sacred_elf";
-    public static final String SR_BUTTERFLYS_GENTLE_TOUCH = "sr_butterflys_gentle_touch";
-    public static final String SR_RIPPLES_OF_THE_PAST = "sr_ripples_of_the_past";
-    public static final String SR_COMMANDER = "sr_commander";
-    public static final String SR_PLANA = "sr_plana";
-    public static final String SR_ZEPHYRS_CARE = "sr_zephyrs_care";
-    public static final String SR_ILLUSION_BUBBLE = "sr_illusion_bubble";
-    public static final String SR_SWISS_ROLL_MOMENT = "sr_swiss_roll_moment";
-    public static final String SR_GANYUS_BLESSING = "sr_ganyus_blessing";
-    public static final String SR_HOMURAS_BLESSING = "sr_homuras_blessing";
-    public static final String SR_KARYLS_BLESSING = "sr_karyls_blessing";
-    public static final String SR_KOKKOROS_BLESSING = "sr_kokkoros_blessing";
-    public static final String SR_KONATAS_BLESSING = "sr_konatas_blessing";
-    public static final String SR_MURASAMES_BLESSING = "sr_murasames_blessing";
-    public static final String SR_PECORINES_BLESSING = "sr_pecorines_blessing";
-    public static final String SSR_INNATE_DREAM = "ssr_innate_dream";
-    public static final String SSR_SEVEN_COLORED_MAGICIAN = "ssr_seven_colored_magician";
-    public static final String SSR_FIREFLY_FLAME = "ssr_firefly_flame";
-    public static final String SSR_PEERLESS_CALCULATION = "ssr_peerless_calculation";
-    public static final String SSR_STARLIGHT_INTERTWINED_BENEDICTION = "ssr_starlight_intertwined_benediction";
-    public static final String SSR_LAW_OF_THE_CYCLE = "ssr_law_of_the_cycle";
-    public static final String SSR_BECAUSE_YOU_EXIST_AS_I_WRITE = "ssr_because_you_exist_as_i_write";
-    public static final String SSR_LONGHUA_FEIXIAO = "ssr_longhua_feixiao";
-    public static final String SSR_TOP_PLAYER = "ssr_top_player";
-    public static final String SSR_BLESSING_OF_THE_WORLD_TREE = "ssr_blessing_of_the_world_tree";
-    public static final String SSR_PLATEAU_WITCH = "ssr_plateau_witch";
-    public static final String SSR_TEACHER_FOX = "ssr_teacher_fox";
-    public static final String SSR_WORLD_IS_MINE = "ssr_world_is_mine";
-    public static final String SSR_REINHARDT = "ssr_reinhardt";
-    public static final String SSR_TWIN_MAGIC_MIRROR = "ssr_twin_magic_mirror";
-    public static final String SSR_ET_OMNIA_VANITAS = "ssr_et_omnia_vanitas";
-    public static final String SSR_DOMINUS_LAPIDIS = "ssr_dominus_lapidis";
+    public static final String PERK_HEALING_MAGIC = "perk_healing_magic";
+    public static final String PERK_MUNDANE_STROLL = "perk_mundane_stroll";
+    public static final String PERK_LUCKY_ARROW = "perk_lucky_arrow";
+    public static final String PERK_INK_DYED_SAKURA = "perk_ink_dyed_sakura";
+    public static final String PERK_HALF_HUMAN_HALF_PHANTOM_GARDENER = "perk_half_human_half_phantom_gardener";
+    public static final String PERK_CRIMSON_YOUNG_MOON = "perk_crimson_young_moon";
+    public static final String PERK_LAEVATEIN = "perk_laevatein";
+    public static final String PERK_CIRNO = "perk_cirno";
+    public static final String PERK_NAGISA_LEISURE_TIME = "perk_nagisa_leisure_time";
+    public static final String PERK_LUNAR_GODDESSS_BLESSING = "perk_lunar_goddesss_blessing";
+    public static final String PERK_ALYA = "perk_alya";
+    public static final String PERK_DIVINE_SAKURA_POWER = "perk_divine_sakura_power";
+    public static final String PERK_BOUNDARY_OF_LIFE_AND_DEATH = "perk_boundary_of_life_and_death";
+    public static final String PERK_FLICKERING_LIGHT = "perk_flickering_light";
+    public static final String PERK_WHITE_STAR_OBSIDIAN = "perk_white_star_obsidian";
+    public static final String PERK_ALICE = "perk_alice";
+    public static final String PERK_SHIROKO = "perk_shiroko";
+    public static final String PERK_HAYASE_YUKA = "perk_hayase_yuka";
+    public static final String PERK_OTOGI_NOAH = "perk_otogi_noah";
+    public static final String PERK_SKILL_DAMAGE_CONVERSION = "perk_skill_damage_conversion";
+    public static final String PERK_CASHBACK = "perk_cashback";
+    public static final String PERK_SILENT_DAWN = "perk_silent_dawn";
+    public static final String PERK_TSUKIYUKI_MIYAKO = "perk_tsukiyuki_miyako";
+    public static final String PERK_TOLD_YOU_ITS_MAGIC = "perk_told_you_its_magic";
+    public static final String PERK_NOELLE = "perk_noelle";
+    public static final String PERK_ARONA = "perk_arona";
+    public static final String PERK_MATTER_TO_MAGIC_CONVERSION = "perk_matter_to_magic_conversion";
+    public static final String PERK_MYSTERIOUS_DOLL = "perk_mysterious_doll";
+    public static final String PERK_CLEAR_MIND_STATE = "perk_clear_mind_state";
+    public static final String PERK_MAGIC_CONVERSION = "perk_magic_conversion";
+    public static final String PERK_KOKONA = "perk_kokona";
+    public static final String PERK_SUNOHARA_SHUN = "perk_sunohara_shun";
+    public static final String PERK_MAGIC_BLADE = "perk_magic_blade";
+    public static final String PERK_BARRAGE_CONTROL_MAGIC = "perk_barrage_control_magic";
+    public static final String PERK_MOMO = "perk_momo";
+    public static final String PERK_MIDORI = "perk_midori";
+    public static final String PERK_CONGYU_CIALLO = "perk_congyu_ciallo";
+    public static final String PERK_YOSHINO_CIALLO = "perk_yoshino_ciallo";
+    public static final String PERK_SHIZURU_CIALLO = "perk_shizuru_ciallo";
+    public static final String PERK_NINGNING_CIALLO = "perk_ningning_ciallo";
+    public static final String PERK_NANAMI_CIALLO = "perk_nanami_ciallo";
+    public static final String PERK_ROLLING_IN_WEALTH = "perk_rolling_in_wealth";
+    public static final String PERK_ENIGMA = "perk_enigma";
+    public static final String PERK_AQUAS_BLESSING = "perk_aquas_blessing";
+    public static final String PERK_SHRINE_MAIDEN_DANCE = "perk_shrine_maiden_dance";
+    public static final String PERK_FRENZY = "perk_frenzy";
+    public static final String PERK_HANAKOS_BLESSING = "perk_hanakos_blessing";
+    public static final String PERK_KISAKIS_BLESSING = "perk_kisakis_blessing";
+    public static final String PERK_KOHARUS_BLESSING = "perk_koharus_blessing";
+    public static final String PERK_PERFECT_AND_ELEGANT_SERVANT =
+            "perk_perfect_and_elegant_servant";
+    public static final String PERK_SUSPENSION_OF_DISBELIEF =
+            "perk_suspension_of_disbelief";
+    public static final String PERK_TEAM_STAR = "perk_team_star";
+    public static final String PERK_MASTER_SPARK = "perk_master_spark";
+    public static final String PERK_FOCUSED_SHOT = "perk_focused_shot";
+    public static final String PERK_METEOR_SPARKLE = "perk_meteor_sparkle";
+    public static final String PERK_BEATER = "perk_beater";
+    public static final String PERK_YURIZONO_SEIA = "perk_yurizono_seia";
+    public static final String PERK_FRIEREN = "perk_frieren";
+    public static final String PERK_FERN = "perk_fern";
+    public static final String PERK_WIND_ARROW = "perk_wind_arrow";
+    public static final String PERK_PRINCESS_OF_EGRET = "perk_princess_of_egret";
+    public static final String PERK_I_SHALL_INTERPRET_THE_RADIANCE = "perk_i_shall_interpret_the_radiance";
+    public static final String PERK_RIGHTEOUS_KNIGHT = "perk_righteous_knight";
+    public static final String PERK_BLAZING_FEATHER_STARWEAVER = "perk_blazing_feather_starweaver";
+    public static final String PERK_NECROMANCER = "perk_necromancer";
+    public static final String PERK_GRIM_REAPERS_CONTRACT = "perk_grim_reapers_contract";
+    public static final String PERK_KOHARU_SPRITE = "perk_koharu_sprite";
+    public static final String PERK_MIKA = "perk_mika";
+    public static final String PERK_FAIR_TRADE = "perk_fair_trade";
+    public static final String PERK_GLASS_CANNON = "perk_glass_cannon";
+    public static final String PERK_COLLECTOR = "perk_collector";
+    public static final String PERK_FLOWER_FAIRY = "perk_flower_fairy";
+    public static final String PERK_SHARED_FORTUNE = "perk_shared_fortune";
+    public static final String PERK_GREAT_FAIRY = "perk_great_fairy";
+    public static final String PERK_SACRED_ELF = "perk_sacred_elf";
+    public static final String PERK_BUTTERFLYS_GENTLE_TOUCH = "perk_butterflys_gentle_touch";
+    public static final String PERK_RIPPLES_OF_THE_PAST = "perk_ripples_of_the_past";
+    public static final String PERK_COMMANDER = "perk_commander";
+    public static final String PERK_PLANA = "perk_plana";
+    public static final String PERK_ZEPHYRS_CARE = "perk_zephyrs_care";
+    public static final String PERK_ILLUSION_BUBBLE = "perk_illusion_bubble";
+    public static final String PERK_SWISS_ROLL_MOMENT = "perk_swiss_roll_moment";
+    public static final String PERK_GANYUS_BLESSING = "perk_ganyus_blessing";
+    public static final String PERK_HOMURAS_BLESSING = "perk_homuras_blessing";
+    public static final String PERK_KARYLS_BLESSING = "perk_karyls_blessing";
+    public static final String PERK_KOKKOROS_BLESSING = "perk_kokkoros_blessing";
+    public static final String PERK_KONATAS_BLESSING = "perk_konatas_blessing";
+    public static final String PERK_MURASAMES_BLESSING = "perk_murasames_blessing";
+    public static final String PERK_PECORINES_BLESSING = "perk_pecorines_blessing";
+    public static final String PERK_INNATE_DREAM = "perk_innate_dream";
+    public static final String PERK_SEVEN_COLORED_MAGICIAN = "perk_seven_colored_magician";
+    public static final String PERK_FIREFLY_FLAME = "perk_firefly_flame";
+    public static final String PERK_PEERLESS_CALCULATION = "perk_peerless_calculation";
+    public static final String PERK_STARLIGHT_INTERTWINED_BENEDICTION = "perk_starlight_intertwined_benediction";
+    public static final String PERK_LAW_OF_THE_CYCLE = "perk_law_of_the_cycle";
+    public static final String PERK_BECAUSE_YOU_EXIST_AS_I_WRITE = "perk_because_you_exist_as_i_write";
+    public static final String PERK_LONGHUA_FEIXIAO = "perk_longhua_feixiao";
+    public static final String PERK_TOP_PLAYER = "perk_top_player";
+    public static final String PERK_BLESSING_OF_THE_WORLD_TREE = "perk_blessing_of_the_world_tree";
+    public static final String PERK_PLATEAU_WITCH = "perk_plateau_witch";
+    public static final String PERK_TEACHER_FOX = "perk_teacher_fox";
+    public static final String PERK_WORLD_IS_MINE = "perk_world_is_mine";
+    public static final String PERK_REINHARDT = "perk_reinhardt";
+    public static final String PERK_TWIN_MAGIC_MIRROR = "perk_twin_magic_mirror";
+    public static final String PERK_ET_OMNIA_VANITAS = "perk_et_omnia_vanitas";
+    public static final String PERK_DOMINUS_LAPIDIS = "perk_dominus_lapidis";
 
     // Soul-Link IDs
     public static final String SOUL_HAKUGYOKUROU =
@@ -212,8 +211,8 @@ public final class TalentConstants {
             "ciallo_max_health_multiplier";
     public static final String CIALLO_PHYSICAL_DAMAGE_AMPLIFICATION =
             "ciallo_physical_damage_amplification";
-    public static final String CIALLO_SPELL_DAMAGE_AMPLIFICATION =
-            "ciallo_spell_damage_amplification";
+    public static final String CIALLO_MAGIC_DAMAGE_AMPLIFICATION =
+            "ciallo_magic_damage_amplification";
     public static final String COPY_TALENT_CHANCE = "copy_talent_chance";
     public static final String SHARED_FORTUNE_FALLBACK_SKILL_ENHANCEMENT_CHARGES =
             "fallback_skill_enhancement_charges";
@@ -296,8 +295,8 @@ public final class TalentConstants {
     public static final String BREAKTHROUGH_INDEPENDENT_SKILL_DAMAGE =
             "breakthrough_independent_skill_damage";
     public static final String BREAKTHROUGH_SUMMON_POWER = "breakthrough_summon_power";
-    public static final String BREAKTHROUGH_SPELL_DAMAGE_AMPLIFICATION =
-            "breakthrough_spell_damage_amplification";
+    public static final String BREAKTHROUGH_MAGIC_DAMAGE_AMPLIFICATION =
+            "breakthrough_magic_damage_amplification";
     public static final String BREAKTHROUGH_SWISS_ROLLS = "breakthrough_swiss_rolls";
     public static final String BREAKTHROUGH_TRUE_DAMAGE = "breakthrough_true_damage";
     public static final String BREAKTHROUGH_ATTACK_RANGE = "breakthrough_attack_range";
@@ -343,7 +342,6 @@ public final class TalentConstants {
             "innate_skill_damage_trigger_count";
     public static final String INNATE_CRITICAL_DAMAGE_TRIGGER_COUNT =
             "innate_critical_damage_trigger_count";
-    public static final String INTELLIGENCE_MULTIPLIER = "intelligence_multiplier";
     public static final String INTERVAL_SECONDS = "interval_seconds";
     public static final String DISTANCE_DAMAGE_OFFSET = "distance_damage_offset";
     public static final String MINIMUM_DAMAGE_DISTANCE = "minimum_damage_distance";
@@ -417,6 +415,7 @@ public final class TalentConstants {
     public static final String PRIMARY_ATTRIBUTE_FLAT_PER_ELITE_KILL = "primary_attribute_flat_per_elite_kill";
     public static final String PRIMARY_ATTRIBUTE_FLAT_PER_TRIGGER = "primary_attribute_flat_per_trigger";
     public static final String PRIMARY_ATTRIBUTE_GAIN_CHANCE_PER_BARRAGE = "primary_attribute_gain_chance_per_barrage";
+    public static final String BARRAGE_DAMAGE_MULTIPLIER = "barrage_damage_multiplier";
     public static final String PRIMARY_ATTRIBUTE_MULTIPLIER = "primary_attribute_multiplier";
     public static final String PERK_REFRESH_CHARGE_PER_CHARGE =
             "perk_refresh_charge_per_charge";
@@ -493,9 +492,9 @@ public final class TalentConstants {
     public static final String MAGIC_DAMAGE_TRIGGER_CHANCE = "magic_damage_trigger_chance";
     public static final String SKILL_ENHANCEMENT_CHARGES_GRANTED = "skill_enhancement_charges_granted";
     public static final String SKILL_ENHANCEMENT_OPTION_BONUS = "skill_enhancement_option_bonus";
-    public static final String SPELL_DAMAGE_AMPLIFICATION = "spell_damage_amplification";
-    public static final String SPELL_DAMAGE_AMPLIFICATION_PER_SOUL_LINK = "spell_damage_amplification_per_soul_link";
-    public static final String SPELL_DAMAGE_AMPLIFICATION_PER_TRIGGER = "spell_damage_amplification_per_trigger";
+    public static final String MAGIC_DAMAGE_AMPLIFICATION = "magic_damage_amplification";
+    public static final String MAGIC_DAMAGE_AMPLIFICATION_PER_SOUL_LINK = "magic_damage_amplification_per_soul_link";
+    public static final String MAGIC_DAMAGE_AMPLIFICATION_PER_TRIGGER = "magic_damage_amplification_per_trigger";
     public static final String SUMMON_COUNT = "summon_count";
     public static final String SUMMON_POWER = "summon_power";
     public static final String SUMMON_POWER_PER_SUMMON = "summon_power_per_summon";

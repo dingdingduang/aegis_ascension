@@ -19,7 +19,7 @@ public final class TeamStar {
         if (server == null) {
             return 0.0D;
         }
-        Perk perk = Perk.byId(R_TEAM_STAR).orElse(null);
+        Perk perk = Perk.byId(PERK_TEAM_STAR).orElse(null);
         if (perk == null) {
             return 0.0D;
         }
@@ -28,7 +28,7 @@ public final class TeamStar {
         ));
         int owners = 0;
         for (ServerPlayer online : server.getPlayerList().getPlayers()) {
-            if (PerkData.get(online).map(data -> data.owns(R_TEAM_STAR)).orElse(false)
+            if (PerkData.get(online).map(data -> data.owns(PERK_TEAM_STAR)).orElse(false)
                     && ++owners >= maximumStacks) {
                 break;
             }

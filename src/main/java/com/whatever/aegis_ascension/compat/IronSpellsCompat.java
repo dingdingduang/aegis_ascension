@@ -102,6 +102,18 @@ public final class IronSpellsCompat {
         );
     }
 
+    /** Restores live Iron mana; direct API symbols remain isolated in the nested bridge. */
+    public static void restoreMana(Player player, double amount) {
+        if (!isLoaded() || amount <= 0.0D || !Double.isFinite(amount)) {
+            return;
+        }
+        try {
+            SpellBridge.restoreMana(player, amount);
+        } catch (LinkageError | RuntimeException exception) {
+            // Optional API missing or changed: leave the other supported pools usable.
+        }
+    }
+
     /** Publishes data-driven Max Mana bonuses as Iron's real attribute. */
     public static void updateAttributeModifiers(Player player, PlayerPerkData data) {
         if (!isLoaded()) {
@@ -213,6 +225,13 @@ public final class IronSpellsCompat {
                     io.redspace.ironsspellbooks.api.spells.CastSource.SPELLBOOK,
                     io.redspace.ironsspellbooks.api.magic.MagicData.getPlayerMagicData(caster));
             return true;
+        }
+
+        private static void restoreMana(Player player, double amount) {
+            io.redspace.ironsspellbooks.api.magic.MagicData data =
+                    io.redspace.ironsspellbooks.api.magic.MagicData
+                            .getPlayerMagicData(player);
+            data.addMana((float) Math.min(Float.MAX_VALUE, amount));
         }
 
         private static void invulnerableOwnedSummons(

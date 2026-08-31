@@ -2,38 +2,32 @@ package com.whatever.aegis_ascension.mechanic;
 
 import static com.whatever.aegis_ascension.perk.TalentConstants.*;
 import static com.whatever.aegis_ascension.mechanic.TalentStatService.*;
+import static com.whatever.aegis_ascension.mechanic.TalentDamageCalculations.*;
 
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.aegis.AegisConstants;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.compat.ApothicAttributesCompat;
-import com.whatever.aegis_ascension.compat.ArsNouveauCompat;
 import com.whatever.aegis_ascension.compat.IronSpellsCompat;
+import com.whatever.aegis_ascension.compat.ManaCompat;
 import com.whatever.aegis_ascension.compat.SummonCompat;
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.perk.Perk;
-import com.whatever.aegis_ascension.perk.talents.FairTrade;
 import com.whatever.aegis_ascension.perk.talents.FocusedShot;
 import com.whatever.aegis_ascension.perk.talents.DominusLapidis;
 import com.whatever.aegis_ascension.perk.talents.PerfectAndElegantServant;
 import com.whatever.aegis_ascension.perk.talents.TeamStar;
 import com.whatever.aegis_ascension.perk.soullink.MakeUpWorkClub;
-import com.whatever.aegis_ascension.perk.soullink.TeamRadiance;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
-import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.damagesource.DamageTypes;
 import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.damagesource.CombatRules;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.player.Player;
-
-import java.util.Map;
 
 /** Handles active combat, healing, revival, kill, and combat-tick talent effects. */
 public final class TalentCombatEffects {
@@ -121,17 +115,22 @@ public final class TalentCombatEffects {
             );
         }
 
-        Perk healingMagic = requiredPerk(R_HEALING_MAGIC);
+        Perk healingMagic = requiredPerk(PERK_HEALING_MAGIC);
         int healingInterval = Math.max(1, (int) Math.round(
                 healingMagic.stat(INTERVAL_SECONDS) * 20.0D
         ));
         if (data.owns(healingMagic.id()) && player.tickCount % healingInterval == 0) {
             player.heal(player.getMaxHealth()
                     * (float) healingMagic.stat(HEALTH_RESTORE_PER_SECOND));
+            ManaCompat.restoreFraction(
+                    player,
+                    data,
+                    healingMagic.stat(MANA_RESTORE_PER_SECOND)
+            );
         }
 
-        if (data.owns(R_MUNDANE_STROLL)) {
-            Perk mundaneStroll = requiredPerk(R_MUNDANE_STROLL);
+        if (data.owns(PERK_MUNDANE_STROLL)) {
+            Perk mundaneStroll = requiredPerk(PERK_MUNDANE_STROLL);
             double lastX = data.getCustomStat(WALK_LAST_X);
             double lastY = data.getCustomStat(WALK_LAST_Y);
             double lastZ = data.getCustomStat(WALK_LAST_Z);
@@ -197,7 +196,8 @@ public final class TalentCombatEffects {
             amount = PerkData.get(damageOwner)
                     .map(data -> (float) Math.min(
                             Float.MAX_VALUE,
-                            Math.max(0.0D, currentAmount * independentDamageMultiplier(data))
+                            Math.max(0.0D,
+                                    currentAmount * damageIndependentCalculation(data))
                     ))
                     .orElse(currentAmount);
         }
@@ -218,53 +218,46 @@ public final class TalentCombatEffects {
             DamageSource source,
             float originalAmount
     ) {
-        boolean ironSpellDamage = IronSpellsCompat.isIronSpellDamage(source);
-        boolean nativeMagicDamage = isNativeMinecraftMagic(source);
-        boolean arsSpellDamage = ArsNouveauCompat.isArsSpellDamage(source);
-        boolean spellDamage = ironSpellDamage || arsSpellDamage;
-        boolean magicDamageSource = spellDamage || nativeMagicDamage;
+        DamageCalculationContext context = DamageCalculationContext.create(
+                attacker,
+                target,
+                source
+        );
         double situationalFinalDamage = fernFinalDamageOnTrigger(
                 attacker,
                 data,
-                magicDamageSource
+                context.magicDamage()
         );
-        if (data.owns(SR_PECORINES_BLESSING)
+        if (data.owns(PERK_PECORINES_BLESSING)
                 && attacker.getHealth() >= attacker.getMaxHealth()) {
             situationalFinalDamage += stat(
-                    SR_PECORINES_BLESSING,
+                    PERK_PECORINES_BLESSING,
                     FULL_HEALTH_FINAL_DAMAGE
             );
         }
         double baseDamage = originalAmount;
-        if (data.owns(SR_COMMANDER)) {
+        if (data.owns(PERK_COMMANDER)) {
             baseDamage += attacker.getMaxHealth()
-                    * stat(SR_COMMANDER, MAX_HEALTH_TO_BASE_DAMAGE);
+                    * stat(PERK_COMMANDER, MAX_HEALTH_TO_BASE_DAMAGE);
         }
-        double amount = baseDamage * outgoingDamageMultiplier(
-                attacker,
-                data,
-                !magicDamageSource,
-                situationalFinalDamage
+        double amount = baseDamage * damageCommonCalculation(
+                attacker, data, situationalFinalDamage
         );
-        if (magicDamageSource) {
-            amount *= magicDamageMultiplier(attacker, data, spellDamage);
+        if (context.physicalDamage()) {
+            amount *= damagePhysicalCalculation(data);
         }
-        if (!ApothicAttributesCompat.handlesCriticalHits(attacker)) {
-            double criticalChance = criticalChance(data);
-            if (criticalChance > 0.0D
-                    && attacker.getRandom().nextDouble() < Math.min(1.0D, criticalChance)) {
-                double criticalDamage = criticalDamageBonus(data)
-                        + flameCriticalDamage(data, criticalChance)
-                        + millenniumOverflowCriticalDamage(data, criticalChance);
-                amount *= Math.max(1.0D, 1.5D + criticalDamage);
-            }
+        if (context.magicDamage()) {
+            amount *= damageMagicCalculation(data);
         }
-        // Lucky Strike is a final total-damage multiplier. A value of
-        // 0.8 means +80% total damage, or a 1.8x multiplier.
-        amount *= luckyStrikeMultiplier(attacker, data);
+        if (context.spellDamage()) {
+            amount *= damageSkillCalculation(attacker, data);
+        }
+        if (context.directMeleeAttack()) {
+            amount *= damageAttackAmplificationCalculation(data);
+        }
         amount *= FocusedShot.arrowDamageMultiplier(attacker, data, source);
-        if (data.owns(SR_GANYUS_BLESSING)) {
-            Perk ganyu = requiredPerk(SR_GANYUS_BLESSING);
+        if (data.owns(PERK_GANYUS_BLESSING)) {
+            Perk ganyu = requiredPerk(PERK_GANYUS_BLESSING);
             double distance = attacker.distanceTo(target);
             if (distance >= ganyu.stat(MINIMUM_DAMAGE_DISTANCE)) {
                 amount *= Math.max(0.0D, 1.0D
@@ -273,13 +266,13 @@ public final class TalentCombatEffects {
             }
         }
         double armorIgnore = 0.0D;
-        if (!magicDamageSource && data.owns(R_HANAKOS_BLESSING)) {
-            armorIgnore += stat(R_HANAKOS_BLESSING, PHYSICAL_ARMOR_IGNORE)
+        if (context.physicalDamage() && data.owns(PERK_HANAKOS_BLESSING)) {
+            armorIgnore += stat(PERK_HANAKOS_BLESSING, PHYSICAL_ARMOR_IGNORE)
                     * MakeUpWorkClub.hanakoMultiplier(data);
         }
-        if (data.owns(SSR_ET_OMNIA_VANITAS)
+        if (data.owns(PERK_ET_OMNIA_VANITAS)
                 && !ApothicAttributesCompat.handlesMappedAttribute(attacker, ARMOR_SHRED)) {
-            armorIgnore += stat(SSR_ET_OMNIA_VANITAS, ARMOR_SHRED);
+            armorIgnore += stat(PERK_ET_OMNIA_VANITAS, ARMOR_SHRED);
         }
         amount = compensateForArmorIgnore(amount, target, source, armorIgnore);
         return (float) Math.min(Float.MAX_VALUE, amount);
@@ -290,8 +283,8 @@ public final class TalentCombatEffects {
             PlayerPerkData data,
             float originalAmount
     ) {
-        if (data.owns(R_TSUKIYUKI_MIYAKO) && victim.getRandom().nextDouble()
-                < stat(R_TSUKIYUKI_MIYAKO, IGNORE_DAMAGE_CHANCE)) {
+        if (data.owns(PERK_TSUKIYUKI_MIYAKO) && victim.getRandom().nextDouble()
+                < stat(PERK_TSUKIYUKI_MIYAKO, IGNORE_DAMAGE_CHANCE)) {
             return 0.0F;
         }
         double multiplier = 1.0D - effectiveDamageResistance(data);
@@ -357,6 +350,7 @@ public final class TalentCombatEffects {
                         finalAttacker,
                         data,
                         target,
+                        source,
                         postDamage.amount()
                 ))
                 .orElse(postDamage.amount());
@@ -371,16 +365,17 @@ public final class TalentCombatEffects {
             ServerPlayer attacker,
             PlayerPerkData data,
             LivingEntity target,
+            DamageSource source,
             float originalAmount
     ) {
             float amount = originalAmount;
-            if (data.owns(R_CRIMSON_YOUNG_MOON)) {
+            if (data.owns(PERK_CRIMSON_YOUNG_MOON)) {
                 float missingHealth = attacker.getMaxHealth() - attacker.getHealth();
                 attacker.heal(missingHealth
-                        * (float) stat(R_CRIMSON_YOUNG_MOON, MISSING_HEALTH_RESTORE));
+                        * (float) stat(PERK_CRIMSON_YOUNG_MOON, MISSING_HEALTH_RESTORE));
             }
-            if (data.owns(R_LAEVATEIN)) {
-                Perk laevatein = requiredPerk(R_LAEVATEIN);
+            if (data.owns(PERK_LAEVATEIN)) {
+                Perk laevatein = requiredPerk(PERK_LAEVATEIN);
                 double healthPerTrigger = laevatein.stat(MAX_HEALTH_FLAT_PER_DAMAGE);
                 if (consumeCappedTrigger(
                         data,
@@ -395,8 +390,8 @@ public final class TalentCombatEffects {
                     recalculateAttributes(attacker, data);
                 }
             }
-            if (data.owns(R_MAGIC_CONVERSION)) {
-                Perk magicConversion = requiredPerk(R_MAGIC_CONVERSION);
+            if (data.owns(PERK_MAGIC_CONVERSION)) {
+                Perk magicConversion = requiredPerk(PERK_MAGIC_CONVERSION);
                 double manaPerTrigger = magicConversion.stat(MAX_MANA_FLAT_PER_DAMAGE);
                 if (consumeCappedTrigger(
                         data,
@@ -411,9 +406,14 @@ public final class TalentCombatEffects {
                     recalculateAttributes(attacker, data);
                 }
             }
-            if (data.owns(SR_RIGHTEOUS_KNIGHT)) {
+            if (data.owns(PERK_RIGHTEOUS_KNIGHT)
+                    && DamageCalculationContext.create(
+                            attacker,
+                            target,
+                            source
+                    ).directMeleeAttack()) {
                 double attacks = data.addCustomStat(KNIGHT_ATTACKS, 1.0D);
-                Perk knight = requiredPerk(SR_RIGHTEOUS_KNIGHT);
+                Perk knight = requiredPerk(PERK_RIGHTEOUS_KNIGHT);
                 long attacksPerStack = Math.max(1L, Math.round(knight.stat(ATTACKS_PER_STACK)));
                 if (((long) attacks) % attacksPerStack == 0L) {
                     boolean attributesChanged = false;
@@ -440,8 +440,8 @@ public final class TalentCombatEffects {
                     }
                 }
             }
-            if (data.owns(SSR_INNATE_DREAM)) {
-                Perk innateDream = requiredPerk(SSR_INNATE_DREAM);
+            if (data.owns(PERK_INNATE_DREAM)) {
+                Perk innateDream = requiredPerk(PERK_INNATE_DREAM);
                 double chance = Math.min(1.0D,
                         innateDream.stat(BASE_TRIGGER_CHANCE)
                                 + innateDream.stat(TRIGGER_CHANCE_PER_BREAKTHROUGH)
@@ -504,8 +504,8 @@ public final class TalentCombatEffects {
                     }
                 }
             }
-            if (data.owns(SR_NECROMANCER)) {
-                Perk necromancer = requiredPerk(SR_NECROMANCER);
+            if (data.owns(PERK_NECROMANCER)) {
+                Perk necromancer = requiredPerk(PERK_NECROMANCER);
                 double threshold = target.getMaxHealth()
                         >= necromancer.stat(ELITE_MAX_HEALTH_THRESHOLD)
                         ? necromancer.stat(ELITE_EXECUTE_HEALTH_FRACTION)
@@ -540,11 +540,11 @@ public final class TalentCombatEffects {
 //                    event.isCanceled()
 //            );
             boolean revived = PerkData.get(player).map(data -> {
-                if (data.owns(R_BOUNDARY_OF_LIFE_AND_DEATH)
+                if (data.owns(PERK_BOUNDARY_OF_LIFE_AND_DEATH)
                         && data.getCustomStat(REVIVES_REMAINING) > 0.0D) {
                     double revivesBefore = data.getCustomStat(REVIVES_REMAINING);
                     data.addCustomStat(REVIVES_REMAINING, -1.0D);
-                    Perk boundary = requiredPerk(R_BOUNDARY_OF_LIFE_AND_DEATH);
+                    Perk boundary = requiredPerk(PERK_BOUNDARY_OF_LIFE_AND_DEATH);
 //                    AegisAscensionMod.LOGGER.info(
 //                            "[ReviveDebug] Selecting revive: player={}, perk={}, usesBefore={}, usesAfter={}",
 //                            player.getGameProfile().getName(),
@@ -558,10 +558,10 @@ public final class TalentCombatEffects {
 //                    logPostRecalculationState(player, boundary);
                     return true;
                 }
-                if (data.owns(SR_BLAZING_FEATHER_STARWEAVER)
+                if (data.owns(PERK_BLAZING_FEATHER_STARWEAVER)
                         && data.getCustomStat(BLAZING_REVIVE_USED) == 0.0D) {
                     data.setCustomStat(BLAZING_REVIVE_USED, 1.0D);
-                    Perk blazing = requiredPerk(SR_BLAZING_FEATHER_STARWEAVER);
+                    Perk blazing = requiredPerk(PERK_BLAZING_FEATHER_STARWEAVER);
 //                    AegisAscensionMod.LOGGER.info(
 //                            "[ReviveDebug] Selecting revive: player={}, perk={}, blazingReviveUsed={}",
 //                            player.getGameProfile().getName(),
@@ -615,16 +615,16 @@ public final class TalentCombatEffects {
                         SOUL_DEATH_GODS_AUTHORITY, ADDITIONAL_TRIGGER_COUNT));
             }
             for (int run = 0; run < killEffectRuns; run++) {
-                if (data.owns(R_LUNAR_GODDESSS_BLESSING)
+                if (data.owns(PERK_LUNAR_GODDESSS_BLESSING)
                         && killer.getRandom().nextDouble() < stat(
-                        R_LUNAR_GODDESSS_BLESSING, KILL_TRIGGER_CHANCE)) {
+                        PERK_LUNAR_GODDESSS_BLESSING, KILL_TRIGGER_CHANCE)) {
                     data.addCustomStat(LUNAR_DAMAGE, stat(
-                            R_LUNAR_GODDESSS_BLESSING,
+                            PERK_LUNAR_GODDESSS_BLESSING,
                             PHYSICAL_DAMAGE_AMPLIFICATION_PER_TRIGGER
                     ));
                 }
-                if (data.owns(SR_I_SHALL_INTERPRET_THE_RADIANCE)) {
-                    Perk radiance = requiredPerk(SR_I_SHALL_INTERPRET_THE_RADIANCE);
+                if (data.owns(PERK_I_SHALL_INTERPRET_THE_RADIANCE)) {
+                    Perk radiance = requiredPerk(PERK_I_SHALL_INTERPRET_THE_RADIANCE);
                     double damagePerTrigger = radiance.stat(DAMAGE_BONUS_PER_KILL);
                     double damageTakenPerTrigger = -radiance.stat(
                             DAMAGE_REDUCTION_PER_KILL
@@ -652,7 +652,7 @@ public final class TalentCombatEffects {
                         );
                     }
                 }
-                Perk topPlayer = requiredPerk(SSR_TOP_PLAYER);
+                Perk topPlayer = requiredPerk(PERK_TOP_PLAYER);
                 if (data.owns(topPlayer.id()) && target.getMaxHealth()
                         >= topPlayer.stat(ELITE_MAX_HEALTH_THRESHOLD)) {
                     killer.giveExperiencePoints(integerStat(
@@ -762,118 +762,24 @@ public final class TalentCombatEffects {
 //        );
     }
 
-    private static double outgoingDamageMultiplier(ServerPlayer player, PlayerPerkData data,
-                                                    boolean includePhysicalAmplification,
-                                                    double situationalFinalDamage) {
-        double bonus = data.getCustomStat(WALK_DAMAGE)
-                + data.getCustomStat(KNIGHT_DAMAGE)
-                + data.getCustomStat(FROSTBITE_DAMAGE)
-                + data.getCustomStat(INNATE_DAMAGE)
-                + data.getCustomStat(TOP_DAMAGE)
-                + data.getCustomStat(DOMINUS_SHIELD_DAMAGE_BONUS)
-                + FairTrade.damageBonus(data)
-                + TeamStar.damageBonus(player)
-                + VirtualItems.statBonus(data, VirtualItems.DAMAGE_BONUS)
-                + finalDamageBonus(player, data, situationalFinalDamage);
-        if (includePhysicalAmplification) {
-            // Lunar Damage contributes to both typed amplification paths. Magic receives
-            // it in magicAmplification(); non-magic player damage receives it here.
-            bonus += data.getCustomStat(LUNAR_DAMAGE)
-                    + data.getCustomStat(PHYSICAL_DAMAGE_AMPLIFICATION)
-                    + data.getCustomStat(CIALLO_PHYSICAL_DAMAGE_AMPLIFICATION)
-                    * yuzusoftFanMultiplier(data)
-                    + sumOwnedStat(data, PHYSICAL_DAMAGE_AMPLIFICATION);
-        }
-        for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
-            bonus += entry.getKey().stat(DAMAGE_BONUS) * entry.getValue();
-        }
-        if (includePhysicalAmplification && data.owns(SR_COLLECTOR)) {
-            bonus += stat(SR_COLLECTOR, PHYSICAL_DAMAGE_AMPLIFICATION_PER_SOUL_LINK)
-                    * data.getActiveSoulLinks().size()
-                    * MakeUpWorkClub.collectorMultiplier(data);
-        }
-        if (data.hasActiveSoulLink(SOUL_COMBO_TECHNIQUE)) {
-            bonus += bonusStat(SOUL_COMBO_TECHNIQUE, ATTACK_DAMAGE_AMPLIFICATION);
-        }
-        return Math.max(0.0D, 1.0D + bonus);
-    }
-
     /** Returns only the Final Damage bucket used by converted True Damage. */
     static double trueDamageFinalDamageMultiplier(ServerPlayer player,
                                                    PlayerPerkData data,
                                                    DamageSource source) {
-        boolean magicDamage = IronSpellsCompat.isIronSpellDamage(source)
-                || ArsNouveauCompat.isArsSpellDamage(source)
-                || isNativeMinecraftMagic(source);
+        boolean magicDamage = DamageCalculationContext.isMagicDamage(source);
         double situationalFinalDamage = fernFinalDamageOnTrigger(
                 player,
                 data,
                 magicDamage
         );
-        if (data.owns(SR_PECORINES_BLESSING)
+        if (data.owns(PERK_PECORINES_BLESSING)
                 && player.getHealth() >= player.getMaxHealth()) {
             situationalFinalDamage += stat(
-                    SR_PECORINES_BLESSING,
+                    PERK_PECORINES_BLESSING,
                     FULL_HEALTH_FINAL_DAMAGE
             );
         }
-        return Math.max(0.0D, 1.0D
-                + finalDamageBonus(player, data, situationalFinalDamage));
-    }
-
-    private static double finalDamageBonus(ServerPlayer player,
-                                           PlayerPerkData data,
-                                           double situationalFinalDamage) {
-        double bonus = data.getCustomStat(FINAL_DAMAGE)
-                + data.getCustomStat(BLAZING_BREAKTHROUGH_DAMAGE)
-                + data.getCustomStat(CIALLO_FINAL_DAMAGE) * yuzusoftFanMultiplier(data)
-                + PerfectAndElegantServant.finalDamage(data)
-                + TeamRadiance.finalDamageBonus(data)
-                + VirtualItems.statBonus(data, VirtualItems.FINAL_DAMAGE)
-                + situationalFinalDamage;
-        for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
-            bonus += entry.getKey().stat(FINAL_DAMAGE) * entry.getValue();
-        }
-        if (data.owns(R_KOKONA)) {
-            bonus += stat(R_KOKONA, FINAL_DAMAGE_PER_OWNED_TALENT)
-                    * data.getUniqueTalentCount();
-        }
-        if (data.owns(SSR_FIREFLY_FLAME) && luckyStrike(player, data)
-                > stat(SSR_FIREFLY_FLAME, LUCKY_STRIKE_THRESHOLD)) {
-            bonus += stat(SSR_FIREFLY_FLAME, FINAL_DAMAGE_ABOVE_THRESHOLD);
-        }
-        if (data.isAegisEnabled(AegisConstants.HARMONY)) {
-            bonus += aegisStat(AegisConstants.HARMONY, FINAL_DAMAGE)
-                    * harmonyScalingFactor(data);
-        }
-        if (data.isAegisEnabled(AegisConstants.DESTRUCTION)) {
-            bonus += Math.max(0.0D, -rawDamageResistance(data))
-                    * aegisStat(
-                            AegisConstants.DESTRUCTION,
-                            AegisConstants.FINAL_DAMAGE_PER_NEGATIVE_DAMAGE_REDUCTION
-                    );
-        }
-        return bonus;
-    }
-
-    private static double independentDamageMultiplier(PlayerPerkData data) {
-        double bonus = data.getCustomStat(INDEPENDENT_DAMAGE_AMPLIFICATION)
-                + sumOwnedStat(data, INDEPENDENT_DAMAGE_AMPLIFICATION);
-        return Math.max(0.0D, 1.0D + bonus);
-    }
-
-    private static boolean isNativeMinecraftMagic(DamageSource source) {
-        return source.is(DamageTypes.MAGIC) || source.is(DamageTypes.INDIRECT_MAGIC);
-    }
-
-    private static double magicDamageMultiplier(Player player, PlayerPerkData data,
-                                                boolean spellDamage) {
-        double additiveDamage = magicDamageBonus(data);
-        if (spellDamage) {
-            additiveDamage += skillDamageBonus(data, luckyStrike(player, data));
-        }
-        return Math.max(0.0D, 1.0D + additiveDamage)
-                * Math.max(0.0D, 1.0D + magicAmplification(data));
+        return damageFinalCalculation(player, data, situationalFinalDamage);
     }
 
     /**
@@ -914,10 +820,10 @@ public final class TalentCombatEffects {
     private static double fernFinalDamageOnTrigger(ServerPlayer player,
                                                     PlayerPerkData data,
                                                     boolean magicDamage) {
-        if (!magicDamage || !data.owns(SR_FERN)) {
+        if (!magicDamage || !data.owns(PERK_FERN)) {
             return 0.0D;
         }
-        double chance = stat(SR_FERN, MAGIC_DAMAGE_TRIGGER_CHANCE);
+        double chance = stat(PERK_FERN, MAGIC_DAMAGE_TRIGGER_CHANCE);
         if (data.hasActiveSoulLink(SOUL_MAGICIAN_MASTER_AND_APPRENTICE)) {
             chance += bonusStat(
                     SOUL_MAGICIAN_MASTER_AND_APPRENTICE,
@@ -925,7 +831,7 @@ public final class TalentCombatEffects {
             );
         }
         return player.getRandom().nextDouble() < Mth.clamp(chance, 0.0D, 1.0D)
-                ? stat(SR_FERN, FINAL_DAMAGE_ON_TRIGGER)
+                ? stat(PERK_FERN, FINAL_DAMAGE_ON_TRIGGER)
                 : 0.0D;
     }
 }

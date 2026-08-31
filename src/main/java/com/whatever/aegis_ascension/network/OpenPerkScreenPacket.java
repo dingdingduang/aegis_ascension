@@ -22,7 +22,11 @@ public record OpenPerkScreenPacket(List<Perk> offers) {
     }
 
     public static OpenPerkScreenPacket decode(FriendlyByteBuf buffer) {
-        int count = Math.min(Math.max(0, buffer.readVarInt()), Perk.values().size());
+        int count = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_TALENTS,
+                "talent offer"
+        );
         List<Perk> offers = new ArrayList<>();
         for (int index = 0; index < count; index++) {
             Perk.byId(buffer.readUtf(128)).ifPresent(offers::add);

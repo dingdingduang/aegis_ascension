@@ -6,10 +6,12 @@ import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.compat.SummonCompat;
 import com.whatever.aegis_ascension.network.ModNetworking;
-import com.whatever.aegis_ascension.mechanic.TalentEffects;
+import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
+import com.whatever.aegis_ascension.quest.QuestManager;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.IntegerArgumentType;
+import com.mojang.brigadier.arguments.LongArgumentType;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
@@ -21,10 +23,10 @@ import net.minecraftforge.fml.common.Mod;
 
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getLiteralString;
 
-/** Administrative commands for resetting saved player progression. */
+/** Administrative commands for saved progression, testing, and resets. */
 @Mod.EventBusSubscriber(modid = AegisAscensionMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public final class PerkCommands {
-    private PerkCommands() {
+public final class AegisAscensionCommands {
+    private AegisAscensionCommands() {
     }
 
     @SubscribeEvent
@@ -34,7 +36,7 @@ public final class PerkCommands {
 
     private static void register(CommandDispatcher<CommandSourceStack> dispatcher) {
         dispatcher.register(
-                Commands.literal("perk")
+                Commands.literal("aegis_ascension")
                         .then(Commands.literal("givevirtual")
                                 .requires(source -> source.hasPermission(2))
                                 .then(Commands.argument("id", StringArgumentType.word())
@@ -93,7 +95,54 @@ public final class PerkCommands {
                                         ))
                                 )
                         )
-        );
+                        .then(Commands.literal("experience")
+                                .requires(source -> source.hasPermission(2))
+                                .then(Commands.literal("get")
+                                        .executes(context -> experienceGet(
+                                                context.getSource(),
+                                                context.getSource().getPlayerOrException()))
+                                        .then(Commands.argument("player", EntityArgument.player())
+                                                .executes(context -> experienceGet(
+                                                        context.getSource(),
+                                                        EntityArgument.getPlayer(context, "player")))))
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("amount", LongArgumentType.longArg(0L))
+                                                .executes(context -> experienceAdd(
+                                                        context.getSource(),
+                                                        context.getSource().getPlayerOrException(),
+                                                        LongArgumentType.getLong(context, "amount")))
+                                                .then(Commands.argument("player", EntityArgument.player())
+                                                        .executes(context -> experienceAdd(
+                                                                context.getSource(),
+                                                                EntityArgument.getPlayer(context, "player"),
+                                                                LongArgumentType.getLong(context, "amount"))))))
+                                .then(Commands.literal("set")
+                                        .then(Commands.argument("amount", LongArgumentType.longArg(0L))
+                                                .executes(context -> experienceSet(
+                                                        context.getSource(),
+                                                        context.getSource().getPlayerOrException(),
+                                                        LongArgumentType.getLong(context, "amount")))
+                                                .then(Commands.argument("player", EntityArgument.player())
+                                                        .executes(context -> experienceSet(
+                                                                context.getSource(),
+                                                                EntityArgument.getPlayer(context, "player"),
+                                                                LongArgumentType.getLong(context, "amount"))))))
+                        )
+                        .then(Commands.literal("rank")
+                                .requires(source -> source.hasPermission(2))
+                                .then(Commands.literal("set")
+                                        .then(Commands.argument("rank", IntegerArgumentType.integer(1, 1000))
+                                                .executes(context -> rankSet(
+                                                        context.getSource(),
+                                                        context.getSource().getPlayerOrException(),
+                                                        IntegerArgumentType.getInteger(context, "rank")))
+                                                .then(Commands.argument("player", EntityArgument.player())
+                                                        .executes(context -> rankSet(
+                                                                context.getSource(),
+                                                                EntityArgument.getPlayer(context, "player"),
+                                                                IntegerArgumentType.getInteger(context, "rank"))))))
+                        )
+                );
     }
 
     /**
@@ -145,33 +194,79 @@ public final class PerkCommands {
     }
 
     /**
-     * Wipes a player's perks, Aegises and breakthroughs, then re-grants whatever their
-     * current level entitles them to — the body of {@code /perk reset}.
+     * Wipes a player's perks, Aegises, AAE rank, and breakthroughs, then re-grants whatever
+     * their currently selected progression source entitles them to — the body of
+     * {@code /perk reset}.
      *
      * <p>Public so the Lethe's River Water virtual item performs the identical reset rather
      * than reimplementing it; a second copy would drift the moment either side changed.
-     * Deliberately leaves virtual storage and virtual-item use counts alone, matching the
-     * command's existing behaviour.</p>
+     * Deliberately leaves ordinary virtual storage and ordinary virtual-item use counts
+     * alone. Devour Aegis Core levels, banked copies, and unique-purchase history reset
+     * with the Aegis progression they upgrade.</p>
      */
     public static void resetProgression(ServerPlayer target) {
         PerkData.get(target).ifPresent(data -> {
             data.resetAll();
-            PlayerPerkData.PerkMilestoneAwards perkAwards =
-                    data.awardMilestonesForLevel(target.experienceLevel);
-            data.awardSkillEnhancementMilestonesForLevel(target.experienceLevel);
-            data.awardAegisChargesForLevel(target.experienceLevel);
-            int immediateBreakthroughs = perkAwards.breakthroughsToTriggerImmediately();
-            if (immediateBreakthroughs > 0) {
-                TalentEffects.triggerBreakthroughs(
-                        target,
-                        data,
-                        immediateBreakthroughs
-                );
-            }
+            QuestManager.tick(target, data);
+            AegisExperienceSystem.awardMilestones(target, data, false);
             data.applyChosenPerks(target);
             SummonCompat.refreshOwnedSummons(target, data);
             ModNetworking.syncTo(target);
+            ModNetworking.syncStorageTo(target);
+            ModNetworking.syncShopTo(target);
         });
+    }
+
+    private static int experienceGet(CommandSourceStack source, ServerPlayer target) {
+        PlayerPerkData data = PerkData.of(target);
+        AegisExperienceSystem.Snapshot snapshot =
+                AegisExperienceSystem.snapshot(target, data);
+        source.sendSuccess(() -> getLiteralString(
+                target.getGameProfile().getName() + " — Aegis Rank "
+                        + snapshot.aegisAscensionRank() + ", "
+                        + snapshot.aegisAscensionExperience() + "/"
+                        + snapshot.experienceToNextRank() + " AAE"
+                        + (snapshot.usesMinecraftDefaultLevel()
+                        ? " (Minecraft level " + snapshot.progressionLevel() + " is active)"
+                        : "")), false);
+        return 1;
+    }
+
+    private static int experienceAdd(CommandSourceStack source, ServerPlayer target,
+                                     long amount) {
+        PlayerPerkData data = PerkData.of(target);
+        AegisExperienceSystem.AwardResult result =
+                AegisExperienceSystem.addExperience(data, amount);
+        AegisExperienceSystem.awardMilestones(target, data, false);
+        ModNetworking.syncTo(target);
+        source.sendSuccess(() -> getLiteralString(
+                "Added " + amount + " AAE to " + target.getGameProfile().getName()
+                        + " (Rank " + result.currentRank() + ")."), true);
+        return 1;
+    }
+
+    private static int experienceSet(CommandSourceStack source, ServerPlayer target,
+                                     long amount) {
+        PlayerPerkData data = PerkData.of(target);
+        data.setAegisAscensionProgress(1, 0L);
+        AegisExperienceSystem.addExperience(data, amount);
+        AegisExperienceSystem.awardMilestones(target, data, false);
+        ModNetworking.syncTo(target);
+        source.sendSuccess(() -> getLiteralString(
+                "Set Aegis Ascension Experience for " + target.getGameProfile().getName()
+                        + " to " + amount + "."), true);
+        return 1;
+    }
+
+    private static int rankSet(CommandSourceStack source, ServerPlayer target, int rank) {
+        PlayerPerkData data = PerkData.of(target);
+        AegisExperienceSystem.setRank(data, rank);
+        AegisExperienceSystem.awardMilestones(target, data, false);
+        ModNetworking.syncTo(target);
+        source.sendSuccess(() -> getLiteralString(
+                "Set Aegis Rank for " + target.getGameProfile().getName()
+                        + " to " + data.getAegisAscensionRank() + "."), true);
+        return 1;
     }
 
     private static int resetAll(CommandSourceStack source, ServerPlayer target) {

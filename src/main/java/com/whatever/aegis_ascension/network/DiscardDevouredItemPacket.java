@@ -2,6 +2,7 @@ package com.whatever.aegis_ascension.network;
 
 import com.whatever.aegis_ascension.aegis.AegisConstants;
 import com.whatever.aegis_ascension.data.PerkData;
+import com.whatever.aegis_ascension.platform.PlatformServices;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
@@ -13,7 +14,6 @@ import java.util.function.Supplier;
 
 /** Server-authoritative request to discard one devoured item's inherited bonuses. */
 public record DiscardDevouredItemPacket(String itemId) {
-    private static final long MINIMUM_INTERVAL_TICKS = 10L;
     private static final Map<ServerPlayer, Long> LAST_REQUEST_TICK = new WeakHashMap<>();
 
     public static void encode(DiscardDevouredItemPacket packet, FriendlyByteBuf buffer) {
@@ -48,13 +48,10 @@ public record DiscardDevouredItemPacket(String itemId) {
     }
 
     private static boolean tryAcquire(ServerPlayer player) {
-        long currentTick = player.serverLevel().getGameTime();
-        Long lastTick = LAST_REQUEST_TICK.get(player);
-        if (lastTick != null && currentTick >= lastTick
-                && currentTick - lastTick < MINIMUM_INTERVAL_TICKS) {
-            return false;
-        }
-        LAST_REQUEST_TICK.put(player, currentTick);
-        return true;
+        return PacketRequestLimiter.tryAcquire(
+                player,
+                LAST_REQUEST_TICK,
+                PlatformServices.config().discardDevourPacketCooldownSeconds()
+        );
     }
 }

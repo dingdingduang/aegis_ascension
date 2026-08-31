@@ -24,7 +24,7 @@ public record RequestAegisOffersPacket() {
                 return;
             }
             PerkData.get(sender).ifPresent(data -> {
-                ModNetworking.syncTo(sender);
+                ModNetworking.syncPerkDataTo(sender);
                 // Pending choices are persistent and cannot be rerolled by reopening.
                 var offers = data.getPendingAegisOffers();
                 if (offers.isEmpty()) {

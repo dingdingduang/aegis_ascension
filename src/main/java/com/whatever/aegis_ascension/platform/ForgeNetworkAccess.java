@@ -2,6 +2,7 @@ package com.whatever.aegis_ascension.platform;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.network.*;
+import com.whatever.aegis_ascension.util.GeneralClientMethods;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -22,10 +23,18 @@ public final class ForgeNetworkAccess implements NetworkAccess {
     // 27 -> 28: Shared Fortune binding request and synchronized bond state.
     // 28 -> 29: store hovered player-inventory slot request.
     // 29 -> 30: open the server-backed ACG inventory/workbench menu.
-    private static final String PROTOCOL_VERSION = "30";
+    // 30 -> 31: Common/Discovery shop type and enabled state in shop packets.
+    // 31 -> 34: Quest Center request, action, and synchronization packets.
+    // 34 -> 35: per-player quest auto-accept setting and synchronized preference.
+    // 35 -> 36: repeatable Common quest cycle and reward-cooldown state.
+    // 37 -> 38: synchronized Gold Currency mode and balance, plus quest Gold rewards.
+    // 38 -> 39: login-time server catalog snapshot and acknowledgement handshake.
+    // 39 -> 40: completed-quest icon metadata in Quest Center synchronization.
+    // 40 -> 41: synchronized data-driven quest completion SoundEvent id.
+    private static final String PROTOCOL_VERSION = "41";
 
     private final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
-            ResourceLocation.fromNamespaceAndPath(AegisAscensionMod.MOD_ID, "main"),
+            GeneralClientMethods.fromNamespaceAndPath(AegisAscensionMod.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
@@ -307,13 +316,43 @@ public final class ForgeNetworkAccess implements NetworkAccess {
                 Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
         channel.registerMessage(
-                id,
+                id++,
                 OpenACGInventoryPacket.class,
                 OpenACGInventoryPacket::encode,
                 OpenACGInventoryPacket::decode,
                 OpenACGInventoryPacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
+        channel.registerMessage(
+                id++, RequestQuestDataPacket.class, RequestQuestDataPacket::encode,
+                RequestQuestDataPacket::decode, RequestQuestDataPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        channel.registerMessage(
+                id++, QuestActionPacket.class, QuestActionPacket::encode,
+                QuestActionPacket::decode, QuestActionPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        channel.registerMessage(
+                id++, SetQuestAutoAcceptPacket.class, SetQuestAutoAcceptPacket::encode,
+                SetQuestAutoAcceptPacket::decode, SetQuestAutoAcceptPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        channel.registerMessage(
+                id++, SyncQuestDataPacket.class, SyncQuestDataPacket::encode,
+                SyncQuestDataPacket::decode, SyncQuestDataPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(
+                id++, SyncQuestProgressPacket.class, SyncQuestProgressPacket::encode,
+                SyncQuestProgressPacket::decode, SyncQuestProgressPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(
+                id++, SyncServerCatalogPacket.class, SyncServerCatalogPacket::encode,
+                SyncServerCatalogPacket::decode, SyncServerCatalogPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
+        channel.registerMessage(
+                id++, AcknowledgeServerCatalogPacket.class,
+                AcknowledgeServerCatalogPacket::encode,
+                AcknowledgeServerCatalogPacket::decode,
+                AcknowledgeServerCatalogPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER));
     }
 
     @Override

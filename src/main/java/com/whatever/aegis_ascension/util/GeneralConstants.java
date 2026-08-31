@@ -47,6 +47,17 @@ public final class GeneralConstants {
         return 0;
     }
 
+    /** Canonical tier name for a resolved rarity tint. */
+    public static String rarityTier(int rarityColor) {
+        if (rarityColor == RARITY_SSR) {
+            return TIER_SSR;
+        }
+        if (rarityColor == RARITY_SR) {
+            return TIER_SR;
+        }
+        return TIER_R;
+    }
+
     /** The tint for a tier name; unrecognised names read as R. */
     public static int rarityColor(String tier) {
         return switch (normalizeTier(tier)) {

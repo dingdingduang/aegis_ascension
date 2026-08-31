@@ -26,7 +26,7 @@ public record RequestPerkOffersPacket() {
 
             PerkData.get(sender).ifPresent(data -> {
                 // Sync first so the UI always renders the server's current charge/rank state.
-                ModNetworking.syncTo(sender);
+                ModNetworking.syncPerkDataTo(sender);
                 // An offer remains locked until the player spends a charge. Closing and
                 // reopening the screen must not act as a free reroll.
                 var offers = data.getPendingOffers();

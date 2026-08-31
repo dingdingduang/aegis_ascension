@@ -22,10 +22,11 @@ public record OpenAegisScreenPacket(List<Aegis> offers) {
     }
 
     public static OpenAegisScreenPacket decode(FriendlyByteBuf buffer) {
-        int count = buffer.readVarInt();
-        if (count < 0 || count > Aegis.values().size()) {
-            throw new IllegalArgumentException("Invalid Aegis offer count: " + count);
-        }
+        int count = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_AEGISES,
+                "Aegis offer"
+        );
         List<Aegis> offers = new ArrayList<>();
         for (int index = 0; index < count; index++) {
             Aegis.byId(buffer.readUtf(128)).ifPresent(aegis -> {

@@ -1,11 +1,10 @@
 package com.whatever.aegis_ascension.mechanic;
 
-import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
-
-import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.perk.soullink.MakeUpWorkClub;
+import com.whatever.aegis_ascension.shop.ShopType;
+import com.whatever.aegis_ascension.quest.QuestManager;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
 
@@ -28,75 +27,32 @@ public final class ServerTickHandler {
         // rerolls exactly once after the 24000-tick boundary is crossed.
         if (player.tickCount % SHOP_RESET_CHECK_INTERVAL_TICKS == 0) {
             PerkData.get(player).ifPresent(data -> {
-                if (data.getShopState().tickAutoRefresh(player.serverLevel())) {
-                    ModNetworking.syncShopTo(player);
+                for (ShopType shopType : ShopType.values()) {
+                    if (data.getShopState(shopType)
+                            .tickAutoRefresh(player.serverLevel(), data)) {
+                        ModNetworking.syncShopTo(player, shopType);
+                    }
                 }
             });
         }
 
         PerkData.get(player).ifPresent(data -> {
+            boolean questStructureChanged = QuestManager.tick(player, data);
+            QuestManager.sampleWalkMovement(player, data);
+            if (player.tickCount % 20 == 0) {
+                QuestManager.onBiomeVisited(player);
+            }
             TalentEffects.onPlayerTick(player, data);
-            PlayerPerkData.PerkMilestoneAwards perkAwards =
-                    data.awardMilestonesForLevel(player.experienceLevel);
-            int skillEnhancementsGranted =
-                    data.awardSkillEnhancementMilestonesForLevel(player.experienceLevel);
-            int aegisGranted = data.awardAegisChargesForLevel(player.experienceLevel);
-            int immediateBreakthroughs = perkAwards.breakthroughsToTriggerImmediately();
-            if (immediateBreakthroughs > 0) {
-                TalentEffects.triggerBreakthroughs(player, data, immediateBreakthroughs);
+            AegisExperienceSystem.MilestoneResult milestones =
+                    AegisExperienceSystem.awardMilestones(player, data, true);
+            if (milestones.changed()) {
+                ModNetworking.syncPerkDataTo(player);
             }
-            if (perkAwards.chargesGranted() > 0) {
-                sendAwardMessage(
-                        player,
-                        perkAwards.chargesGranted(),
-                        data.getSelectionCharges()
-                );
+            if (questStructureChanged) {
+                ModNetworking.syncQuestsTo(player);
             }
-            if (skillEnhancementsGranted > 0) {
-                TalentEffects.recalculateAttributes(player, data);
-                sendSkillEnhancementAwardMessage(
-                        player,
-                        skillEnhancementsGranted,
-                        data.getSkillEnhancementCharges()
-                );
-            }
-            if (aegisGranted > 0) {
-                sendAegisAwardMessage(player, aegisGranted, data.getAegisSelectionCharges());
-            }
-            if (perkAwards.chargesGranted() > 0
-                    || perkAwards.breakthroughsTriggered() > 0
-                    || skillEnhancementsGranted > 0
-                    || aegisGranted > 0) {
-                ModNetworking.syncTo(player);
-            }
+            QuestManager.flushPendingProgressSync(player);
         });
     }
 
-    private static void sendAwardMessage(ServerPlayer player, int granted, int total) {
-        player.sendSystemMessage(getTranslatableString(
-                "message.aegis_ascension.charge_awarded",
-                granted,
-                total
-        ));
-    }
-
-    private static void sendSkillEnhancementAwardMessage(
-            ServerPlayer player,
-            int granted,
-            int total
-    ) {
-        player.sendSystemMessage(getTranslatableString(
-                "message.aegis_ascension.skill_enhancement_charge_awarded",
-                granted,
-                total
-        ));
-    }
-
-    private static void sendAegisAwardMessage(ServerPlayer player, int granted, int total) {
-        player.sendSystemMessage(getTranslatableString(
-                "message.aegis_ascension.aegis_charge_awarded",
-                granted,
-                total
-        ));
-    }
 }

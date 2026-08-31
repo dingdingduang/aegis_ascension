@@ -41,6 +41,10 @@ public final class GeneralClientMethods {
     private GeneralClientMethods() {
     }
 
+    public static ResourceLocation fromNamespaceAndPath(String name, String path) {
+        return ResourceLocation.fromNamespaceAndPath(name, path);
+    }
+
     public static Attribute resolveAttribute(ResourceLocation attributeId) {
         return PlatformServices.attributes().resolve(attributeId);
     }

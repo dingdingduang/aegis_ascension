@@ -1,6 +1,6 @@
 package com.whatever.aegis_ascension.perk.talents;
 
-import static com.whatever.aegis_ascension.perk.TalentConstants.SR_HOMURAS_BLESSING;
+import static com.whatever.aegis_ascension.perk.TalentConstants.PERK_HOMURAS_BLESSING;
 
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
@@ -25,7 +25,7 @@ public final class HomuraExperienceProtection {
 
     public static void capture(ServerPlayer player) {
         boolean ownsBlessing = PerkData.get(player)
-                .map(data -> data.owns(SR_HOMURAS_BLESSING))
+                .map(data -> data.owns(PERK_HOMURAS_BLESSING))
                 .orElse(false);
         if (!ownsBlessing) {
             PENDING.remove(player.getUUID());

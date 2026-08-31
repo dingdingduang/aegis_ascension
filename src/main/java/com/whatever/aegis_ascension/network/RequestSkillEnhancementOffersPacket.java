@@ -29,7 +29,7 @@ public record RequestSkillEnhancementOffersPacket() {
                 if (data.getPendingSkillEnhancementOffers().isEmpty()) {
                     data.rollSkillEnhancementOffers(sender);
                 }
-                ModNetworking.syncTo(sender);
+                ModNetworking.syncPerkDataTo(sender);
             });
         });
         context.setPacketHandled(true);

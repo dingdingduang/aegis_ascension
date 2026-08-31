@@ -22,7 +22,7 @@ public final class Frenzy {
     }
 
     public static void onMobJoined(Mob mob) {
-        Perk frenzy = Perk.byId(R_FRENZY).orElse(null);
+        Perk frenzy = Perk.byId(PERK_FRENZY).orElse(null);
         if (frenzy == null) {
             return;
         }
@@ -33,7 +33,7 @@ public final class Frenzy {
                 mob.getBoundingBox().inflate(radius)
         )) {
             if (mob.distanceToSqr(player) <= radius * radius
-                    && PerkData.get(player).map(data -> data.owns(R_FRENZY))
+                    && PerkData.get(player).map(data -> data.owns(PERK_FRENZY))
                     .orElse(false)) {
                 ownerNearby = true;
                 break;

@@ -7,6 +7,7 @@ import com.google.gson.annotations.SerializedName;
 import com.whatever.aegis_ascension.util.GeneralConstants;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -76,8 +77,8 @@ public final class ShopConfig {
      */
     public boolean blacklistMode = true;
     /**
-     * Item ids ({@code "minecraft:emerald"}) or item tags ({@code "#minecraft:planks"}),
-     * interpreted per {@link #blacklistMode}.
+     * Item ids ({@code "minecraft:emerald"}), item tags ({@code "#minecraft:planks"}),
+     * or namespaces ({@code "@example_mod"}), interpreted per {@link #blacklistMode}.
      */
     public List<String> filteredItems = new ArrayList<>();
 
@@ -92,6 +93,8 @@ public final class ShopConfig {
      * against the whole pool.
      */
     public RarityWeights rarityWeights = new RarityWeights();
+    /** Registry-backed shop with its own stock, refresh schedule, filters, and price rules. */
+    public DiscoveryShop discoveryShop = new DiscoveryShop();
 
     /** Relative tier chances. Defaults to 88 / 10 / 2. */
     public static final class RarityWeights {
@@ -140,6 +143,278 @@ public final class ShopConfig {
         public int minCount = 1;
         public int maxCount = 1;
         public int experienceCost = 10;
+    }
+
+    /** Settings for the registry-backed Discovery Shop. */
+    public static final class DiscoveryShop {
+        public boolean enabled = true;
+        public int autoRefreshIntervalMinutes = 60;
+        public int maxManualRefreshes = 3;
+        public int manualRefreshExperienceCost = 500;
+        public int minimumSlots = 4;
+        public int maximumSlots = 10;
+        public double additionalSlotChance = 0.40D;
+        public boolean sequentialSlotUnlock = false;
+        public int defaultMinCount = 1;
+        public int defaultMaxCount = 1;
+        /** Fallback price when an item has no rarity (or an invalid rarity). */
+        public int defaultExperienceCost = 500;
+        public String defaultTier = "R";
+        /** Default prices for items resolved into the corresponding rarity tier. */
+        public RarityExperienceCosts rarityExperienceCosts = new RarityExperienceCosts();
+        /** Tier odds are rolled before an item is selected from that equipment tier. */
+        public RarityWeights rarityWeights = new RarityWeights();
+        public boolean autoClassifyEquipmentTier = true;
+        /** Default thresholds keep all ordinary vanilla weapons in R. */
+        public double srAttackDamageThreshold = 12.0D;
+        public double ssrAttackDamageThreshold = 30.0D;
+        /** Default thresholds keep all ordinary vanilla armor pieces in R. */
+        public double srArmorThreshold = 10.0D;
+        public double ssrArmorThreshold = 20.0D;
+        /** Extra continuous falloff inside a tier; 0 disables it. */
+        public double highPowerFalloffExponent = 2.0D;
+        /** Floor for automatic power falloff before a rule multiplier is applied. */
+        public double minimumHighPowerWeight = 0.001D;
+        public boolean blacklistMode = true;
+        /** Exact item ids, item tags prefixed with '#', or whole namespaces prefixed with '@'. */
+        public List<String> filteredItems = new ArrayList<>(List.of(
+                "minecraft:air",
+                "minecraft:bedrock",
+                "minecraft:barrier",
+                "minecraft:command_block",
+                "minecraft:chain_command_block",
+                "minecraft:repeating_command_block",
+                "minecraft:command_block_minecart",
+                "minecraft:structure_block",
+                "minecraft:structure_void",
+                "minecraft:jigsaw",
+                "minecraft:light",
+                "minecraft:debug_stick",
+                "minecraft:knowledge_book",
+                "minecraft:spawner",
+                "minecraft:end_portal_frame",
+                "#forge:technical_items"
+        ));
+        /** First matching rule overrides the defaults for an item. */
+        public List<DiscoveryRule> rules = new ArrayList<>();
+
+        public long autoRefreshIntervalTicks() {
+            return Math.max(1L, autoRefreshIntervalMinutes) * 60L * 20L;
+        }
+
+        public boolean isItemAllowed(Item item) {
+            boolean listed = matchesAny(item, filteredItems);
+            return blacklistMode != listed;
+        }
+
+        /** Resolves the first matching override, then fills every omitted value from defaults. */
+        public DiscoveryOfferSettings settingsFor(
+                Item item,
+                double attackDamage,
+                double armor
+        ) {
+            DiscoveryRule matched = null;
+            for (DiscoveryRule rule : rules) {
+                if (rule != null && matches(item, rule.match)) {
+                    matched = rule;
+                    break;
+                }
+            }
+            int minCount = matched == null || matched.minCount < 0
+                    ? defaultMinCount : matched.minCount;
+            int maxCount = matched == null || matched.maxCount < 0
+                    ? defaultMaxCount : matched.maxCount;
+            String tier = matched == null || matched.tier == null || matched.tier.isBlank()
+                    ? automaticTier(attackDamage, armor)
+                    : matched.tier;
+            boolean explicitTier = matched != null && matched.tier != null
+                    && !matched.tier.isBlank();
+            boolean automaticallyClassified = autoClassifyEquipmentTier
+                    && (attackDamage > 0.0D || armor > 0.0D);
+            int cost = matched != null && matched.experienceCost >= 0
+                    ? matched.experienceCost
+                    : (explicitTier || automaticallyClassified
+                            ? rarityExperienceCost(tier) : defaultExperienceCost);
+            double ruleWeight = matched == null || matched.selectionWeightMultiplier < 0.0D
+                    ? 1.0D : matched.selectionWeightMultiplier;
+            return new DiscoveryOfferSettings(
+                    Math.max(1, minCount),
+                    Math.max(Math.max(1, minCount), maxCount),
+                    Math.max(0, cost),
+                    GeneralConstants.normalizeTier(tier),
+                    Math.max(0.0D, ruleWeight) * automaticPowerWeight(attackDamage, armor)
+            );
+        }
+
+        private int rarityExperienceCost(String tier) {
+            if (rarityExperienceCosts == null) {
+                return defaultExperienceCost;
+            }
+            return rarityExperienceCosts.costOf(tier, defaultExperienceCost);
+        }
+
+        private String automaticTier(double attackDamage, double armor) {
+            if (!autoClassifyEquipmentTier
+                    || (attackDamage <= 0.0D && armor <= 0.0D)) {
+                return defaultTier;
+            }
+            if (meetsThreshold(attackDamage, ssrAttackDamageThreshold)
+                    || meetsThreshold(armor, ssrArmorThreshold)) {
+                return GeneralConstants.TIER_SSR;
+            }
+            if (meetsThreshold(attackDamage, srAttackDamageThreshold)
+                    || meetsThreshold(armor, srArmorThreshold)) {
+                return GeneralConstants.TIER_SR;
+            }
+            return GeneralConstants.TIER_R;
+        }
+
+        private double automaticPowerWeight(double attackDamage, double armor) {
+            if (highPowerFalloffExponent <= 0.0D) {
+                return 1.0D;
+            }
+            double ratio = Math.max(
+                    powerRatio(attackDamage, srAttackDamageThreshold),
+                    powerRatio(armor, srArmorThreshold)
+            );
+            if (ratio <= 1.0D) {
+                return 1.0D;
+            }
+            return Math.max(
+                    minimumHighPowerWeight,
+                    Math.pow(ratio, -highPowerFalloffExponent)
+            );
+        }
+
+        private static boolean meetsThreshold(double value, double threshold) {
+            return threshold > 0.0D && value >= threshold;
+        }
+
+        private static double powerRatio(double value, double threshold) {
+            return threshold <= 0.0D || value <= threshold ? 1.0D : value / threshold;
+        }
+
+        private void sanitize() {
+            autoRefreshIntervalMinutes = Math.max(1, autoRefreshIntervalMinutes);
+            maxManualRefreshes = Math.max(0, maxManualRefreshes);
+            manualRefreshExperienceCost = Math.max(0, manualRefreshExperienceCost);
+            maximumSlots = Math.max(1, Math.min(54, maximumSlots));
+            minimumSlots = Math.max(0, Math.min(maximumSlots, minimumSlots));
+            additionalSlotChance = Math.max(0.0D, Math.min(1.0D, additionalSlotChance));
+            defaultMinCount = Math.max(1, defaultMinCount);
+            defaultMaxCount = Math.max(defaultMinCount, defaultMaxCount);
+            defaultExperienceCost = Math.max(0, defaultExperienceCost);
+            defaultTier = GeneralConstants.normalizeTier(defaultTier);
+            if (rarityExperienceCosts == null) {
+                rarityExperienceCosts = new RarityExperienceCosts();
+            }
+            rarityExperienceCosts.sanitize(defaultExperienceCost);
+            if (rarityWeights == null) {
+                rarityWeights = new RarityWeights();
+            }
+            rarityWeights.r = Math.max(0, rarityWeights.r);
+            rarityWeights.sr = Math.max(0, rarityWeights.sr);
+            rarityWeights.ssr = Math.max(0, rarityWeights.ssr);
+            srAttackDamageThreshold = finiteNonNegative(srAttackDamageThreshold, 12.0D);
+            ssrAttackDamageThreshold = Math.max(
+                    srAttackDamageThreshold,
+                    finiteNonNegative(ssrAttackDamageThreshold, 30.0D)
+            );
+            srArmorThreshold = finiteNonNegative(srArmorThreshold, 10.0D);
+            ssrArmorThreshold = Math.max(
+                    srArmorThreshold,
+                    finiteNonNegative(ssrArmorThreshold, 20.0D)
+            );
+            highPowerFalloffExponent = finiteNonNegative(highPowerFalloffExponent, 2.0D);
+            minimumHighPowerWeight = Double.isFinite(minimumHighPowerWeight)
+                    ? Math.max(0.0D, Math.min(1.0D, minimumHighPowerWeight))
+                    : 0.001D;
+            if (filteredItems == null) {
+                filteredItems = new ArrayList<>();
+            }
+            if (rules == null) {
+                rules = new ArrayList<>();
+            }
+            for (DiscoveryRule rule : rules) {
+                if (rule == null) {
+                    continue;
+                }
+                rule.match = rule.match == null ? "" : rule.match.trim();
+                rule.minCount = Math.max(-1, rule.minCount);
+                rule.maxCount = Math.max(-1, rule.maxCount);
+                if (rule.minCount >= 0 && rule.maxCount >= 0) {
+                    rule.maxCount = Math.max(rule.minCount, rule.maxCount);
+                }
+                rule.experienceCost = Math.max(-1, rule.experienceCost);
+                rule.tier = rule.tier == null ? "" : rule.tier.trim();
+                rule.selectionWeightMultiplier =
+                        Double.isFinite(rule.selectionWeightMultiplier)
+                                ? Math.max(-1.0D, Math.min(1_000_000.0D,
+                                rule.selectionWeightMultiplier))
+                                : -1.0D;
+            }
+        }
+
+        private static double finiteNonNegative(double value, double fallback) {
+            return Double.isFinite(value) ? Math.max(0.0D, value) : fallback;
+        }
+    }
+
+    /** An ordered exact-id, tag, or namespace override for Discovery Shop offers. */
+    public static final class DiscoveryRule {
+        public String match = "";
+        /** -1 inherits {@link DiscoveryShop#defaultMinCount}. */
+        public int minCount = -1;
+        /** -1 inherits {@link DiscoveryShop#defaultMaxCount}. */
+        public int maxCount = -1;
+        /** -1 inherits the matching rarity default, or {@link DiscoveryShop#defaultExperienceCost}
+         * when no rarity is available. */
+        public int experienceCost = -1;
+        /** Blank inherits {@link DiscoveryShop#defaultTier}. */
+        public String tier = "";
+        /** -1 inherits 1.0; 0 removes matching items from rolls; higher values make them likelier. */
+        public double selectionWeightMultiplier = -1.0D;
+    }
+
+    /** Default Discovery Shop prices by resolved rarity. */
+    public static final class RarityExperienceCosts {
+        @SerializedName("R")
+        public int r = 500;
+        @SerializedName("SR")
+        public int sr = 1500;
+        @SerializedName("SSR")
+        public int ssr = 5000;
+
+        public int costOf(String tier, int fallback) {
+            if (tier == null) {
+                return Math.max(0, fallback);
+            }
+            return switch (tier.trim().toUpperCase(java.util.Locale.ROOT)) {
+                case GeneralConstants.TIER_R -> r;
+                case GeneralConstants.TIER_SR -> sr;
+                case GeneralConstants.TIER_SSR -> ssr;
+                default -> Math.max(0, fallback);
+            };
+        }
+
+        private void sanitize(int fallback) {
+            int safeFallback = Math.max(0, fallback);
+            // Keep hand-edited negative values from becoming a free offer while allowing
+            // an explicitly configured zero price when desired.
+            r = r < 0 ? safeFallback : r;
+            sr = sr < 0 ? safeFallback : sr;
+            ssr = ssr < 0 ? safeFallback : ssr;
+        }
+    }
+
+    /** Fully resolved count, price, and rarity for one Discovery Shop candidate. */
+    public record DiscoveryOfferSettings(
+            int minCount,
+            int maxCount,
+            int experienceCost,
+            String tier,
+            double selectionWeight
+    ) {
     }
 
     public static ShopConfig get() {
@@ -229,6 +504,9 @@ public final class ShopConfig {
         if (rarityWeights == null) {
             rarityWeights = new RarityWeights();
         }
+        if (discoveryShop == null) {
+            discoveryShop = new DiscoveryShop();
+        }
         rarityWeights.r = Math.max(0, rarityWeights.r);
         rarityWeights.sr = Math.max(0, rarityWeights.sr);
         rarityWeights.ssr = Math.max(0, rarityWeights.ssr);
@@ -248,6 +526,7 @@ public final class ShopConfig {
             entry.maxCount = Math.max(entry.minCount, entry.maxCount);
             entry.experienceCost = Math.max(0, entry.experienceCost);
         }
+        discoveryShop.sanitize();
     }
 
     /**
@@ -258,32 +537,60 @@ public final class ShopConfig {
      * behaving like no filter at all.
      */
     public boolean isItemAllowed(Item item) {
-        boolean listed = matchesFilter(item);
+        boolean listed = matchesAny(item, filteredItems);
         return blacklistMode != listed;
     }
 
-    private boolean matchesFilter(Item item) {
-        ItemStack probe = new ItemStack(item);
-        for (String entry : filteredItems) {
-            if (entry == null || entry.isBlank()) {
-                continue;
-            }
-            String trimmed = entry.trim();
-            if (trimmed.startsWith("#")) {
-                ResourceLocation tagId = PlatformServices.resources().tryParse(
-                        trimmed.substring(1)
-                );
-                if (tagId != null && probe.is(TagKey.create(Registries.ITEM, tagId))) {
-                    return true;
-                }
-            } else {
-                ResourceLocation itemId = PlatformServices.resources().tryParse(trimmed);
-                if (itemId != null && itemId.equals(GeneralServerMethods.getItemKey(item))) {
-                    return true;
-                }
+    private static boolean matchesAny(Item item, List<String> filters) {
+        if (filters == null) {
+            return false;
+        }
+        for (String entry : filters) {
+            if (matches(item, entry)) {
+                return true;
             }
         }
         return false;
+    }
+
+    private static boolean matches(Item item, String expression) {
+        if (item == null || expression == null || expression.isBlank()) {
+            return false;
+        }
+        ItemStack probe = new ItemStack(item);
+        String trimmed = expression.trim();
+        ResourceLocation actualId = GeneralServerMethods.getItemKey(item);
+        if (trimmed.startsWith("#")) {
+            ResourceLocation tagId = PlatformServices.resources().tryParse(trimmed.substring(1));
+            return tagId != null && probe.is(TagKey.create(Registries.ITEM, tagId));
+        }
+        if (trimmed.startsWith("@")) {
+            return actualId != null && actualId.getNamespace().equals(trimmed.substring(1));
+        }
+        ResourceLocation itemId = PlatformServices.resources().tryParse(trimmed);
+        return itemId != null && itemId.equals(actualId);
+    }
+
+    public boolean isEnabled(ShopType shopType) {
+        return shopType == ShopType.COMMON || discoveryShop.enabled;
+    }
+
+    public long autoRefreshIntervalTicks(ShopType shopType) {
+        return shopType == ShopType.DISCOVERY
+                ? discoveryShop.autoRefreshIntervalTicks()
+                : autoRefreshIntervalTicks();
+    }
+
+    public int maxManualRefreshes(ShopType shopType) {
+        return shopType == ShopType.DISCOVERY
+                ? discoveryShop.maxManualRefreshes
+                : maxManualRefreshes;
+    }
+
+    public int manualRefreshExperienceCost(ShopType shopType) {
+        return shopType == ShopType.DISCOVERY
+                ? discoveryShop.manualRefreshExperienceCost
+                : manualRefreshExperienceCost;
     }
 
     /**

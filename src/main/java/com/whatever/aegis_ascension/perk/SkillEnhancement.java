@@ -34,14 +34,14 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatab
 public final class SkillEnhancement {
     public static final String DEFAULT_PRIMARY_ID = "attack_damage";
     private static final Gson GSON = new Gson();
-    private static final Catalog CATALOG = loadCatalog();
-    private static final List<SkillEnhancement> VALUES;
-    private static final Map<String, SkillEnhancement> BY_ID;
+    private static final Catalog LOCAL_CATALOG = loadCatalog();
+    private static final CatalogSnapshot LOCAL_SNAPSHOT = buildSnapshot(LOCAL_CATALOG);
+    private static volatile CatalogSnapshot activeSnapshot = LOCAL_SNAPSHOT;
 
-    static {
+    private static CatalogSnapshot buildSnapshot(Catalog catalog) {
         List<SkillEnhancement> values = new ArrayList<>();
         Map<String, SkillEnhancement> byId = new LinkedHashMap<>();
-        for (EnhancementJson definition : CATALOG.enhancements) {
+        for (EnhancementJson definition : catalog.enhancements) {
             String id = definition.id;
             ResourceLocation attributeId = blank(definition.attribute)
                     ? null : requireLocation(definition.attribute, "attribute");
@@ -84,8 +84,10 @@ public final class SkillEnhancement {
         if (values.isEmpty()) {
             throw new IllegalStateException("Skill enhancement catalog is empty");
         }
-        VALUES = List.copyOf(values);
-        BY_ID = Collections.unmodifiableMap(byId);
+        return new CatalogSnapshot(
+                List.copyOf(values),
+                Collections.unmodifiableMap(byId)
+        );
     }
 
     private final String id;
@@ -180,11 +182,31 @@ public final class SkillEnhancement {
     }
 
     public static List<SkillEnhancement> values() {
-        return VALUES;
+        return activeSnapshot.values();
     }
 
     public static Optional<SkillEnhancement> byId(String id) {
-        return Optional.ofNullable(BY_ID.get(id));
+        return Optional.ofNullable(activeSnapshot.byId().get(id));
+    }
+
+    /** Serializes the server's effective, validated catalog for the login snapshot. */
+    public static String exportCatalogJson() {
+        return GSON.toJson(LOCAL_CATALOG);
+    }
+
+    /** Installs a server-authoritative catalog in client memory without touching local files. */
+    public static void installSyncedCatalog(String json) {
+        Catalog catalog = Objects.requireNonNull(
+                GSON.fromJson(json, Catalog.class),
+                "Synchronized skill enhancement catalog was empty"
+        );
+        Objects.requireNonNull(catalog.enhancements, "Missing enhancements");
+        activeSnapshot = buildSnapshot(catalog);
+    }
+
+    /** Restores this installation's own catalog after leaving a remote server. */
+    public static void resetSyncedCatalog() {
+        activeSnapshot = LOCAL_SNAPSHOT;
     }
 
     public static SkillEnhancement defaultPrimary() {
@@ -346,5 +368,11 @@ public final class SkillEnhancement {
         private String displayFormat = "number";
         @SerializedName("affected_by_all_skill_enhancement_attribute")
         private Boolean affectedByAllSkillEnhancementAttribute;
+    }
+
+    private record CatalogSnapshot(
+            List<SkillEnhancement> values,
+            Map<String, SkillEnhancement> byId
+    ) {
     }
 }

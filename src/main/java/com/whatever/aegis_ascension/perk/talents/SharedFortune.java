@@ -3,7 +3,7 @@ package com.whatever.aegis_ascension.perk.talents;
 import static com.whatever.aegis_ascension.perk.TalentConstants.COPY_TALENT_CHANCE;
 import static com.whatever.aegis_ascension.perk.TalentConstants.SHARED_FORTUNE_FALLBACK_SKILL_ENHANCEMENT_CHARGES;
 import static com.whatever.aegis_ascension.perk.TalentConstants.SHARED_FORTUNE_REBIND_COOLDOWN_SECONDS;
-import static com.whatever.aegis_ascension.perk.TalentConstants.SR_SHARED_FORTUNE;
+import static com.whatever.aegis_ascension.perk.TalentConstants.PERK_SHARED_FORTUNE;
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
@@ -23,7 +23,7 @@ public final class SharedFortune {
     /** Binds the owner to one currently online player, subject to the JSON cooldown. */
     public static boolean bind(ServerPlayer owner, UUID partnerId) {
         PlayerPerkData data = PerkData.of(owner);
-        if (!data.owns(SR_SHARED_FORTUNE)) {
+        if (!data.owns(PERK_SHARED_FORTUNE)) {
             owner.sendSystemMessage(getTranslatableString(
                     "message.aegis_ascension.shared_fortune.not_owned"
             ));
@@ -60,7 +60,7 @@ public final class SharedFortune {
             return false;
         }
 
-        Perk sharedFortune = Perk.byId(SR_SHARED_FORTUNE).orElseThrow();
+        Perk sharedFortune = Perk.byId(PERK_SHARED_FORTUNE).orElseThrow();
         long cooldownMillis = Math.max(0L, Math.round(
                 sharedFortune.stat(SHARED_FORTUNE_REBIND_COOLDOWN_SECONDS) * 1_000.0D
         ));
@@ -107,14 +107,14 @@ public final class SharedFortune {
                 continue;
             }
             PlayerPerkData receiverData = PerkData.of(receiver);
-            if (!receiverData.owns(SR_SHARED_FORTUNE)
+            if (!receiverData.owns(PERK_SHARED_FORTUNE)
                     || receiverData.getSharedFortunePartnerId()
                     .filter(source.getUUID()::equals)
                     .isEmpty()) {
                 continue;
             }
 
-            Perk sharedFortune = Perk.byId(SR_SHARED_FORTUNE).orElseThrow();
+            Perk sharedFortune = Perk.byId(PERK_SHARED_FORTUNE).orElseThrow();
             double copyChance = Mth.clamp(
                     sharedFortune.stat(COPY_TALENT_CHANCE),
                     0.0D,

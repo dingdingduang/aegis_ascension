@@ -55,4 +55,38 @@ public interface ConfigAccess {
     boolean convertFlatAttackSpeedToPercentage();
 
     boolean isDevourAttributeBlacklisted(String attributeId);
+
+    boolean useMinecraftDefaultLevel();
+
+    boolean useGoldCurrency();
+
+    long aegisAscensionBaseXp();
+
+    double aegisAscensionGrowthRate();
+
+    int aegisAscensionMaximumRank();
+
+    double storageMutationPacketCooldownSeconds();
+
+    double storageViewPacketCooldownSeconds();
+
+    double togglePacketCooldownSeconds();
+
+    double refreshPacketCooldownSeconds();
+
+    double devourItemPacketCooldownSeconds();
+
+    double devourDataPacketCooldownSeconds();
+
+    double discardDevourPacketCooldownSeconds();
+
+    double perkDataPacketCooldownSeconds();
+
+    double livePerkDataPacketCooldownSeconds();
+
+    double sharedFortunePacketCooldownSeconds();
+
+    double questProgressSyncIntervalSeconds();
+
+    double questViewPacketCooldownSeconds();
 }

@@ -146,6 +146,18 @@ public final class ClientEvents {
                     minecraft.setScreen(new ACGPerkSelectionScreen());
                 }
             }
+
+            while (TOGGLE_QUEST_TRACKER.consumeClick()) {
+                QuestTrackerOverlay.toggleVisibility();
+            }
+
+            while (ADVANCE_CARD_PAGE.consumeClick()) {
+                // ACGPerkSelectionScreen keeps handling this same binding directly for
+                // hovered multi-page cards. In the world it cycles the Quest Tracker.
+                if (minecraft.screen == null) {
+                    QuestTrackerOverlay.advancePage();
+                }
+            }
         }
 
         @SubscribeEvent

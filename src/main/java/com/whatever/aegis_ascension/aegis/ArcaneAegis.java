@@ -18,9 +18,8 @@ import java.util.Locale;
  * Arcane Aegis: the barrage aegis.
  *
  * <p>This is the whole implementation of the aegis's {@code aegises.json} entry, and the
- * public facade the barrage addon calls. Nothing here references the addon: barrages are
- * identified by their string id, so this class is useful whether or not the addon is
- * installed.</p>
+ * public facade the barrage addon calls. Nothing here links against the addon directly:
+ * barrages are identified by string id so the optional integration remains loader-safe.</p>
  *
  * <h2>① Breakthrough</h2>
  * <p>Each Breakthrough permanently adds {@code barrage_missile_speed},
@@ -42,6 +41,16 @@ import java.util.Locale;
  */
 public final class ArcaneAegis {
     private ArcaneAegis() {
+    }
+
+    /** Whether this caster currently has Arcane Aegis selected and enabled. */
+    public static boolean active(LivingEntity caster) {
+        if (!(caster instanceof ServerPlayer player)) {
+            return false;
+        }
+        return PerkData.get(player)
+                .map(data -> data.isAegisEnabled(AegisConstants.ARCANE))
+                .orElse(false);
     }
 
     /** The five barrages, each with its bonus stat, bonus size, and trigger cap. */
@@ -201,7 +210,7 @@ public final class ArcaneAegis {
         });
     }
 
-    /** Barrage area (AoE radius) multiplier from accumulated {@code barrage_area}. */
+    /** Barrage target-acquisition range multiplier from accumulated {@code barrage_area}. */
     public static double areaMultiplier(LivingEntity caster) {
         return readAegis(caster, data -> 1.0D + data.getCustomStat(AegisConstants.BARRAGE_AREA));
     }

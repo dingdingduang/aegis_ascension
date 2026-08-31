@@ -12,9 +12,6 @@ import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.util.ConfigDescription;
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -36,7 +33,7 @@ import java.util.function.Predicate;
 public final class Perk {
     //TODO: remove from nbt when retire a talent
 //    private static final List<String> RETIRED_TALENT_IDS = List.of(
-//            "sr_magic_conversion"
+//            "perk_magic_conversion"
 //    );
 
     public enum Tier {
@@ -46,17 +43,15 @@ public final class Perk {
     }
 
     private static final Gson GSON = new Gson();
-    private static final Catalog CATALOG = loadCatalog();
-    private static final List<Perk> VALUES;
-    private static final Map<String, Perk> BY_ID;
-    private static final List<SoulLink> SOUL_LINKS;
-    private static final Map<Tier, Integer> RARITY_WEIGHTS;
-    private static final List<ApothicAttributeMapping> APOTHIC_ATTRIBUTE_MAPPINGS;
+    private static final List<SoulLink> SOUL_LINKS = SoulLinkCatalog.values();
+    private static final Catalog LOCAL_CATALOG = loadCatalog();
+    private static final CatalogSnapshot LOCAL_SNAPSHOT = buildSnapshot(LOCAL_CATALOG);
+    private static volatile CatalogSnapshot activeSnapshot = LOCAL_SNAPSHOT;
 
-    static {
+    private static CatalogSnapshot buildSnapshot(Catalog catalog) {
         List<Perk> values = new ArrayList<>();
         Map<String, Perk> byId = new LinkedHashMap<>();
-        for (TalentJson talent : CATALOG.perks) {
+        for (TalentJson talent : catalog.perks) {
 //            if (RETIRED_TALENT_IDS.contains(talent.id)) {
 //                continue;
 //            }
@@ -80,7 +75,7 @@ public final class Perk {
                             : defaultPoolRequiredSoulLinks(talent.id),
                     requiredMods(talent),
                     talent.randomRewardEligible == null
-                            ? !R_SUSPENSION_OF_DISBELIEF.equals(talent.id)
+                            ? !PERK_SUSPENSION_OF_DISBELIEF.equals(talent.id)
                             : talent.randomRewardEligible,
                     talent.sourceRow
             );
@@ -89,13 +84,10 @@ public final class Perk {
             }
             values.add(perk);
         }
-        VALUES = List.copyOf(values);
-        BY_ID = Collections.unmodifiableMap(byId);
 
-        SOUL_LINKS = SoulLinkCatalog.values();
         for (SoulLink soulLink : SOUL_LINKS) {
             for (String perkId : soulLink.requirements()) {
-                if (!BY_ID.containsKey(perkId)) {
+                if (!byId.containsKey(perkId)) {
                     throw new IllegalStateException(
                             "Soul Link " + soulLink.id()
                                     + " references missing talent " + perkId
@@ -103,7 +95,7 @@ public final class Perk {
                 }
             }
             for (String perkId : soulLink.rankPerks()) {
-                if (!BY_ID.containsKey(perkId)) {
+                if (!byId.containsKey(perkId)) {
                     throw new IllegalStateException(
                             "Soul Link " + soulLink.id()
                                     + " references missing rank talent " + perkId
@@ -113,7 +105,7 @@ public final class Perk {
         }
 
         List<ApothicAttributeMapping> attributeMappings = new ArrayList<>();
-        for (AttributeMappingJson mapping : CATALOG.apothicAttributeMappings) {
+        for (AttributeMappingJson mapping : catalog.apothicAttributeMappings) {
             if (mapping.customStat == null || mapping.customStat.isBlank()) {
                 throw new IllegalStateException("Apothic attribute mapping has a blank custom_stat");
             }
@@ -130,13 +122,17 @@ public final class Perk {
                     mapping.enabled
             ));
         }
-        APOTHIC_ATTRIBUTE_MAPPINGS = List.copyOf(attributeMappings);
 
         EnumMap<Tier, Integer> weights = new EnumMap<>(Tier.class);
-        weights.put(Tier.R, CATALOG.rarityWeights.r);
-        weights.put(Tier.SR, CATALOG.rarityWeights.sr);
-        weights.put(Tier.SSR, CATALOG.rarityWeights.ssr);
-        RARITY_WEIGHTS = Collections.unmodifiableMap(weights);
+        weights.put(Tier.R, catalog.rarityWeights.r);
+        weights.put(Tier.SR, catalog.rarityWeights.sr);
+        weights.put(Tier.SSR, catalog.rarityWeights.ssr);
+        return new CatalogSnapshot(
+                List.copyOf(values),
+                Collections.unmodifiableMap(byId),
+                Collections.unmodifiableMap(weights),
+                List.copyOf(attributeMappings)
+        );
     }
 
     private final String id;
@@ -207,10 +203,10 @@ public final class Perk {
     }
 
     public Component description() {
-        if (id.equals(R_MYSTERIOUS_DOLL)) {
+        if (id.equals(PERK_MYSTERIOUS_DOLL)) {
             return MysteriousDoll.description();
         }
-        if (id.equals(R_SHRINE_MAIDEN_DANCE)) {
+        if (id.equals(PERK_SHRINE_MAIDEN_DANCE)) {
             return ShrineMaidenDance.description();
         }
         Map<String, Double> descriptionValues = new LinkedHashMap<>(stats);
@@ -302,23 +298,23 @@ public final class Perk {
     }
 
     public static List<Perk> values() {
-        return VALUES;
+        return activeSnapshot.values();
     }
 
     public static Optional<Perk> byId(String id) {
-        return Optional.ofNullable(BY_ID.get(id));
+        return Optional.ofNullable(activeSnapshot.byId().get(id));
     }
 
     private static List<String> defaultPoolRequiredPerks(String id) {
         return switch (id) {
-            case R_YOSHINO_CIALLO, R_SHIZURU_CIALLO,
-                    R_NINGNING_CIALLO, R_NANAMI_CIALLO -> List.of(R_CONGYU_CIALLO);
+            case PERK_YOSHINO_CIALLO, PERK_SHIZURU_CIALLO,
+                    PERK_NINGNING_CIALLO, PERK_NANAMI_CIALLO -> List.of(PERK_CONGYU_CIALLO);
             default -> List.of();
         };
     }
 
     private static List<String> defaultPoolRequiredSoulLinks(String id) {
-        return id.equals(SR_SWISS_ROLL_MOMENT)
+        return id.equals(PERK_SWISS_ROLL_MOMENT)
                 ? List.of(SOUL_TRINITY_TEA_PARTY)
                 : List.of();
     }
@@ -355,11 +351,36 @@ public final class Perk {
     }
 
     public static int rarityWeight(Tier tier) {
-        return RARITY_WEIGHTS.getOrDefault(tier, 0);
+        return activeSnapshot.rarityWeights().getOrDefault(tier, 0);
     }
 
     public static List<ApothicAttributeMapping> apothicAttributeMappings() {
-        return APOTHIC_ATTRIBUTE_MAPPINGS;
+        return activeSnapshot.apothicAttributeMappings();
+    }
+
+    /** Serializes the server's effective, validated catalog for the login snapshot. */
+    public static String exportCatalogJson() {
+        return GSON.toJson(LOCAL_CATALOG);
+    }
+
+    /** Installs a server-authoritative catalog in client memory without touching local files. */
+    public static void installSyncedCatalog(String json) {
+        Catalog catalog = Objects.requireNonNull(
+                GSON.fromJson(json, Catalog.class),
+                "Synchronized talent catalog was empty"
+        );
+        Objects.requireNonNull(catalog.rarityWeights, "Missing rarity_weights");
+        Objects.requireNonNull(catalog.perks, "Missing perks");
+        Objects.requireNonNull(
+                catalog.apothicAttributeMappings,
+                "Missing apothic_attribute_mappings"
+        );
+        activeSnapshot = buildSnapshot(catalog);
+    }
+
+    /** Restores this installation's own catalog after leaving a remote server. */
+    public static void resetSyncedCatalog() {
+        activeSnapshot = LOCAL_SNAPSHOT;
     }
 
     private static Catalog loadCatalog() {
@@ -380,100 +401,23 @@ public final class Perk {
                 }
             }
 
-            JsonObject configuredRoot;
             try (var reader = Files.newBufferedReader(configPath, StandardCharsets.UTF_8)) {
-                configuredRoot = JsonParser.parseReader(reader).getAsJsonObject();
+                Catalog catalog = GSON.fromJson(reader, Catalog.class);
+                Objects.requireNonNull(catalog, "Talent catalog was empty");
+                Objects.requireNonNull(catalog.rarityWeights, "Missing rarity_weights");
+                Objects.requireNonNull(catalog.perks, "Missing perks");
+                if (catalog.apothicAttributeMappings == null) {
+                    Catalog bundled = loadBundledCatalog();
+                    catalog.apothicAttributeMappings = Objects.requireNonNull(
+                            bundled.apothicAttributeMappings,
+                            "Bundled catalog is missing apothic_attribute_mappings"
+                    );
+                }
+                return catalog;
             }
-
-            JsonObject bundledRoot = loadBundledCatalogJson();
-            inheritBundledModRequirements(configuredRoot, bundledRoot);
-
-            Catalog catalog = GSON.fromJson(configuredRoot, Catalog.class);
-            Objects.requireNonNull(catalog, "Talent catalog was empty");
-            Objects.requireNonNull(catalog.rarityWeights, "Missing rarity_weights");
-            Objects.requireNonNull(catalog.perks, "Missing perks");
-            if (catalog.apothicAttributeMappings == null) {
-                Catalog bundled = loadBundledCatalog();
-                catalog.apothicAttributeMappings = Objects.requireNonNull(
-                        bundled.apothicAttributeMappings,
-                        "Bundled catalog is missing apothic_attribute_mappings"
-                );
-            }
-            return catalog;
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
-    }
-
-    private static boolean appendBundledEntryIfMissing(
-            JsonObject configuredRoot,
-            JsonObject bundledRoot,
-            String arrayName,
-            String entryId) {
-        JsonArray configuredEntries = Objects.requireNonNull(
-                configuredRoot.getAsJsonArray(arrayName),
-                "Missing " + arrayName
-        );
-        if (findEntry(configuredEntries, entryId) != null) {
-            return false;
-        }
-        JsonObject bundledEntry = Objects.requireNonNull(
-                findEntry(bundledRoot.getAsJsonArray(arrayName), entryId),
-                "Bundled catalog is missing " + entryId
-        );
-        configuredEntries.add(bundledEntry.deepCopy());
-        return true;
-    }
-
-    /**
-     * Makes newly bundled dependency metadata effective for an existing config.
-     * An explicit empty requires_mod or required_mods value in the config opts out.
-     */
-    private static void inheritBundledModRequirements(
-            JsonObject configuredRoot,
-            JsonObject bundledRoot) {
-        JsonArray configuredPerks = configuredRoot.getAsJsonArray("perks");
-        JsonArray bundledPerks = bundledRoot.getAsJsonArray("perks");
-        if (configuredPerks == null || bundledPerks == null) {
-            return;
-        }
-        for (var configuredElement : configuredPerks) {
-            if (!configuredElement.isJsonObject()) {
-                continue;
-            }
-            JsonObject configured = configuredElement.getAsJsonObject();
-            if (configured.has("requires_mod") || configured.has("required_mods")
-                    || !configured.has("id")) {
-                continue;
-            }
-            JsonObject bundled = findEntry(
-                    bundledPerks,
-                    configured.get("id").getAsString()
-            );
-            if (bundled == null) {
-                continue;
-            }
-            if (bundled.has("requires_mod")) {
-                configured.add("requires_mod", bundled.get("requires_mod").deepCopy());
-            }
-            if (bundled.has("required_mods")) {
-                configured.add("required_mods", bundled.get("required_mods").deepCopy());
-            }
-        }
-    }
-
-    private static JsonObject findEntry(JsonArray entries, String entryId) {
-        if (entries == null) {
-            return null;
-        }
-        for (var entry : entries) {
-            if (entry.isJsonObject()
-                    && entry.getAsJsonObject().has("id")
-                    && entryId.equals(entry.getAsJsonObject().get("id").getAsString())) {
-                return entry.getAsJsonObject();
-            }
-        }
-        return null;
     }
 
     private static ResourceLocation requireLocation(String value) {
@@ -491,7 +435,7 @@ public final class Perk {
         );
     }
 
-    private static JsonObject loadBundledCatalogJson() throws Exception {
+    private static com.google.gson.JsonObject loadBundledCatalogJson() throws Exception {
         try (var stream = Perk.class.getResourceAsStream(
                 "/assets/aegis_ascension/talents.json")) {
             if (stream == null) {
@@ -500,7 +444,7 @@ public final class Perk {
                 );
             }
             try (var reader = new java.io.InputStreamReader(stream, StandardCharsets.UTF_8)) {
-                return JsonParser.parseReader(reader).getAsJsonObject();
+                return com.google.gson.JsonParser.parseReader(reader).getAsJsonObject();
             }
         }
     }
@@ -565,5 +509,13 @@ public final class Perk {
         private String operation;
         private double scale = 1.0D;
         private boolean enabled = true;
+    }
+
+    private record CatalogSnapshot(
+            List<Perk> values,
+            Map<String, Perk> byId,
+            Map<Tier, Integer> rarityWeights,
+            List<ApothicAttributeMapping> apothicAttributeMappings
+    ) {
     }
 }

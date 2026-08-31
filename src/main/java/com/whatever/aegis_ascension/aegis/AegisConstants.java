@@ -31,7 +31,7 @@ public final class AegisConstants {
     public static final String RANDOM_PERK_ONE_CHANCE = "random_perk_one_chance";
     public static final String RANDOM_PERK_TWO_CHANCE = "random_perk_two_chance";
     public static final String RANDOM_PERK_THREE_CHANCE = "random_perk_three_chance";
-    public static final String SSR_PER_PERKS_RECEIVED = "ssr_per_perks_received";
+    public static final String PERK_PER_PERKS_RECEIVED = "perk_per_perks_received";
     public static final String BLISS_PERKS_RECEIVED = "bliss_perks_received";
     public static final String CRITICAL_DAMAGE_PER_CRITICAL_CHANCE =
             "critical_damage_per_critical_chance";
@@ -88,9 +88,9 @@ public final class AegisConstants {
             "final_damage_per_negative_damage_reduction";
     public static final String HEALTH_RESTORE_PER_SECOND = "health_restore_per_second";
     public static final String BLOCKS_EXTERNAL_HEALING = "blocks_external_healing";
-    public static final String R_TALENT_SCALING = "r_talent_scaling";
-    public static final String SR_TALENT_SCALING = "sr_talent_scaling";
-    public static final String SSR_TALENT_SCALING = "ssr_talent_scaling";
+    public static final String PERK_R_TALENT_SCALING = "perk_r_talent_scaling";
+    public static final String PERK_SR_TALENT_SCALING = "perk_sr_talent_scaling";
+    public static final String PERK_SSR_TALENT_SCALING = "perk_ssr_talent_scaling";
     public static final String WARD_SUMMON_COUNT = "ward_summon_count";
     public static final String WARD_INVULNERABLE = "ward_invulnerable";
     public static final String BREAKTHROUGH_EFFECT_PER_CONSTELLATION =
@@ -148,6 +148,10 @@ public final class AegisConstants {
     public static final String ARCANE_BARRAGE_DAMAGE_BONUS = "arcane_barrage_damage_bonus";
     public static final String ARCANE_ARMOR_SHRED_TRIGGERS = "arcane_armor_shred_triggers";
     public static final String DEVOUR_STAT_INHERITANCE = "devour_stat_inheritance";
+    public static final String DEVOUR_ITEM_LIMIT_LEVEL_0 = "devour_item_limit_level_0";
+    public static final String DEVOUR_ITEM_LIMIT_LEVEL_1 = "devour_item_limit_level_1";
+    public static final String DEVOUR_ITEM_LIMIT_LEVEL_2 = "devour_item_limit_level_2";
+    public static final String DEVOUR_ITEM_LIMIT_LEVEL_3 = "devour_item_limit_level_3";
 
     private AegisConstants() {
     }

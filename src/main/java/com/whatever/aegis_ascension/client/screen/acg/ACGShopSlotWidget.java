@@ -1,8 +1,10 @@
 package com.whatever.aegis_ascension.client.screen.acg;
 
 import com.whatever.aegis_ascension.shop.ShopOffer;
+import com.whatever.aegis_ascension.client.ClientPerkState;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import com.whatever.aegis_ascension.util.GeneralClientMethods;
+import com.whatever.aegis_ascension.util.GeneralConstants;
 import com.whatever.aegis_ascension.util.GeneralTextMethods;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -14,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.function.IntConsumer;
 
 /**
- * One daily-shop slot: the item on sale, its stack count, and its experience price.
+ * One daily-shop slot: the item on sale, its stack count, and its configured currency price.
  *
  * <p>Three visual states, all derived from data the server sent rather than from local
  * guesses — sold out (dimmed, struck price), unaffordable (red price, inert), and buyable
@@ -120,6 +122,11 @@ public final class ACGShopSlotWidget extends AbstractButton implements Clippable
         ACGInventoryStyle.texSquareTinted(graphics, ACGInventoryStyle.GEM,
                 x + width / 2.0F, y + 8.0F, 6.0F, ACGInventoryStyle.GEM_SIZE,
                 sold ? ACGInventoryStyle.TEXT_DIM : offer.rarityColor());
+        ACGInventoryStyle.text(graphics, font,
+                GeneralConstants.rarityTier(offer.rarityColor()),
+                x + 4.0F, y + 4.0F, 0.65F,
+                sold ? ACGInventoryStyle.TEXT_DIM : offer.rarityColor(),
+                ACGInventoryStyle.ALIGN_LEFT);
 
         // Icon slightly smaller than the Inventory's 32 to make room for the extra price
         // row this card carries.
@@ -169,9 +176,22 @@ public final class ACGShopSlotWidget extends AbstractButton implements Clippable
                         offer.experienceCost());
         int priceColor = sold ? ACGInventoryStyle.TEXT_DIM
                 : affordable ? ACGInventoryStyle.ACCENT_ORANGE : ACGTheme.STATUS_LOCKED;
-        ACGInventoryStyle.text(graphics, font, price.getString(),
-                x + width / 2.0F, y + height - 10.0F, 0.75F, priceColor,
-                ACGInventoryStyle.ALIGN_CENTER);
+        if (!sold && ClientPerkState.usesGoldCurrency()) {
+            float coinSize = 9.0F;
+            float textWidth = font.width(String.valueOf(offer.experienceCost())) * 0.75F;
+            float totalWidth = coinSize + 2.0F + textWidth;
+            ACGInventoryStyle.tex(graphics, ACGInventoryStyle.GOLD_CURRENCY,
+                    x + (width - totalWidth) / 2.0F, y + height - 14.0F,
+                    coinSize, coinSize, ACGInventoryStyle.GOLD_CURRENCY_SIZE,
+                    ACGInventoryStyle.GOLD_CURRENCY_SIZE);
+            ACGInventoryStyle.text(graphics, font, String.valueOf(offer.experienceCost()),
+                    x + (width + totalWidth) / 2.0F, y + height - 10.0F, 0.75F,
+                    priceColor, ACGInventoryStyle.ALIGN_RIGHT);
+        } else {
+            ACGInventoryStyle.text(graphics, font, price.getString(),
+                    x + width / 2.0F, y + height - 10.0F, 0.75F, priceColor,
+                    ACGInventoryStyle.ALIGN_CENTER);
+        }
 
         // A sold-out slot is greyed under a scrim so it reads as spent at a glance; an
         // unaffordable one stays legible, since its price is the thing to look at.

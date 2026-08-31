@@ -13,11 +13,11 @@ public final class DominusLapidis {
     }
 
     public static void tick(ServerPlayer player, PlayerPerkData data) {
-        if (!data.owns(SSR_DOMINUS_LAPIDIS)) {
+        if (!data.owns(PERK_DOMINUS_LAPIDIS)) {
             data.setCustomStat(DOMINUS_SHIELD_DAMAGE_BONUS, 0.0D);
             return;
         }
-        Perk perk = Perk.byId(SSR_DOMINUS_LAPIDIS).orElseThrow();
+        Perk perk = Perk.byId(PERK_DOMINUS_LAPIDIS).orElseThrow();
         int interval = Math.max(1, (int) Math.round(
                 perk.stat(SHIELD_DAMAGE_BONUS_INTERVAL_SECONDS) * 20.0D
         ));

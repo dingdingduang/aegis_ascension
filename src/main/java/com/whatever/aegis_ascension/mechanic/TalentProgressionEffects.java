@@ -33,36 +33,36 @@ public final class TalentProgressionEffects {
         recalculateAttributes(player, data);
 
         switch (perk.id()) {
-            case R_SILENT_DAWN -> {
+            case PERK_SILENT_DAWN -> {
                 int charges = integerStat(perk, SELECTION_CHARGES_GRANTED);
                 data.addSelectionCharges(charges);
 
 //                triggerBreakthroughs(player, data, charges);
             }
-            case SR_YURIZONO_SEIA ->
+            case PERK_YURIZONO_SEIA ->
                     player.giveExperienceLevels(integerStat(perk, IMMEDIATE_LEVEL_GAIN));
-            case R_BOUNDARY_OF_LIFE_AND_DEATH -> {
+            case PERK_BOUNDARY_OF_LIFE_AND_DEATH -> {
                 // This is the talent's initial runtime state, not a permanent
                 // accumulated reward. Reacquiring it after a progression reset must
                 // start from the configured number of uses.
                 data.setCustomStat(REVIVES_REMAINING, perk.stat(REVIVE_USES));
                 data.setCustomStat(REVIVE_LUCK, 0.0D);
             }
-            case R_MYSTERIOUS_DOLL -> {
+            case PERK_MYSTERIOUS_DOLL -> {
                 if (triggerRewardChains) {
                     MysteriousDoll.roll(player, data);
                 }
             }
-            case R_SHRINE_MAIDEN_DANCE -> {
+            case PERK_SHRINE_MAIDEN_DANCE -> {
                 if (triggerRewardChains) {
                     ShrineMaidenDance.roll(player, data);
                 }
             }
-            case SSR_WORLD_IS_MINE -> data.addSkillEnhancementCharges(Math.max(
+            case PERK_WORLD_IS_MINE -> data.addSkillEnhancementCharges(Math.max(
                     0,
                     integerStat(perk, SKILL_ENHANCEMENT_CHARGES_GRANTED)
             ));
-            case SSR_REINHARDT -> {
+            case PERK_REINHARDT -> {
                 int count = Math.max(0, integerStat(perk, RANDOM_AEGIS_COUNT));
                 for (int index = 0; index < count; index++) {
                     Aegis granted = data.grantRandomUnownedAegis(player).orElse(null);
@@ -83,8 +83,8 @@ public final class TalentProgressionEffects {
     }
 
     public static void onTalentSelected(ServerPlayer player, PlayerPerkData data) {
-        if (data.owns(R_ALICE)) {
-            Perk alice = requiredPerk(R_ALICE);
+        if (data.owns(PERK_ALICE)) {
+            Perk alice = requiredPerk(PERK_ALICE);
             if (GeneralServerMethods.getAttributeValue(player, Attributes.LUCK)
                     > alice.stat(LUCK_THRESHOLD)) {
                 int triggerLimit = Math.max(0, integerStat(alice, LUCK_GAIN_TRIGGER_LIMIT));
@@ -107,9 +107,9 @@ public final class TalentProgressionEffects {
     public static void triggerBreakthroughs(ServerPlayer player, PlayerPerkData data, int count) {
         for (int index = 0; index < count; index++) {
             triggerBreakthrough(player, data);
-            if (data.owns(SR_RIPPLES_OF_THE_PAST)
+            if (data.owns(PERK_RIPPLES_OF_THE_PAST)
                     && player.getRandom().nextDouble() < Mth.clamp(
-                    stat(SR_RIPPLES_OF_THE_PAST, ADDITIONAL_BREAKTHROUGH_CHANCE),
+                    stat(PERK_RIPPLES_OF_THE_PAST, ADDITIONAL_BREAKTHROUGH_CHANCE),
                     0.0D,
                     1.0D
             )) {
@@ -144,15 +144,15 @@ public final class TalentProgressionEffects {
                     BREAKTHROUGH_EFFECT_MULTIPLIER_BONUS
             );
         }
-        if (data.owns(SSR_STARLIGHT_INTERTWINED_BENEDICTION)) {
-            Perk starlight = requiredPerk(SSR_STARLIGHT_INTERTWINED_BENEDICTION);
+        if (data.owns(PERK_STARLIGHT_INTERTWINED_BENEDICTION)) {
+            Perk starlight = requiredPerk(PERK_STARLIGHT_INTERTWINED_BENEDICTION);
             multiplier *= player.getRandom().nextDouble()
                     < starlight.stat(DOUBLE_BREAKTHROUGH_CHANCE)
                     ? starlight.stat(DOUBLE_BREAKTHROUGH_MULTIPLIER)
                     : starlight.stat(TRIPLE_BREAKTHROUGH_MULTIPLIER);
         }
-        if (data.owns(R_ENIGMA)) {
-            Perk enigma = requiredPerk(R_ENIGMA);
+        if (data.owns(PERK_ENIGMA)) {
+            Perk enigma = requiredPerk(PERK_ENIGMA);
             boolean triggered = data.isAegisEnabled(AegisConstants.BLISS)
                     || player.getRandom().nextDouble() < Mth.clamp(
                             enigma.stat(ENIGMA_TRIGGER_CHANCE),
@@ -165,8 +165,8 @@ public final class TalentProgressionEffects {
                             : ENIGMA_FAILURE_MULTIPLIER
             ));
             boolean failureNegated = !triggered
-                    && data.owns(SSR_LAW_OF_THE_CYCLE)
-                    && stat(SSR_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
+                    && data.owns(PERK_LAW_OF_THE_CYCLE)
+                    && stat(PERK_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
             if (failureNegated) {
                 enigmaMultiplier = 1.0D;
             }
@@ -188,61 +188,61 @@ public final class TalentProgressionEffects {
             }
         }
 
-        addIfOwned(data, R_HALF_HUMAN_HALF_PHANTOM_GARDENER,
+        addIfOwned(data, PERK_HALF_HUMAN_HALF_PHANTOM_GARDENER,
                 GARDENER_CRITICAL_DAMAGE,
                 BREAKTHROUGH_CRITICAL_DAMAGE, multiplier);
-        addIfOwned(data, R_HAYASE_YUKA, INDEPENDENT_SKILL_DAMAGE,
+        addIfOwned(data, PERK_HAYASE_YUKA, INDEPENDENT_SKILL_DAMAGE,
                 BREAKTHROUGH_INDEPENDENT_SKILL_DAMAGE, multiplier);
-        addIfOwned(data, R_OTOGI_NOAH, INDEPENDENT_SKILL_AREA,
+        addIfOwned(data, PERK_OTOGI_NOAH, INDEPENDENT_SKILL_AREA,
                 BREAKTHROUGH_INDEPENDENT_SKILL_AREA, multiplier);
-        addIfOwned(data, R_SKILL_DAMAGE_CONVERSION, TRUE_DAMAGE,
+        addIfOwned(data, PERK_SKILL_DAMAGE_CONVERSION, TRUE_DAMAGE,
                 BREAKTHROUGH_TRUE_DAMAGE, multiplier);
-        addIfOwned(data, R_NOELLE, SUMMON_POWER, BREAKTHROUGH_SUMMON_POWER, multiplier);
-        addIfOwned(data, SR_KARYLS_BLESSING, SPELL_DAMAGE_AMPLIFICATION,
-                BREAKTHROUGH_SPELL_DAMAGE_AMPLIFICATION, multiplier);
-        addIfOwned(data, SR_KOKKOROS_BLESSING, PHYSICAL_DAMAGE_AMPLIFICATION,
+        addIfOwned(data, PERK_NOELLE, SUMMON_POWER, BREAKTHROUGH_SUMMON_POWER, multiplier);
+        addIfOwned(data, PERK_KARYLS_BLESSING, MAGIC_DAMAGE_AMPLIFICATION,
+                BREAKTHROUGH_MAGIC_DAMAGE_AMPLIFICATION, multiplier);
+        addIfOwned(data, PERK_KOKKOROS_BLESSING, PHYSICAL_DAMAGE_AMPLIFICATION,
                 BREAKTHROUGH_PHYSICAL_DAMAGE_AMPLIFICATION, multiplier);
-        addIfOwned(data, SR_MASTER_SPARK, TRUE_DAMAGE, BREAKTHROUGH_TRUE_DAMAGE, multiplier);
-        addIfOwned(data, SR_WIND_ARROW, BREAKTHROUGH_ATTACK_RANGE,
+        addIfOwned(data, PERK_MASTER_SPARK, TRUE_DAMAGE, BREAKTHROUGH_TRUE_DAMAGE, multiplier);
+        addIfOwned(data, PERK_WIND_ARROW, BREAKTHROUGH_ATTACK_RANGE,
                 BREAKTHROUGH_ATTACK_RANGE_FLAT, multiplier);
-        addIfOwned(data, SSR_SEVEN_COLORED_MAGICIAN, TRUE_DAMAGE,
+        addIfOwned(data, PERK_SEVEN_COLORED_MAGICIAN, TRUE_DAMAGE,
                 BREAKTHROUGH_TRUE_DAMAGE, multiplier);
-        addIfOwned(data, SSR_BLESSING_OF_THE_WORLD_TREE, HEALING_POWER,
+        addIfOwned(data, PERK_BLESSING_OF_THE_WORLD_TREE, HEALING_POWER,
                 BREAKTHROUGH_HEALING_POWER, multiplier);
-        addIfOwned(data, SSR_PLATEAU_WITCH, SUMMON_POWER,
+        addIfOwned(data, PERK_PLATEAU_WITCH, SUMMON_POWER,
                 BREAKTHROUGH_SUMMON_POWER, multiplier);
 
         // Ciallo gains are fixed per Breakthrough and deliberately ignore every global
         // Breakthrough multiplier, including Starlight. Only Yuzusoft Fan Level scales
         // their accumulated totals live.
-        addIfOwned(data, R_CONGYU_CIALLO, CIALLO_MAX_HEALTH_MULTIPLIER,
+        addIfOwned(data, PERK_CONGYU_CIALLO, CIALLO_MAX_HEALTH_MULTIPLIER,
                 BREAKTHROUGH_MAX_HEALTH_MULTIPLIER, 1.0D);
-        addIfOwned(data, R_CONGYU_CIALLO, CIALLO_PHYSICAL_DAMAGE_AMPLIFICATION,
+        addIfOwned(data, PERK_CONGYU_CIALLO, CIALLO_PHYSICAL_DAMAGE_AMPLIFICATION,
                 BREAKTHROUGH_PHYSICAL_DAMAGE_AMPLIFICATION, 1.0D);
-        addIfOwned(data, R_CONGYU_CIALLO, CIALLO_SPELL_DAMAGE_AMPLIFICATION,
-                BREAKTHROUGH_SPELL_DAMAGE_AMPLIFICATION, 1.0D);
-        addIfOwned(data, R_YOSHINO_CIALLO, CIALLO_ATTACK_MULTIPLIER,
+        addIfOwned(data, PERK_CONGYU_CIALLO, CIALLO_MAGIC_DAMAGE_AMPLIFICATION,
+                BREAKTHROUGH_MAGIC_DAMAGE_AMPLIFICATION, 1.0D);
+        addIfOwned(data, PERK_YOSHINO_CIALLO, CIALLO_ATTACK_MULTIPLIER,
                 BREAKTHROUGH_ATTACK_MULTIPLIER, 1.0D);
-        addIfOwned(data, R_SHIZURU_CIALLO, CIALLO_FINAL_DAMAGE,
+        addIfOwned(data, PERK_SHIZURU_CIALLO, CIALLO_FINAL_DAMAGE,
                 BREAKTHROUGH_FINAL_DAMAGE, 1.0D);
-        addIfOwned(data, R_NINGNING_CIALLO, CIALLO_COOLDOWN_REDUCTION,
+        addIfOwned(data, PERK_NINGNING_CIALLO, CIALLO_COOLDOWN_REDUCTION,
                 BREAKTHROUGH_COOLDOWN_REDUCTION, 1.0D);
-        addIfOwned(data, R_NANAMI_CIALLO, CIALLO_LUCK,
+        addIfOwned(data, PERK_NANAMI_CIALLO, CIALLO_LUCK,
                 BREAKTHROUGH_LUCK_FLAT, 1.0D);
 
-        addIfOwned(data, SR_ILLUSION_BUBBLE, PRIMARY_FLAT,
+        addIfOwned(data, PERK_ILLUSION_BUBBLE, PRIMARY_FLAT,
                 BREAKTHROUGH_PRIMARY_ATTRIBUTE_FLAT, multiplier);
-        if (data.owns(R_CIRNO)) {
+        if (data.owns(PERK_CIRNO)) {
             data.addCustomStat(
                     PRIMARY_FLAT,
-                    (stat(R_CIRNO, BREAKTHROUGH_PRIMARY_ATTRIBUTE_FLAT)
+                    (stat(PERK_CIRNO, BREAKTHROUGH_PRIMARY_ATTRIBUTE_FLAT)
                             + MistyLake.cirnoPrimaryStatBonus(data)) * multiplier
             );
         }
 
-        if (data.owns(SR_PLANA)) {
+        if (data.owns(PERK_PLANA)) {
             double allSkillEnhancementGain = stat(
-                    SR_PLANA,
+                    PERK_PLANA,
                     BREAKTHROUGH_ALL_SKILL_ENHANCEMENT_ATTRIBUTE
             );
             if (data.hasActiveSoulLink(SOUL_SHITTIM_CHEST)) {
@@ -251,77 +251,81 @@ public final class TalentProgressionEffects {
                         PLANA_LOGIC_CORRECTION_MULTIPLIER_BONUS
                 );
             }
-            data.addCustomStat(
+            data.addAttributedCustomStat(
+                    PERK_PLANA,
                     ALL_SKILL_ENHANCEMENT_ATTRIBUTE,
                     allSkillEnhancementGain * multiplier
             );
         }
         addIfOwned(
                 data,
-                SR_ZEPHYRS_CARE,
+                PERK_ZEPHYRS_CARE,
                 BREAKTHROUGH_ALL_SKILL_ENHANCEMENT_ATTRIBUTE,
                 ALL_SKILL_ENHANCEMENT_ATTRIBUTE,
                 multiplier
         );
 
-        if (data.owns(R_ARONA)) {
+        if (data.owns(PERK_ARONA)) {
             double primaryGain = aronaBreakthroughPrimaryGain(data);
             data.addCustomStat(ARONA_PRIMARY_FLAT, primaryGain * multiplier);
         }
-        if (data.owns(SR_YURIZONO_SEIA)) {
+        if (data.owns(PERK_YURIZONO_SEIA)) {
             player.giveExperienceLevels(Math.max(1, (int) Math.round(
-                    stat(SR_YURIZONO_SEIA, BREAKTHROUGH_LEVEL_GAIN) * multiplier
+                    stat(PERK_YURIZONO_SEIA, BREAKTHROUGH_LEVEL_GAIN) * multiplier
             )));
         }
-        if (data.owns(SR_FLOWER_FAIRY)) {
+        if (data.owns(PERK_FLOWER_FAIRY)) {
             // Flower Fairy's Skill Enhancement reward is fixed per Breakthrough and
             // deliberately ignores every Breakthrough multiplier.
             data.addSkillEnhancementCharges(Math.max(0, integerStat(
-                    requiredPerk(SR_FLOWER_FAIRY),
+                    requiredPerk(PERK_FLOWER_FAIRY),
                     BREAKTHROUGH_SKILL_ENHANCEMENT_CHARGES
             )));
         }
-        if (data.owns(SR_BUTTERFLYS_GENTLE_TOUCH)) {
+        if (data.owns(PERK_BUTTERFLYS_GENTLE_TOUCH)) {
             // Butterfly's reward is deliberately fixed per Breakthrough and does not use
             // the Breakthrough multiplier from Plana, soul links, Aegis, or Starlight.
             data.addSelectionCharges(Math.max(0, integerStat(
-                    requiredPerk(SR_BUTTERFLYS_GENTLE_TOUCH),
+                    requiredPerk(PERK_BUTTERFLYS_GENTLE_TOUCH),
                     BREAKTHROUGH_SELECTION_CHARGES
             )));
         }
-        if (data.owns(SR_ZEPHYRS_CARE)) {
+        if (data.owns(PERK_ZEPHYRS_CARE)) {
             player.giveExperiencePoints(Math.max(1, (int) Math.round(
-                    stat(SR_ZEPHYRS_CARE, BREAKTHROUGH_EXPERIENCE) * multiplier
+                    stat(PERK_ZEPHYRS_CARE, BREAKTHROUGH_EXPERIENCE) * multiplier
             )));
         }
-        if (data.owns(SSR_WORLD_IS_MINE)) {
+        if (data.owns(PERK_WORLD_IS_MINE)) {
             player.giveExperiencePoints(Math.max(0, (int) Math.round(
-                    stat(SSR_WORLD_IS_MINE, BREAKTHROUGH_EXPERIENCE) * multiplier
+                    stat(PERK_WORLD_IS_MINE, BREAKTHROUGH_EXPERIENCE) * multiplier
             )));
         }
-        if (data.owns(SSR_TEACHER_FOX)) {
+        if (data.owns(PERK_TEACHER_FOX)) {
             data.addCustomStat(TEACHER_HEALTH_MULTIPLIER,
-                    stat(SSR_TEACHER_FOX, BREAKTHROUGH_MAX_HEALTH_MULTIPLIER) * multiplier);
+                    stat(PERK_TEACHER_FOX, BREAKTHROUGH_MAX_HEALTH_MULTIPLIER) * multiplier);
         }
         if (data.hasActiveSoulLink(SOUL_LOGISTICS_COMBO)) {
-            data.addCustomStat(INDEPENDENT_SKILL_AREA,
+            data.addAttributedCustomStat(SOUL_LOGISTICS_COMBO, INDEPENDENT_SKILL_AREA,
                     bonusStat(
                             SOUL_LOGISTICS_COMBO,
                             BREAKTHROUGH_INDEPENDENT_SKILL_AREA
                     ) * multiplier);
         }
         if (data.hasActiveSoulLink(SOUL_MILLENNIUM_ECHO)) {
-            data.addCustomStat(CRITICAL_CHANCE,
+            data.addAttributedCustomStat(SOUL_MILLENNIUM_ECHO, CRITICAL_CHANCE,
                     bonusStat(SOUL_MILLENNIUM_ECHO, BREAKTHROUGH_CRITICAL_CHANCE) * multiplier);
         }
         if (data.hasActiveSoulLink(SOUL_TRINITY_TEA_PARTY)) {
             grantTrinitySwissRolls(player, data, multiplier);
         }
         if (data.hasActiveSoulLink(SOUL_LOVE_AS_ETERNAL_AS_THIS_MOMENT)) {
-            data.addCustomStat(INDEPENDENT_DAMAGE_AMPLIFICATION, bonusStat(
+            data.addAttributedCustomStat(
                     SOUL_LOVE_AS_ETERNAL_AS_THIS_MOMENT,
-                    BREAKTHROUGH_INDEPENDENT_DAMAGE_AMPLIFICATION
-            ) * multiplier);
+                    INDEPENDENT_DAMAGE_AMPLIFICATION,
+                    bonusStat(
+                            SOUL_LOVE_AS_ETERNAL_AS_THIS_MOMENT,
+                            BREAKTHROUGH_INDEPENDENT_DAMAGE_AMPLIFICATION
+                    ) * multiplier);
         }
         if (data.isAegisEnabled(AegisConstants.WATER)) {
             data.addCustomStat(
@@ -333,7 +337,8 @@ public final class TalentProgressionEffects {
             );
         }
         if (data.isAegisEnabled(AegisConstants.HEALING)) {
-            data.addCustomStat(
+            data.addAttributedCustomStat(
+                    AegisConstants.HEALING,
                     HEALTH_REGENERATION,
                     aegisStat(
                             AegisConstants.HEALING,
@@ -342,7 +347,8 @@ public final class TalentProgressionEffects {
             );
         }
         if (data.isAegisEnabled(AegisConstants.WISDOM)) {
-            data.addCustomStat(
+            data.addAttributedCustomStat(
+                    AegisConstants.WISDOM,
                     SKILL_DAMAGE,
                     aegisStat(AegisConstants.WISDOM, AegisConstants.BREAKTHROUGH_SKILL_DAMAGE)
                             * multiplier
@@ -356,17 +362,20 @@ public final class TalentProgressionEffects {
         if (data.isAegisEnabled(AegisConstants.ARCANE)) {
             // Arcane Aegis (1): each Breakthrough permanently raises barrage missile
             // speed, damage, and area. ArcaneAegis turns these totals into multipliers.
-            data.addCustomStat(
+            data.addAttributedCustomStat(
+                    AegisConstants.ARCANE,
                     AegisConstants.BARRAGE_MISSILE_SPEED,
                     aegisStat(AegisConstants.ARCANE, AegisConstants.BARRAGE_MISSILE_SPEED)
                             * multiplier
             );
-            data.addCustomStat(
+            data.addAttributedCustomStat(
+                    AegisConstants.ARCANE,
                     AegisConstants.BARRAGE_DAMAGE,
                     aegisStat(AegisConstants.ARCANE, AegisConstants.BARRAGE_DAMAGE)
                             * multiplier
             );
-            data.addCustomStat(
+            data.addAttributedCustomStat(
+                    AegisConstants.ARCANE,
                     AegisConstants.BARRAGE_AREA,
                     aegisStat(AegisConstants.ARCANE, AegisConstants.BARRAGE_AREA)
                             * multiplier
@@ -434,8 +443,8 @@ public final class TalentProgressionEffects {
             return;
         }
 
-        if (data.owns(SR_SWISS_ROLL_MOMENT)) {
-            Perk moment = requiredPerk(SR_SWISS_ROLL_MOMENT);
+        if (data.owns(PERK_SWISS_ROLL_MOMENT)) {
+            Perk moment = requiredPerk(PERK_SWISS_ROLL_MOMENT);
             double oneChance = Mth.clamp(moment.stat(ONE_EXTRA_ROLL_CHANCE), 0.0D, 1.0D);
             double twoChance = Mth.clamp(moment.stat(TWO_EXTRA_ROLL_CHANCE), 0.0D, 1.0D);
             double roll = player.getRandom().nextDouble();
@@ -465,7 +474,7 @@ public final class TalentProgressionEffects {
     }
 
     private static double aronaBreakthroughPrimaryGain(PlayerPerkData data) {
-        Perk arona = requiredPerk(R_ARONA);
+        Perk arona = requiredPerk(PERK_ARONA);
         double primaryGain = arona.stat(BREAKTHROUGH_PRIMARY_ATTRIBUTE_FLAT);
         if (data.hasActiveSoulLink(SOUL_SHITTIM_CHEST)) {
             primaryGain += bonusStat(
@@ -479,7 +488,7 @@ public final class TalentProgressionEffects {
     private static void addIfOwned(PlayerPerkData data, String perkId, String customStat,
                                    String perkStat, double multiplier) {
         if (data.owns(perkId)) {
-            data.addCustomStat(customStat, stat(perkId, perkStat) * multiplier);
+            data.addAttributedCustomStat(perkId, customStat, stat(perkId, perkStat) * multiplier);
         }
     }
 }

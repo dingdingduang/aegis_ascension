@@ -11,7 +11,7 @@ import java.util.function.Supplier;
 
 /** Requests authoritative player data, primarily before opening Collection. */
 public record RequestPerkDataPacket(boolean liveRefresh) {
-    private static final Map<ServerPlayer, Integer> LAST_REQUEST_TICK = new WeakHashMap<>();
+    private static final Map<ServerPlayer, Long> LAST_REQUEST_TICK = new WeakHashMap<>();
 
     public static void encode(RequestPerkDataPacket packet, FriendlyByteBuf buffer) {
         buffer.writeBoolean(packet.liveRefresh);
@@ -35,14 +35,19 @@ public record RequestPerkDataPacket(boolean liveRefresh) {
                 return;
             }
 
-            int minimumInterval = packet.liveRefresh ? 20 : 5;
-            Integer lastTick = LAST_REQUEST_TICK.get(player);
-            if (lastTick != null && player.tickCount >= lastTick
-                    && player.tickCount - lastTick < minimumInterval) {
+            double cooldownSeconds = packet.liveRefresh
+                    ? PlatformServices.config().livePerkDataPacketCooldownSeconds()
+                    : PlatformServices.config().perkDataPacketCooldownSeconds();
+            if (!PacketRequestLimiter.tryAcquire(
+                    player,
+                    LAST_REQUEST_TICK,
+                    cooldownSeconds
+            )) {
                 return;
             }
-            LAST_REQUEST_TICK.put(player, player.tickCount);
-            ModNetworking.syncTo(player);
+            // This request can run continuously while Custom Stats is open. Sending the
+            // full quest catalogue here would bypass quest batching entirely.
+            ModNetworking.syncPerkDataTo(player);
         });
         context.setPacketHandled(true);
     }

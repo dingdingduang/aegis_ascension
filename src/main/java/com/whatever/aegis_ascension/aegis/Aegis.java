@@ -19,31 +19,39 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 /** A unique, data-driven Aegis loaded from config/aegis_ascension/aegises.json. */
 public final class Aegis {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Catalog CATALOG = loadCatalog();
-    private static final List<Aegis> VALUES;
-    private static final Map<String, Aegis> BY_ID;
+    private static final Catalog LOCAL_CATALOG = loadCatalog();
+    private static final CatalogSnapshot LOCAL_SNAPSHOT = buildSnapshot(LOCAL_CATALOG);
+    private static volatile CatalogSnapshot activeSnapshot = LOCAL_SNAPSHOT;
 
-    static {
+    private static CatalogSnapshot buildSnapshot(Catalog catalog) {
         List<Aegis> values = new ArrayList<>();
         Map<String, Aegis> byId = new LinkedHashMap<>();
-        for (AegisJson definition : CATALOG.aegises) {
+        for (AegisJson definition : catalog.aegises) {
+            Map<String, Double> stats = definition.stats == null
+                    ? new LinkedHashMap<>()
+                    : new LinkedHashMap<>(definition.stats);
             Aegis aegis = new Aegis(
                     Objects.requireNonNull(definition.id, "Missing Aegis id"),
                     Objects.requireNonNull(definition.name, "Missing Aegis name"),
                     Objects.requireNonNull(definition.description, "Missing Aegis description"),
                     requireLocation(definition.icon),
-                    definition.stats == null ? Map.of() : definition.stats,
+                    stats,
                     definition.primaryStatMultipliers == null
                             ? Map.of()
                             : definition.primaryStatMultipliers,
+                    definition.extraCastExcludedSpells == null
+                            ? List.of()
+                            : definition.extraCastExcludedSpells,
                     definition.enabled,
                     definition.initialSelectionAllowed,
                     definition.requiresMod == null ? "" : definition.requiresMod,
@@ -59,8 +67,10 @@ public final class Aegis {
         if (values.isEmpty()) {
             throw new IllegalStateException("Aegis catalog is empty");
         }
-        VALUES = List.copyOf(values);
-        BY_ID = Collections.unmodifiableMap(byId);
+        return new CatalogSnapshot(
+                List.copyOf(values),
+                Collections.unmodifiableMap(byId)
+        );
     }
 
     private final String id;
@@ -69,6 +79,7 @@ public final class Aegis {
     private final ResourceLocation iconTexture;
     private final Map<String, Double> stats;
     private final Map<String, Double> primaryStatMultipliers;
+    private final Set<ResourceLocation> extraCastExcludedSpells;
     private final boolean enabled;
     private final boolean initialSelectionAllowed;
     private final String requiresMod;
@@ -77,6 +88,7 @@ public final class Aegis {
     private Aegis(String id, String nameKey, String descriptionKey,
                   ResourceLocation iconTexture, Map<String, Double> stats,
                   Map<String, Double> primaryStatMultipliers,
+                  List<String> extraCastExcludedSpells,
                   boolean enabled, boolean initialSelectionAllowed, String requiresMod,
                   boolean manuallyToggleable) {
         this.id = id;
@@ -102,6 +114,21 @@ public final class Aegis {
         });
         this.primaryStatMultipliers = Collections.unmodifiableMap(
                 effectivePrimaryStatMultipliers
+        );
+        LinkedHashSet<ResourceLocation> effectiveExtraCastExclusions = new LinkedHashSet<>();
+        for (String spellId : extraCastExcludedSpells) {
+            ResourceLocation location = spellId == null
+                    ? null
+                    : PlatformServices.resources().tryParse(spellId);
+            if (location == null) {
+                throw new IllegalStateException(
+                        "Invalid extra-cast spell exclusion for Aegis " + id + ": " + spellId
+                );
+            }
+            effectiveExtraCastExclusions.add(location);
+        }
+        this.extraCastExcludedSpells = Collections.unmodifiableSet(
+                effectiveExtraCastExclusions
         );
         this.enabled = enabled;
         this.initialSelectionAllowed = initialSelectionAllowed;
@@ -156,6 +183,14 @@ public final class Aegis {
         return primaryStatMultipliers;
     }
 
+    /** Returns whether this Aegis must not repeat the given spell. */
+    public boolean excludesExtraCast(String spellId) {
+        ResourceLocation location = spellId == null
+                ? null
+                : PlatformServices.resources().tryParse(spellId);
+        return location != null && extraCastExcludedSpells.contains(location);
+    }
+
     public boolean manuallyToggleable() {
         return manuallyToggleable;
     }
@@ -167,11 +202,31 @@ public final class Aegis {
     }
 
     public static List<Aegis> values() {
-        return VALUES;
+        return activeSnapshot.values();
     }
 
     public static Optional<Aegis> byId(String id) {
-        return Optional.ofNullable(BY_ID.get(id));
+        return Optional.ofNullable(activeSnapshot.byId().get(id));
+    }
+
+    /** Serializes the server's effective, validated catalog for the login snapshot. */
+    public static String exportCatalogJson() {
+        return GSON.toJson(LOCAL_CATALOG);
+    }
+
+    /** Installs a server-authoritative catalog in client memory without touching local files. */
+    public static void installSyncedCatalog(String json) {
+        Catalog catalog = Objects.requireNonNull(
+                GSON.fromJson(json, Catalog.class),
+                "Synchronized Aegis catalog was empty"
+        );
+        Objects.requireNonNull(catalog.aegises, "Missing aegises");
+        activeSnapshot = buildSnapshot(catalog);
+    }
+
+    /** Restores this installation's own catalog after leaving a remote server. */
+    public static void resetSyncedCatalog() {
+        activeSnapshot = LOCAL_SNAPSHOT;
     }
 
     private static boolean defaultManualToggle(String id) {
@@ -239,6 +294,8 @@ public final class Aegis {
         private Map<String, Double> stats = Map.of();
         @SerializedName("primary_stat_multipliers")
         private Map<String, Double> primaryStatMultipliers = Map.of();
+        @SerializedName("extra_cast_excluded_spells")
+        private List<String> extraCastExcludedSpells = List.of();
         private boolean enabled = true;
         @SerializedName("initial_selection_allowed")
         private boolean initialSelectionAllowed = true;
@@ -246,5 +303,8 @@ public final class Aegis {
         private String requiresMod = "";
         @SerializedName("manual_toggle")
         private Boolean manualToggle;
+    }
+
+    private record CatalogSnapshot(List<Aegis> values, Map<String, Aegis> byId) {
     }
 }

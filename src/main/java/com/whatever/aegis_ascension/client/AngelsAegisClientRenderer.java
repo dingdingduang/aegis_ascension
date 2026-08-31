@@ -146,7 +146,7 @@ public final class AngelsAegisClientRenderer {
             for (Entity entity : level.entitiesForRendering()) {
                 if (!(entity instanceof AnimatedMdxProjectile visualizer)
                         || visualizer.isRemoved()
-                        || !ShieldMechanic.SHIELD_MODEL.equals(visualizer.getMdxModelId())) {
+                        || !ShieldMechanic.SHIELD_MODEL.equals(visualizer.getMdxModelLocation())) {
                     continue;
                 }
                 if (camera.distanceToSqr(visualizer) > rangeSquared) {

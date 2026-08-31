@@ -1,7 +1,7 @@
 package com.whatever.aegis_ascension.client.screen;
 
-import static com.whatever.aegis_ascension.perk.TalentConstants.R_DIVINE_SAKURA_POWER;
-import static com.whatever.aegis_ascension.perk.TalentConstants.SR_SHARED_FORTUNE;
+import static com.whatever.aegis_ascension.perk.TalentConstants.PERK_DIVINE_SAKURA_POWER;
+import static com.whatever.aegis_ascension.perk.TalentConstants.PERK_SHARED_FORTUNE;
 import static com.whatever.aegis_ascension.util.GeneralClientMethods.blitScaledRegion;
 import static com.whatever.aegis_ascension.util.GeneralClientMethods.drawCenteredString;
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getLiteralString;
@@ -54,7 +54,7 @@ final class ACGOwnedTalentsPage implements ACGPage {
                 || owned.stream().noneMatch(perk -> perk.id().equals(selectedId))) {
             selectedId = owned.isEmpty() ? null : owned.get(0).id();
         }
-        if (choosingPartner && !SR_SHARED_FORTUNE.equals(selectedId)) {
+        if (choosingPartner && !PERK_SHARED_FORTUNE.equals(selectedId)) {
             choosingPartner = false;
         }
         if (choosingPartner) {
@@ -105,14 +105,14 @@ final class ACGOwnedTalentsPage implements ACGPage {
         }
         Perk perk = Perk.byId(selectedId).orElse(null);
         if (perk == null || (!perk.manuallyToggleable()
-                && !perk.id().equals(R_DIVINE_SAKURA_POWER)
-                && !perk.id().equals(SR_SHARED_FORTUNE))) {
+                && !perk.id().equals(PERK_DIVINE_SAKURA_POWER)
+                && !perk.id().equals(PERK_SHARED_FORTUNE))) {
             return;
         }
-        boolean constellation = perk.id().equals(R_DIVINE_SAKURA_POWER);
+        boolean constellation = perk.id().equals(PERK_DIVINE_SAKURA_POWER);
         boolean enabled = ClientPerkState.isTalentEnabled(perk);
         Component label;
-        if (perk.id().equals(SR_SHARED_FORTUNE)) {
+        if (perk.id().equals(PERK_SHARED_FORTUNE)) {
             String partnerName = ClientPerkState.getSharedFortunePartnerName();
             label = partnerName.isBlank()
                     ? getTranslatableString(
@@ -137,7 +137,7 @@ final class ACGOwnedTalentsPage implements ACGPage {
     }
 
     private void performAction(ACGScreenContext context, Perk perk) {
-        if (perk.id().equals(SR_SHARED_FORTUNE)) {
+        if (perk.id().equals(PERK_SHARED_FORTUNE)) {
             choosingPartner = true;
             partnerPage = 0;
             context.rebuild();
@@ -147,9 +147,9 @@ final class ACGOwnedTalentsPage implements ACGPage {
             return;
         }
         actionCooldownTicks = 20;
-        if (perk.id().equals(R_DIVINE_SAKURA_POWER)) {
+        if (perk.id().equals(PERK_DIVINE_SAKURA_POWER)) {
             ModNetworking.sendToServer(
-                    new UnlockConstellationPacket(R_DIVINE_SAKURA_POWER));
+                    new UnlockConstellationPacket(PERK_DIVINE_SAKURA_POWER));
             context.rebuild();
             return;
         }

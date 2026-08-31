@@ -7,6 +7,7 @@ import net.minecraft.server.level.ServerPlayer;
 import com.whatever.aegis_ascension.util.GeneralConstants;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Item;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -119,6 +120,28 @@ public final class PlayerStorage {
         return items.size() < getMaxTypes();
     }
 
+    /** Whether this virtual item currently has a banked row. */
+    public boolean containsVirtual(String virtualId) {
+        VirtualItems.Definition definition = VirtualItems.byId(virtualId);
+        return definition != null && indexOf(definition.iconStack(), virtualId) >= 0;
+    }
+
+    /** Removes every banked copy of one virtual item, returning the amount discarded. */
+    public long removeAllVirtual(String virtualId) {
+        if (virtualId == null || virtualId.isBlank()) {
+            return 0L;
+        }
+        long removed = 0L;
+        for (int index = items.size() - 1; index >= 0; index--) {
+            StoredItem item = items.get(index);
+            if (virtualId.equals(item.virtualId())) {
+                removed += item.count();
+                items.remove(index);
+            }
+        }
+        return removed;
+    }
+
     private boolean addInternal(ItemStack stack, String virtualId, long amount, int rarityColor) {
         if (amount <= 0L) {
             return true;
@@ -168,6 +191,33 @@ public final class PlayerStorage {
             items.set(index, item.plus(-removed));
         }
         return removed;
+    }
+
+    /** Counts every non-virtual row of an item, ignoring NBT for material turn-ins. */
+    public long countItem(Item item) {
+        if (item == null) return 0L;
+        long total = 0L;
+        for (StoredItem stored : items) {
+            if (!stored.isVirtual() && stored.prototype().is(item)) {
+                if (Long.MAX_VALUE - total < stored.count()) return Long.MAX_VALUE;
+                total += stored.count();
+            }
+        }
+        return total;
+    }
+
+    /** Removes up to {@code amount} of an item across all non-virtual storage rows. */
+    public long removeItem(Item item, long amount) {
+        if (item == null || amount <= 0L) return 0L;
+        long remaining = amount;
+        for (int index = items.size() - 1; index >= 0 && remaining > 0L; index--) {
+            StoredItem stored = items.get(index);
+            if (stored.isVirtual() || !stored.prototype().is(item)) continue;
+            long removed = Math.min(remaining, stored.count());
+            remove(index, removed);
+            remaining -= removed;
+        }
+        return amount - remaining;
     }
 
     /**

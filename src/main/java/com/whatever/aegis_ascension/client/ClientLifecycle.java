@@ -2,7 +2,11 @@ package com.whatever.aegis_ascension.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
 import com.whatever.aegis_ascension.client.screen.ACGInventoryScreen;
+import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.menu.ModMenus;
+import com.whatever.aegis_ascension.perk.Perk;
+import com.whatever.aegis_ascension.perk.SkillEnhancement;
+import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.gui.screens.MenuScreens;
 import org.lwjgl.glfw.GLFW;
@@ -38,11 +42,18 @@ public final class ClientLifecycle {
             GLFW.GLFW_KEY_N,
             "key.categories.aegis_ascension"
     );
-    /** Advances the hovered offer card to the next description page. */
+    /** Advances the hovered offer card, or the world HUD Quest Tracker, to its next page. */
     public static final KeyMapping ADVANCE_CARD_PAGE = new KeyMapping(
             "key.aegis_ascension.advance_card_page",
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_DOWN,
+            "key.categories.aegis_ascension"
+    );
+    /** Shows or hides the accepted-quest tracker HUD. */
+    public static final KeyMapping TOGGLE_QUEST_TRACKER = new KeyMapping(
+            "key.aegis_ascension.toggle_quest_tracker",
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_L,
             "key.categories.aegis_ascension"
     );
 
@@ -52,7 +63,8 @@ public final class ClientLifecycle {
                     OPEN_DEVOUR_SCREEN,
                     OPEN_ACG_SCREEN,
                     PUT_INTO_STORAGE_UI,
-                    ADVANCE_CARD_PAGE
+                    ADVANCE_CARD_PAGE,
+                    TOGGLE_QUEST_TRACKER
             )
     );
 
@@ -62,6 +74,7 @@ public final class ClientLifecycle {
     /** Runs once from the active loader's client-setup work queue. */
     public static void initialize() {
         ClientSettings.get();
+        MiscLocalSettings.get();
         DevourClientSettings.get();
         MenuScreens.register(ModMenus.acgInventory(), ACGInventoryScreen::new);
     }
@@ -72,8 +85,16 @@ public final class ClientLifecycle {
 
     /** Clears world-specific client mirrors when leaving a server or save. */
     public static void clearSessionState() {
+        // Restore local definitions first so ClientPerkState's default-primary reset stores
+        // an object from the restored catalog rather than the disconnected server snapshot.
+        Perk.resetSyncedCatalog();
+        Aegis.resetSyncedCatalog();
+        SkillEnhancement.resetSyncedCatalog();
+        VirtualItems.resetSyncedCatalog();
         ClientPerkState.clear();
         ClientShopState.clear();
         ClientStorageState.clear();
+        ClientQuestState.clear();
+        QuestTrackerOverlay.clear();
     }
 }

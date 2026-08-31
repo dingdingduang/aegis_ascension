@@ -2,114 +2,124 @@ package com.whatever.aegis_ascension.client;
 
 import com.whatever.aegis_ascension.network.SyncShopDataPacket;
 import com.whatever.aegis_ascension.shop.ShopOffer;
+import com.whatever.aegis_ascension.shop.ShopType;
 import net.minecraft.client.Minecraft;
 
+import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 
 /**
- * Client-side mirror of the server's shop view, populated only by
- * {@link SyncShopDataPacket}. Display state exclusively — the GUI reads prices and
- * availability from here, but every purchase is re-validated server-side, so a stale or
- * edited value here can only make the UI wrong, never grant an item or a discount.
+ * Client-side mirrors of both server-authoritative shop views. Display state only: every
+ * purchase and reroll is still revalidated against the selected server-side shop.
  */
 public final class ClientShopState {
-    private static List<ShopOffer> offers = List.of();
-    private static int refreshExperienceCost;
-    private static int refreshCount;
-    private static long ticksUntilReset;
-    /** Wall-clock time of the last sync, used to age {@link #ticksUntilReset} between syncs. */
-    private static long ticksUntilResetSyncedAtMillis;
+    private static final Map<ShopType, Snapshot> SNAPSHOTS = new EnumMap<>(ShopType.class);
+
+    static {
+        clear();
+    }
 
     private ClientShopState() {
     }
 
+    private record Snapshot(
+            boolean enabled,
+            List<ShopOffer> offers,
+            int refreshExperienceCost,
+            int remainingRefreshes,
+            long ticksUntilReset,
+            long syncedAtMillis
+    ) {
+    }
+
     public static void accept(SyncShopDataPacket packet) {
-        offers = List.copyOf(packet.offers());
-        refreshExperienceCost = packet.refreshExperienceCost();
-        refreshCount = packet.refreshCount();
-        ticksUntilReset = packet.ticksUntilReset();
-        ticksUntilResetSyncedAtMillis = System.currentTimeMillis();
+        SNAPSHOTS.put(packet.shopType(), new Snapshot(
+                packet.enabled(),
+                List.copyOf(packet.offers()),
+                packet.refreshExperienceCost(),
+                packet.remainingRefreshes(),
+                packet.ticksUntilReset(),
+                System.currentTimeMillis()
+        ));
     }
 
     public static void clear() {
-        offers = List.of();
-        refreshExperienceCost = 0;
-        refreshCount = 0;
-        ticksUntilReset = 0L;
-        ticksUntilResetSyncedAtMillis = 0L;
+        SNAPSHOTS.clear();
+        for (ShopType shopType : ShopType.values()) {
+            // Treat an unsynchronised tab as available so it can be selected and requested.
+            SNAPSHOTS.put(shopType, new Snapshot(true, List.of(), 0, 0, 0L, 0L));
+        }
     }
 
-    // ------------------------------------------------------------------
-    // GUI integration hooks
-    // ------------------------------------------------------------------
-
-    /** Every stocked slot, in slot-index order. */
-    public static List<ShopOffer> getOffers() {
-        return offers;
+    private static Snapshot snapshot(ShopType shopType) {
+        ShopType resolved = shopType == null ? ShopType.COMMON : shopType;
+        return SNAPSHOTS.get(resolved);
     }
 
-    public static int getSlotCount() {
-        return offers.size();
+    public static boolean isEnabled(ShopType shopType) {
+        return snapshot(shopType).enabled();
     }
 
-    public static ShopOffer getOffer(int slotIndex) {
+    public static List<ShopOffer> getOffers(ShopType shopType) {
+        return snapshot(shopType).offers();
+    }
+
+    public static int getSlotCount(ShopType shopType) {
+        return snapshot(shopType).offers().size();
+    }
+
+    public static ShopOffer getOffer(ShopType shopType, int slotIndex) {
+        List<ShopOffer> offers = snapshot(shopType).offers();
         return slotIndex >= 0 && slotIndex < offers.size() ? offers.get(slotIndex) : null;
     }
 
-    /** Experience price of one slot, or 0 if the index isn't stocked. */
-    public static int getSlotCost(int slotIndex) {
-        ShopOffer offer = getOffer(slotIndex);
-        return offer == null ? 0 : offer.experienceCost();
+    /** Whether the local player can buy this stocked, unsold, affordable slot. */
+    public static boolean canPurchase(ShopType shopType, int slotIndex) {
+        ShopOffer offer = getOffer(shopType, slotIndex);
+        return isEnabled(shopType)
+                && offer != null
+                && !offer.purchased()
+                && (ClientPerkState.usesGoldCurrency()
+                ? getPlayerGold() >= offer.experienceCost()
+                : getPlayerExperience() >= offer.experienceCost());
     }
 
-    /** Whether the local player can actually buy this slot right now (stocked, unsold, affordable). */
-    public static boolean canPurchase(int slotIndex) {
-        ShopOffer offer = getOffer(slotIndex);
-        return offer != null && !offer.purchased() && getPlayerExperience() >= offer.experienceCost();
+    public static int getRefreshExperienceCost(ShopType shopType) {
+        return snapshot(shopType).refreshExperienceCost();
     }
 
-    public static boolean isPurchased(int slotIndex) {
-        ShopOffer offer = getOffer(slotIndex);
-        return offer != null && offer.purchased();
+    public static int getRemainingRefreshes(ShopType shopType) {
+        return snapshot(shopType).remainingRefreshes();
     }
 
-    public static int getRefreshExperienceCost() {
-        return refreshExperienceCost;
+    public static boolean canRefresh(ShopType shopType) {
+        return isEnabled(shopType) && getRemainingRefreshes(shopType) > 0;
     }
 
-    /** Manual rerolls left before the next automatic restock refills them. */
-    public static int getRemainingRefreshes() {
-        return refreshCount;
+    public static boolean canAffordRefresh(ShopType shopType) {
+        return ClientPerkState.usesGoldCurrency()
+                ? getPlayerGold() >= getRefreshExperienceCost(shopType)
+                : getPlayerExperience() >= getRefreshExperienceCost(shopType);
     }
 
-    public static boolean canRefresh() {
-        return refreshCount > 0;
-    }
-
-    public static boolean canAffordRefresh() {
-        return getPlayerExperience() >= refreshExperienceCost;
-    }
-
-    /**
-     * Ticks left until the daily reroll, aged locally so the countdown moves while the shop
-     * screen is open instead of sitting frozen until the next sync packet.
-     *
-     * <p>Elapsed time comes from the wall clock at 20 ticks/second. That tracks the server
-     * because the shop screen doesn't pause the game ({@code isPauseScreen() == false});
-     * any drift is corrected by the next sync, and the value is floored at 0 so an
-     * over-run reads as "due" rather than counting backwards.</p>
-     */
-    public static long getTicksUntilReset() {
-        if (ticksUntilResetSyncedAtMillis <= 0L) {
-            return ticksUntilReset;
+    /** Ages the selected shop's server countdown locally at twenty ticks per second. */
+    public static long getTicksUntilReset(ShopType shopType) {
+        Snapshot snapshot = snapshot(shopType);
+        if (snapshot.syncedAtMillis() <= 0L) {
+            return snapshot.ticksUntilReset();
         }
-        long elapsedTicks = (System.currentTimeMillis() - ticksUntilResetSyncedAtMillis) / 50L;
-        return Math.max(0L, ticksUntilReset - elapsedTicks);
+        long elapsedTicks = (System.currentTimeMillis() - snapshot.syncedAtMillis()) / 50L;
+        return Math.max(0L, snapshot.ticksUntilReset() - elapsedTicks);
     }
 
-    /** The local player's spendable experience — raw points, matching what the server charges. */
+    /** The local player's raw spendable vanilla experience, used when Gold mode is off. */
     public static int getPlayerExperience() {
         var player = Minecraft.getInstance().player;
         return player == null ? 0 : player.totalExperience;
+    }
+
+    public static long getPlayerGold() {
+        return ClientPerkState.getGoldCurrency();
     }
 }

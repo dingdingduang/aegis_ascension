@@ -26,4 +26,8 @@ public final class GeneralTextMethods {
     public static MutableComponent getLiteralString(String literalString) {
         return Component.literal(literalString);
     }
+
+    public static MutableComponent getEmpty() {
+        return Component.empty();
+    }
 }

@@ -106,10 +106,75 @@ final class ACGClientSettingsPage implements ACGPage {
                 }));
         y += rowGap;
 
+        addRow(context, new ACGSlider(fieldX, y, fieldWidth, 20,
+                ClientSettings.MIN_QUEST_TRACKER_SCALE,
+                ClientSettings.MAX_QUEST_TRACKER_SCALE,
+                settings.questTrackerScale,
+                value -> getTranslatableString(
+                        "screen.aegis_ascension.acg.settings.quest_tracker_scale",
+                        String.format(Locale.ROOT, "%.0f%%", value * 100.0D)),
+                value -> {
+                    settings.questTrackerScale = value;
+                    settings.save();
+                }));
+        y += rowGap;
+
+        addRow(context, new ACGSlider(fieldX, y, fieldWidth, 20,
+                ClientSettings.MIN_QUEST_TRACKER_QUEST_LIMIT,
+                ClientSettings.MAX_QUEST_TRACKER_QUEST_LIMIT,
+                settings.questTrackerQuestLimit,
+                value -> getTranslatableString(
+                        "screen.aegis_ascension.acg.settings.quest_tracker_quest_limit",
+                        Math.round(value)),
+                value -> {
+                    settings.questTrackerQuestLimit = (int) Math.round(value);
+                    settings.save();
+                }));
+        y += rowGap;
+
+        addRow(context, ACGButton.builder(
+                        questTrackerHudAnchorLabel(settings.questTrackerHudAnchor), button -> {
+                            settings.questTrackerHudAnchor = nextAnchor(
+                                    settings.questTrackerHudAnchor);
+                            settings.save();
+                            button.setMessage(questTrackerHudAnchorLabel(
+                                    settings.questTrackerHudAnchor));
+                        }).bounds(fieldX, y, fieldWidth, 20).build());
+        y += rowGap;
+
+        int halfWidth = (fieldWidth - 8) / 2;
+        addRow(context, new ACGSlider(fieldX, y, halfWidth, 20,
+                -200.0D, 200.0D, settings.questTrackerHudOffsetX,
+                value -> getTranslatableString(
+                        "screen.aegis_ascension.acg.settings.quest_tracker_hud_offset_x",
+                        Math.round(value)),
+                value -> {
+                    settings.questTrackerHudOffsetX = (int) Math.round(value);
+                    settings.save();
+                }));
+        addRow(context, new ACGSlider(fieldX + halfWidth + 8, y,
+                fieldWidth - halfWidth - 8, 20,
+                -200.0D, 200.0D, settings.questTrackerHudOffsetY,
+                value -> getTranslatableString(
+                        "screen.aegis_ascension.acg.settings.quest_tracker_hud_offset_y",
+                        Math.round(value)),
+                value -> {
+                    settings.questTrackerHudOffsetY = (int) Math.round(value);
+                    settings.save();
+                }));
+        y += rowGap;
+
         addRow(context, ACGButton.builder(shieldHudLabel(settings.showShieldHud), button -> {
                     settings.showShieldHud = !settings.showShieldHud;
                     settings.save();
                     button.setMessage(shieldHudLabel(settings.showShieldHud));
+                }).bounds(fieldX, y, fieldWidth, 20).build());
+        y += rowGap;
+
+        addRow(context, ACGButton.builder(goldCurrencyLabel(settings.showGoldCurrency), button -> {
+                    settings.showGoldCurrency = !settings.showGoldCurrency;
+                    settings.save();
+                    button.setMessage(goldCurrencyLabel(settings.showGoldCurrency));
                 }).bounds(fieldX, y, fieldWidth, 20).build());
         y += rowGap;
 
@@ -121,7 +186,6 @@ final class ACGClientSettingsPage implements ACGPage {
                         }).bounds(fieldX, y, fieldWidth, 20).build());
         y += rowGap;
 
-        int halfWidth = (fieldWidth - 8) / 2;
         addRow(context, new ACGSlider(fieldX, y, halfWidth, 20,
                 -200.0D, 200.0D, settings.shieldHudOffsetX,
                 value -> getTranslatableString(
@@ -172,9 +236,20 @@ final class ACGClientSettingsPage implements ACGPage {
         return onOffLabel("screen.aegis_ascension.acg.settings.show_shield_hud", enabled);
     }
 
+    private static Component goldCurrencyLabel(boolean enabled) {
+        return onOffLabel("screen.aegis_ascension.acg.settings.show_owned_gold", enabled);
+    }
+
     private static Component shieldHudAnchorLabel(ClientSettings.HudAnchor anchor) {
         return getTranslatableString(
                 "screen.aegis_ascension.acg.settings.shield_hud_anchor",
+                getTranslatableString("screen.aegis_ascension.acg.settings.anchor."
+                        + anchor.name().toLowerCase(Locale.ROOT)));
+    }
+
+    private static Component questTrackerHudAnchorLabel(ClientSettings.HudAnchor anchor) {
+        return getTranslatableString(
+                "screen.aegis_ascension.acg.settings.quest_tracker_hud_anchor",
                 getTranslatableString("screen.aegis_ascension.acg.settings.anchor."
                         + anchor.name().toLowerCase(Locale.ROOT)));
     }

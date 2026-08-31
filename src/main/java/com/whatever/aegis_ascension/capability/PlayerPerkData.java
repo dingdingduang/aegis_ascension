@@ -14,9 +14,12 @@ import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.mechanic.BreakthroughReleasePolicy;
 import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import com.whatever.aegis_ascension.shop.ShopState;
+import com.whatever.aegis_ascension.shop.ShopType;
 import com.whatever.aegis_ascension.storage.PlayerStorage;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
+import com.whatever.aegis_ascension.quest.QuestState;
+import com.whatever.aegis_ascension.util.StatAttribution;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
@@ -92,8 +95,14 @@ public final class PlayerPerkData {
     private static final String DEVOURED_ITEMS_TAG = "DevouredItems";
     private static final String DEVOURED_ATTRIBUTES_TAG = "DevouredAttributes";
     private static final String SHOP_TAG = "DailyShop";
+    private static final String DISCOVERY_SHOP_TAG = "DiscoveryShop";
     private static final String STORAGE_TAG = "VirtualStorage";
     private static final String VIRTUAL_ITEM_USES_TAG = "VirtualItemUses";
+    private static final String UNIQUE_VIRTUAL_PURCHASES_TAG = "UniqueVirtualPurchases";
+    private static final String QUEST_TAG = "Quests";
+    private static final String AEGIS_ASCENSION_RANK_TAG = "AegisAscensionRank";
+    private static final String AEGIS_ASCENSION_EXPERIENCE_TAG = "AegisAscensionExperience";
+    private static final String GOLD_CURRENCY_TAG = "GoldCurrency";
 
     private int selectionCharges;
     private int highestPerkLevel;
@@ -127,6 +136,7 @@ public final class PlayerPerkData {
     private final Set<String> disabledManualAegises = new LinkedHashSet<>();
     private int aegisRefreshCharges;
     private final ShopState shopState = new ShopState();
+    private final ShopState discoveryShopState = new ShopState(ShopType.DISCOVERY);
     private final PlayerStorage storage = new PlayerStorage();
 
     {
@@ -136,11 +146,52 @@ public final class PlayerPerkData {
                 () -> VirtualItems.bonusInt(this, VirtualItems.Effect.STORAGE_SLOTS));
     }
     private final Map<String, Integer> virtualItemUses = new LinkedHashMap<>();
+    private final Set<String> uniqueVirtualPurchases = new LinkedHashSet<>();
     private final Set<String> devouredItems = new LinkedHashSet<>();
     private final List<DevourAegis.InheritedAttribute> devouredAttributes = new ArrayList<>();
+    private final QuestState questState = new QuestState();
+    private int aegisAscensionRank = 1;
+    private long aegisAscensionExperience;
+    private long goldCurrency;
 
     public int getSelectionCharges() {
         return selectionCharges;
+    }
+
+    /** Current server-authoritative Aegis Ascension rank, starting at rank 1. */
+    public int getAegisAscensionRank() {
+        return aegisAscensionRank;
+    }
+
+    /** Experience earned toward the next Aegis Ascension rank. */
+    public long getAegisAscensionExperience() {
+        return aegisAscensionExperience;
+    }
+
+    public long getGoldCurrency() {
+        return goldCurrency;
+    }
+
+    public void addGoldCurrency(long amount) {
+        if (amount <= 0L) {
+            return;
+        }
+        goldCurrency = goldCurrency > Long.MAX_VALUE - amount
+                ? Long.MAX_VALUE : goldCurrency + amount;
+    }
+
+    public boolean trySpendGoldCurrency(long amount) {
+        if (amount < 0L || goldCurrency < amount) {
+            return false;
+        }
+        goldCurrency -= amount;
+        return true;
+    }
+
+    /** Internal progression setter used by the Aegis Ascension experience service. */
+    public void setAegisAscensionProgress(int rank, long experience) {
+        aegisAscensionRank = Math.max(1, Math.min(1000, rank));
+        aegisAscensionExperience = Math.max(0L, experience);
     }
 
     public int getPerkRefreshCharges() {
@@ -180,8 +231,8 @@ public final class PlayerPerkData {
                     .orElseThrow()
                     .stat(AegisConstants.PERK_REFRESH_CHARGE_PER_CHARGE);
         }
-        if (owns(R_WHITE_STAR_OBSIDIAN)) {
-            Perk whiteStarObsidian = Perk.byId(R_WHITE_STAR_OBSIDIAN)
+        if (owns(PERK_WHITE_STAR_OBSIDIAN)) {
+            Perk whiteStarObsidian = Perk.byId(PERK_WHITE_STAR_OBSIDIAN)
                     .orElseThrow();
             refreshCharges += whiteStarObsidian.stat(
                     PERK_REFRESH_CHARGE_PER_CHARGE
@@ -242,7 +293,7 @@ public final class PlayerPerkData {
     public boolean setPrimarySkillEnhancement(SkillEnhancement enhancement) {
         if (!SkillEnhancement.values().contains(enhancement)
                 || (primarySkillEnhancementChosen
-                && !owns(R_MATTER_TO_MAGIC_CONVERSION))) {
+                && !owns(PERK_MATTER_TO_MAGIC_CONVERSION))) {
             return false;
         }
         selectedPrimarySkillEnhancement = enhancement;
@@ -285,6 +336,7 @@ public final class PlayerPerkData {
         boolean alreadyOwnedAnAegis = !chosenAegises.isEmpty();
         Aegis granted = pool.get(player.getRandom().nextInt(pool.size()));
         chosenAegises.add(granted);
+        clearChallengePenalty();
         pendingAegisOffers.remove(granted);
         if (granted.id().equals(AegisConstants.LUCKY) && alreadyOwnedAnAegis) {
             grantRandomInactiveSoulLinkSet(player);
@@ -327,9 +379,26 @@ public final class PlayerPerkData {
         return shopState;
     }
 
+    /** The requested independently persisted Common or Discovery shop state. */
+    public ShopState getShopState(ShopType shopType) {
+        return shopType == ShopType.DISCOVERY ? discoveryShopState : shopState;
+    }
+
     /** This player's virtual item bank, where shop purchases land. */
     public PlayerStorage getStorage() {
         return storage;
+    }
+
+    public QuestState getQuestState() {
+        return questState;
+    }
+
+    public boolean isChallengePenaltyActive() {
+        return questState.challengePenaltyActive();
+    }
+
+    public void clearChallengePenalty() {
+        questState.setPenalty(false);
     }
 
     /** How many times this player has consumed a given virtual book, for its lifetime cap. */
@@ -347,6 +416,32 @@ public final class PlayerPerkData {
 
     public Map<String, Integer> getVirtualItemUses() {
         return Map.copyOf(virtualItemUses);
+    }
+
+    /**
+     * True once a unique virtual item was bought, consumed, or is still banked. Checking
+     * all three states prevents discarding or delaying consumption from bypassing uniqueness.
+     */
+    public boolean isUniqueVirtualItemAcquired(String virtualId) {
+        VirtualItems.Definition definition = VirtualItems.byId(virtualId);
+        if (definition == null || !definition.uniquePurchase) {
+            return false;
+        }
+        return uniqueVirtualPurchases.contains(virtualId)
+                || getVirtualItemUses(virtualId) > 0
+                || storage.containsVirtual(virtualId);
+    }
+
+    /** Records a successful shop purchase of an item configured as unique. */
+    public void recordUniqueVirtualPurchase(String virtualId) {
+        VirtualItems.Definition definition = VirtualItems.byId(virtualId);
+        if (definition != null && definition.uniquePurchase) {
+            uniqueVirtualPurchases.add(virtualId);
+        }
+    }
+
+    public int getDevouredItemCount() {
+        return devouredItems.size();
     }
 
     /** Records one item ID and its immutable attribute snapshot exactly once. */
@@ -527,7 +622,7 @@ public final class PlayerPerkData {
         int currentRank = getRank(perk);
         boolean expandsTalentSlots = perk.stat(EXTRA_TALENT_SLOTS) > 0.0D;
         return !PlatformServices.config().isTalentHidden(perk.id())
-                && (!perk.id().equals(R_SUSPENSION_OF_DISBELIEF)
+                && (!perk.id().equals(PERK_SUSPENSION_OF_DISBELIEF)
                 || getCustomStat(SUSPENSION_OF_DISBELIEF_USED) <= 0.0D
                 && hasSuspensionRewardCandidate())
                 && perk.isUnlockedForPool(this)
@@ -539,7 +634,7 @@ public final class PlayerPerkData {
 
     private boolean hasSuspensionRewardCandidate() {
         return Perk.values().stream()
-                .filter(candidate -> !candidate.id().equals(R_SUSPENSION_OF_DISBELIEF))
+                .filter(candidate -> !candidate.id().equals(PERK_SUSPENSION_OF_DISBELIEF))
                 .filter(Perk::randomRewardEligible)
                 .anyMatch(this::canAcquireTalent);
     }
@@ -568,7 +663,7 @@ public final class PlayerPerkData {
     }
 
     public boolean canAcquireRandomTalent(Perk perk) {
-        return !perk.id().equals(R_SUSPENSION_OF_DISBELIEF)
+        return !perk.id().equals(PERK_SUSPENSION_OF_DISBELIEF)
                 && perk.randomRewardEligible()
                 && canAcquireTalent(perk);
     }
@@ -623,6 +718,9 @@ public final class PlayerPerkData {
     }
 
     public void setCustomStat(String key, double value) {
+        if (key == null || key.isBlank() || !Double.isFinite(value)) {
+            return;
+        }
         if (Math.abs(value) < 1.0E-9D) {
             customStats.remove(key);
         } else {
@@ -634,6 +732,22 @@ public final class PlayerPerkData {
         double updated = getCustomStat(key) + amount;
         setCustomStat(key, updated);
         return updated;
+    }
+
+    /**
+     * Adds to a custom stat and additionally records which source granted it.
+     *
+     * <p>The shared key still carries the whole value, so gameplay is unaffected by
+     * whether the extra record is written. The record only lets the stat screen name
+     * the contributor instead of reporting an unattributed remainder.</p>
+     *
+     * @param sourceId the granting talent, Aegis, or Soul Link id
+     */
+    public double addAttributedCustomStat(String sourceId, String key, double amount) {
+        if (StatAttribution.isUsable(sourceId) && StatAttribution.isUsable(key)) {
+            addCustomStat(StatAttribution.key(sourceId, key), amount);
+        }
+        return addCustomStat(key, amount);
     }
 
     public List<Perk> getPendingOffers() {
@@ -649,8 +763,8 @@ public final class PlayerPerkData {
      * Awards the free starting charge and any newly crossed experience milestones.
      * XP-derived Perk charges and Breakthrough triggers have independent lifetime caps.
      */
-    public PerkMilestoneAwards awardMilestonesForLevel(int experienceLevel) {
-        int currentLevel = Math.max(0, experienceLevel);
+    public PerkMilestoneAwards awardMilestonesForLevel(int progressionLevel) {
+        int currentLevel = Math.max(0, progressionLevel);
         int chargesGranted = 0;
         int breakthroughsTriggered = 0;
         if (!startingPerkChargeAwarded) {
@@ -755,8 +869,8 @@ public final class PlayerPerkData {
      * Awards normal XP charges up to their lifetime cap. Once that cap is reached,
      * Holy Blessing may continue awarding attempts at its own JSON-configured interval.
      */
-    public int awardSkillEnhancementMilestonesForLevel(int experienceLevel) {
-        int currentLevel = Math.max(0, experienceLevel);
+    public int awardSkillEnhancementMilestonesForLevel(int progressionLevel) {
+        int currentLevel = Math.max(0, progressionLevel);
         if (currentLevel <= highestSkillEnhancementLevel) {
             return 0;
         }
@@ -831,8 +945,8 @@ public final class PlayerPerkData {
     }
 
     /** Grants one starting Aegis charge, then one per configured level interval. */
-    public int awardAegisChargesForLevel(int experienceLevel) {
-        highestAegisLevel = Math.max(highestAegisLevel, Math.max(0, experienceLevel));
+    public int awardAegisChargesForLevel(int progressionLevel) {
+        highestAegisLevel = Math.max(highestAegisLevel, Math.max(0, progressionLevel));
         int interval = PlatformServices.config().aegisLevelsPerCharge();
         int maximum = PlatformServices.config().maximumAegisCharges();
         long entitled = 1L + highestAegisLevel / interval;
@@ -1112,7 +1226,7 @@ public final class PlayerPerkData {
         boolean normalTalentPurchase = false;
         if (isAegisEnabled(AegisConstants.BLISS)) {
             grantBlissPerks(player);
-        } else if (perk.id().equals(R_SUSPENSION_OF_DISBELIEF)) {
+        } else if (perk.id().equals(PERK_SUSPENSION_OF_DISBELIEF)) {
             grantSuspensionTalents(player, perk);
         } else {
             acquireTalent(perk, player, TalentAcquisitionContext.STANDARD);
@@ -1163,7 +1277,7 @@ public final class PlayerPerkData {
             if (index > 0 && !canAcquireTalent(offered)) {
                 continue;
             }
-            if (offered.id().equals(R_SUSPENSION_OF_DISBELIEF)) {
+            if (offered.id().equals(PERK_SUSPENSION_OF_DISBELIEF)) {
                 grantSuspensionTalents(player, offered);
             } else {
                 acquireTalent(offered, player, TalentAcquisitionContext.STANDARD);
@@ -1283,10 +1397,10 @@ public final class PlayerPerkData {
 
     /** Shun rolls once per paid perk selection; granted talents never recurse. */
     private void grantSunoharaShunBonusTalent(ServerPlayer player) {
-        if (!owns(R_SUNOHARA_SHUN)) {
+        if (!owns(PERK_SUNOHARA_SHUN)) {
             return;
         }
-        Perk shun = Perk.byId(R_SUNOHARA_SHUN).orElseThrow();
+        Perk shun = Perk.byId(PERK_SUNOHARA_SHUN).orElseThrow();
         double chance = Mth.clamp(
                 shun.stat(ADDITIONAL_RANDOM_TALENT_CHANCE),
                 0.0D,
@@ -1434,7 +1548,7 @@ public final class PlayerPerkData {
                     1.0D
             ));
             int interval = Math.max(1, (int) Math.round(
-                    bliss.stat(AegisConstants.SSR_PER_PERKS_RECEIVED)
+                    bliss.stat(AegisConstants.PERK_PER_PERKS_RECEIVED)
             ));
             if (received % interval == 0) {
                 List<Perk> ssr = Perk.values().stream()
@@ -1481,6 +1595,7 @@ public final class PlayerPerkData {
         boolean alreadyOwnedAnAegis = !chosenAegises.isEmpty();
         aegisSelectionCharges--;
         chosenAegises.add(aegis);
+        clearChallengePenalty();
         pendingAegisOffers.clear();
         if (aegis.id().equals(AegisConstants.LUCKY) && alreadyOwnedAnAegis) {
             grantRandomInactiveSoulLinkSet(player);
@@ -1521,6 +1636,7 @@ public final class PlayerPerkData {
         while (count-- > 0 && !pool.isEmpty()) {
             Aegis granted = pool.remove(player.getRandom().nextInt(pool.size()));
             chosenAegises.add(granted);
+            clearChallengePenalty();
             if (granted.id().equals(AegisConstants.LUCKY)) {
                 grantRandomInactiveSoulLinkSet(player);
             }
@@ -1617,6 +1733,20 @@ public final class PlayerPerkData {
         disabledManualAegises.clear();
         devouredItems.clear();
         devouredAttributes.clear();
+        // Stat-book history and ordinary storage are retained. Cores are part of Devour
+        // progression, so a reset removes consumed levels, banked copies, and purchase
+        // locks. Any retained Core shop slot is reopened, and otherwise the Core becomes
+        // eligible for a future Daily Shop roll after Devour Aegis is acquired again.
+        // Gold is an inventory-like economy balance, so it is retained with storage.
+        for (String coreId : VirtualItems.devourCoreIds()) {
+            virtualItemUses.remove(coreId);
+            storage.removeAllVirtual(coreId);
+            uniqueVirtualPurchases.remove(coreId);
+            shopState.reopenVirtualOffer(coreId);
+        }
+        questState.resetOnProgressionReset();
+        aegisAscensionRank = 1;
+        aegisAscensionExperience = 0L;
     }
 
     public CompoundTag serializeNBT() {
@@ -1726,15 +1856,35 @@ public final class PlayerPerkData {
         tag.put(DEVOURED_ATTRIBUTES_TAG, devouredAttributeTags);
 
         tag.put(SHOP_TAG, shopState.save());
+        tag.put(DISCOVERY_SHOP_TAG, discoveryShopState.save());
         tag.put(STORAGE_TAG, storage.save());
 
         CompoundTag virtualUses = new CompoundTag();
         virtualItemUses.forEach(virtualUses::putInt);
         tag.put(VIRTUAL_ITEM_USES_TAG, virtualUses);
+
+        ListTag uniquePurchases = new ListTag();
+        uniqueVirtualPurchases.forEach(virtualId ->
+                uniquePurchases.add(StringTag.valueOf(virtualId))
+        );
+        tag.put(UNIQUE_VIRTUAL_PURCHASES_TAG, uniquePurchases);
+        tag.put(QUEST_TAG, questState.save());
+        tag.putInt(AEGIS_ASCENSION_RANK_TAG, aegisAscensionRank);
+        tag.putLong(AEGIS_ASCENSION_EXPERIENCE_TAG, aegisAscensionExperience);
+        tag.putLong(GOLD_CURRENCY_TAG, goldCurrency);
         return tag;
     }
 
     public void deserializeNBT(CompoundTag tag) {
+        aegisAscensionRank = Math.max(1, Math.min(1000,
+                tag.contains(AEGIS_ASCENSION_RANK_TAG, Tag.TAG_INT)
+                        ? tag.getInt(AEGIS_ASCENSION_RANK_TAG) : 1));
+        aegisAscensionExperience = Math.max(0L,
+                tag.contains(AEGIS_ASCENSION_EXPERIENCE_TAG, Tag.TAG_LONG)
+                        ? tag.getLong(AEGIS_ASCENSION_EXPERIENCE_TAG) : 0L);
+        goldCurrency = Math.max(0L,
+                tag.contains(GOLD_CURRENCY_TAG, Tag.TAG_LONG)
+                        ? tag.getLong(GOLD_CURRENCY_TAG) : 0L);
         selectionCharges = Math.max(0, tag.getInt(CHARGES_TAG));
         perkRefreshCharges = Math.max(0, tag.getInt(PERK_REFRESH_CHARGES_TAG));
         startingPerkChargeAwarded = tag.getBoolean(STARTING_PERK_CHARGE_AWARDED_TAG);
@@ -1889,6 +2039,7 @@ public final class PlayerPerkData {
         }
 
         shopState.load(tag.getCompound(SHOP_TAG));
+        discoveryShopState.load(tag.getCompound(DISCOVERY_SHOP_TAG));
         storage.load(tag.getCompound(STORAGE_TAG));
 
         virtualItemUses.clear();
@@ -1897,6 +2048,17 @@ public final class PlayerPerkData {
             int used = virtualUses.getInt(key);
             if (used > 0) {
                 virtualItemUses.put(key, used);
+            }
+        }
+        uniqueVirtualPurchases.clear();
+        ListTag uniquePurchases = tag.getList(
+                UNIQUE_VIRTUAL_PURCHASES_TAG,
+                Tag.TAG_STRING
+        );
+        for (int index = 0; index < uniquePurchases.size(); index++) {
+            String virtualId = uniquePurchases.getString(index);
+            if (!virtualId.isBlank()) {
+                uniqueVirtualPurchases.add(virtualId);
             }
         }
         aegisChargesAwarded = Math.max(0, tag.getInt(AEGIS_CHARGES_AWARDED_TAG));
@@ -1919,6 +2081,7 @@ public final class PlayerPerkData {
                 }
             });
         }
+        questState.load(tag.getCompound(QUEST_TAG), com.whatever.aegis_ascension.quest.QuestConfig.get());
     }
 
 }

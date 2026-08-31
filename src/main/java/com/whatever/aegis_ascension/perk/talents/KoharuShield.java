@@ -3,7 +3,7 @@ package com.whatever.aegis_ascension.perk.talents;
 import static com.whatever.aegis_ascension.perk.TalentConstants.INTERVAL_SECONDS;
 import static com.whatever.aegis_ascension.perk.TalentConstants.SHIELD_GAIN;
 import static com.whatever.aegis_ascension.perk.TalentConstants.SHIELD_GAIN_PER_LEVEL;
-import static com.whatever.aegis_ascension.perk.TalentConstants.SR_KOHARU_SPRITE;
+import static com.whatever.aegis_ascension.perk.TalentConstants.PERK_KOHARU_SPRITE;
 
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
@@ -11,6 +11,7 @@ import com.whatever.aegis_ascension.mechanic.ShieldMechanic;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.util.GeneralIronSpellSupportMethods;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
+import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -40,7 +41,7 @@ public final class KoharuShield {
     }
 
     private static void grant(ServerPlayer player, PlayerPerkData data) {
-        Perk koharu = Perk.byId(SR_KOHARU_SPRITE).orElse(null);
+        Perk koharu = Perk.byId(PERK_KOHARU_SPRITE).orElse(null);
         if (koharu == null || !data.owns(koharu.id())
                 || !data.hasChosenPrimarySkillEnhancement()) {
             return;
@@ -54,7 +55,7 @@ public final class KoharuShield {
             return;
         }
         int rank = Math.max(1, data.getRank(koharu));
-        int level = Math.max(0, player.experienceLevel);
+        int level = AegisExperienceSystem.effectiveLevel(player, data);
         double shieldRatio = (koharu.stat(SHIELD_GAIN)
                 + koharu.stat(SHIELD_GAIN_PER_LEVEL) * level) * rank;
         float amount = (float) Math.max(0.0D,

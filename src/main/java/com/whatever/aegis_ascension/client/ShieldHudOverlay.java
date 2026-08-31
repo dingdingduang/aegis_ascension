@@ -3,6 +3,7 @@ package com.whatever.aegis_ascension.client;
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.util.GeneralClientMethods;
+import com.whatever.aegis_ascension.util.GeneralTextMethods;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -76,7 +77,7 @@ public final class ShieldHudOverlay {
                 ICON_TEXTURE_SIZE, ICON_TEXTURE_SIZE);
 
         int textY = y + (ICON_RENDER_SIZE - font.lineHeight) / 2 + 1;
-        GeneralClientMethods.drawString(graphics, font, Component.literal(text),
+        GeneralClientMethods.drawString(graphics, font, GeneralTextMethods.getLiteralString(text),
                 x + ICON_RENDER_SIZE + ICON_TEXT_GAP, textY, TEXT_COLOR, true);
     }
 

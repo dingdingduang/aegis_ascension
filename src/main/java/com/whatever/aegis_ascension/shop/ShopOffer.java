@@ -42,6 +42,11 @@ public record ShopOffer(ItemStack stack, int experienceCost, boolean purchased,
         return new ShopOffer(stack, experienceCost, true, virtualId, rarityColor);
     }
 
+    /** Makes a retained shop slot purchasable again after its unique item is reset. */
+    public ShopOffer asAvailable() {
+        return new ShopOffer(stack, experienceCost, false, virtualId, rarityColor);
+    }
+
     public CompoundTag save() {
         CompoundTag tag = new CompoundTag();
         tag.put("Stack", ItemNbt.save(stack));

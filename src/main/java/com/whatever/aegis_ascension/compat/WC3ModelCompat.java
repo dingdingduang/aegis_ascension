@@ -120,14 +120,8 @@ public final class WC3ModelCompat {
             visualizer.setMdxModelOffset(0.0F, offsetY, 0.0F);
             visualizer.setMdxAnimationLooping(true);
             visualizer.setMdxAffectedByLight(false);
-            // Infinite lifespan: the visualizer lives for exactly as long as the
-            // caller keeps it, and is torn down by removeVisualizer, not by a
-            // self-destruct clock. StationaryMdxProjectile has no gravity, an empty
-            // onHit, and cannot collide with entities, so an infinite-lived one is a
-            // pure decoration rather than an accumulating hazard.
             visualizer.setMdxLifespanTicks(INFINITE);
 
-            visualizer.setSilent(true);
             visualizer.setInvisible(false);
 
             if (!level.addFreshEntity(visualizer)) {
@@ -145,8 +139,9 @@ public final class WC3ModelCompat {
 
         private static void removeVisualizer(ServerLevel level, UUID visualizerId) {
             Entity visualizer = level.getEntity(visualizerId);
-            if (visualizer instanceof AnimatedMdxProjectile) {
-                visualizer.discard();
+            if (visualizer instanceof AnimatedMdxProjectile tempVisualizer) {
+//                visualizer.discard();
+                tempVisualizer.endMdxNow();
             }
         }
     }

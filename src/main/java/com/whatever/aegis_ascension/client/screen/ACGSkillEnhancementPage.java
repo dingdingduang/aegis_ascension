@@ -1,6 +1,6 @@
 package com.whatever.aegis_ascension.client.screen;
 
-import static com.whatever.aegis_ascension.perk.TalentConstants.R_MATTER_TO_MAGIC_CONVERSION;
+import static com.whatever.aegis_ascension.perk.TalentConstants.PERK_MATTER_TO_MAGIC_CONVERSION;
 import static com.whatever.aegis_ascension.util.GeneralClientMethods.drawCenteredString;
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
@@ -34,7 +34,7 @@ final class ACGSkillEnhancementPage implements ACGAwaitingPage {
     @Override
     public void init(ACGScreenContext context) {
         boolean chosen = ClientPerkState.hasChosenPrimarySkillEnhancement();
-        boolean conversionUnlocked = ClientPerkState.owns(R_MATTER_TO_MAGIC_CONVERSION);
+        boolean conversionUnlocked = ClientPerkState.owns(PERK_MATTER_TO_MAGIC_CONVERSION);
         if (choosingPrimary) {
             context.add(ACGButton.builder(
                             getTranslatableString(
@@ -76,7 +76,9 @@ final class ACGSkillEnhancementPage implements ACGAwaitingPage {
                     ? getTranslatableString(
                     "screen.aegis_ascension.collection.skill_enhancement.refresh_free")
                     : getTranslatableString(
-                    "screen.aegis_ascension.collection.skill_enhancement.refresh",
+                    ClientPerkState.usesGoldCurrency()
+                            ? "screen.aegis_ascension.collection.skill_enhancement.refresh_gold"
+                            : "screen.aegis_ascension.collection.skill_enhancement.refresh",
                     ClientPerkState.getSkillEnhancementRefreshExperienceCost());
             ACGButton refresh = ACGButton.builder(
                             refreshLabel, button -> refreshOffers(context))
@@ -193,7 +195,7 @@ final class ACGSkillEnhancementPage implements ACGAwaitingPage {
     public void onServerSync(ACGScreenContext context) {
         clearAwaiting();
         if (ClientPerkState.hasChosenPrimarySkillEnhancement()
-                && !ClientPerkState.owns(R_MATTER_TO_MAGIC_CONVERSION)) {
+                && !ClientPerkState.owns(PERK_MATTER_TO_MAGIC_CONVERSION)) {
             choosingPrimary = false;
         }
     }

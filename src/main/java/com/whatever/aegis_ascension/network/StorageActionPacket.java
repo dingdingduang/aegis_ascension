@@ -2,7 +2,11 @@ package com.whatever.aegis_ascension.network;
 
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
+import com.whatever.aegis_ascension.command.AegisAscensionCommands;
 import com.whatever.aegis_ascension.data.PerkData;
+import com.whatever.aegis_ascension.mechanic.GoldCurrency;
+import com.whatever.aegis_ascension.aegis.AegisConstants;
+import com.whatever.aegis_ascension.aegis.DevourAegis;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
@@ -115,19 +119,26 @@ public record StorageActionPacket(Action action, ItemStack key, String virtualId
                         long payout = Math.round(removed * unit
                                 * StorageConfig.get().sellExperienceRatio);
                         if (payout > 0L) {
-                            // giveExperiencePoints takes an int; a payout past that range
-                            // would silently wrap negative and delete the player's XP.
-                            player.giveExperiencePoints(
-                                    (int) Math.min(Integer.MAX_VALUE, payout));
+                            if (GoldCurrency.enabled()) {
+                                GoldCurrency.grant(data, payout);
+                            } else {
+                                // giveExperiencePoints takes an int; a payout past that range
+                                // would silently wrap negative and delete the player's XP.
+                                player.giveExperiencePoints(
+                                        (int) Math.min(Integer.MAX_VALUE, payout));
+                            }
                         }
                         player.displayClientMessage(getTranslatableString(
-                                "message.aegis_ascension.storage.sold", removed,
-                                row.prototype().getHoverName(), payout), true);
+                                GoldCurrency.enabled()
+                                        ? "message.aegis_ascension.storage.sold_gold"
+                                        : "message.aegis_ascension.storage.sold",
+                                removed, row.prototype().getHoverName(), payout), true);
                     }
                     default -> {
                     }
                 }
                 ModNetworking.syncStorageTo(player);
+                if (GoldCurrency.enabled()) ModNetworking.syncPerkDataTo(player);
             });
         });
         context.setPacketHandled(true);
@@ -148,6 +159,21 @@ public record StorageActionPacket(Action action, ItemStack key, String virtualId
         if (definition == null) {
             return;
         }
+        if (definition.effect == VirtualItems.Effect.DEVOUR_AEGIS_CORE) {
+            if (!data.hasAegis(AegisConstants.DEVOUR)) {
+                player.displayClientMessage(getTranslatableString(
+                        "message.aegis_ascension.devour.core.no_aegis"), true);
+                return;
+            }
+            int expectedLevel = VirtualItems.devourCoreLevel(data) + 1;
+            int targetLevel = VirtualItems.devourCoreTargetLevel(row.virtualId());
+            if (targetLevel != expectedLevel) {
+                player.displayClientMessage(getTranslatableString(
+                        "message.aegis_ascension.devour.core.wrong_order",
+                        expectedLevel), true);
+                return;
+            }
+        }
         int remaining = VirtualItems.remainingUses(data, row.virtualId());
         if (remaining <= 0) {
             player.displayClientMessage(getTranslatableString(
@@ -167,6 +193,16 @@ public record StorageActionPacket(Action action, ItemStack key, String virtualId
             return;
         }
         data.addVirtualItemUse(row.virtualId(), (int) consumed);
+        if (definition.effect == VirtualItems.Effect.DEVOUR_AEGIS_CORE) {
+            int level = VirtualItems.devourCoreLevel(data);
+            player.displayClientMessage(getTranslatableString(
+                    "message.aegis_ascension.devour.core.used",
+                    level,
+                    DevourAegis.itemLimit(data)
+            ), true);
+            ModNetworking.syncTo(player);
+            return;
+        }
         TalentEffects.recalculateAttributes(player, data);
         // The bonus lands on max health as a modifier; without this the player keeps the
         // old current-health value and the new hearts read as already-missing.
@@ -200,7 +236,7 @@ public record StorageActionPacket(Action action, ItemStack key, String virtualId
         switch (definition.effect) {
             case RESET_DEVOURED -> applied = data.resetDevouredItems();
             case RESET_PROGRESSION -> {
-                com.whatever.aegis_ascension.command.PerkCommands.resetProgression(player);
+                AegisAscensionCommands.resetProgression(player);
                 // Always applicable: even with nothing chosen, the reset re-grants the
                 // selection charges the player's level entitles them to.
                 applied = true;
@@ -213,7 +249,10 @@ public record StorageActionPacket(Action action, ItemStack key, String virtualId
                     row.displayComponent()), true);
             return;
         }
-        if (storage.remove(index, 1L) <= 0L) {
+        // RESET_PROGRESSION may remove banked Devour Cores before this action item.
+        // Resolve the row again by identity so an index shift cannot consume another item.
+        int currentIndex = storage.indexOf(row.prototype(), row.virtualId());
+        if (storage.remove(currentIndex, 1L) <= 0L) {
             return;
         }
         data.addVirtualItemUse(row.virtualId(), 1);

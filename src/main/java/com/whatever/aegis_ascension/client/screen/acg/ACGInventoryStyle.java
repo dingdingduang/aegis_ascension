@@ -51,6 +51,8 @@ public final class ACGInventoryStyle {
     public static final int GEM_SIZE = 16;
     public static final ResourceLocation COIN = tex("coin");
     public static final int COIN_SIZE = 32;
+    public static final ResourceLocation GOLD_CURRENCY = tex("gold_currency");
+    public static final int GOLD_CURRENCY_SIZE = 128;
     public static final ResourceLocation CHECK = tex("checkmark_circle_green");
     public static final int CHECK_W = 74;
     public static final int CHECK_H = 73;

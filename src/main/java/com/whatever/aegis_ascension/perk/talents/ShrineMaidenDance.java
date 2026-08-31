@@ -85,7 +85,7 @@ public final class ShrineMaidenDance {
             }
         }
 
-        if (data.owns(SSR_LAW_OF_THE_CYCLE)
+        if (data.owns(PERK_LAW_OF_THE_CYCLE)
                 && NEGATED_BY_LAW_OF_CYCLE.contains(selected.id())) {
             if (MadokaWithHomura.isActive(data)) {
                 convertNegatedOutcome(selected.id(), player, data);
@@ -110,7 +110,8 @@ public final class ShrineMaidenDance {
                         data,
                         CATALOG.settings.allSkillEnhancementAttributePenalty
                 );
-                data.addCustomStat(ALL_SKILL_ENHANCEMENT_ATTRIBUTE, amount);
+                data.addAttributedCustomStat(PERK_SHRINE_MAIDEN_DANCE,
+                        ALL_SKILL_ENHANCEMENT_ATTRIBUTE, amount);
                 player.sendSystemMessage(getTranslatableString(
                         "message.aegis_ascension.madoka_homura.converted_percentage",
                         amount
@@ -121,7 +122,8 @@ public final class ShrineMaidenDance {
                         data,
                         CATALOG.settings.damageReductionPenalty
                 );
-                data.addCustomStat(DAMAGE_REDUCTION, amount);
+                data.addAttributedCustomStat(PERK_SHRINE_MAIDEN_DANCE,
+                        DAMAGE_REDUCTION, amount);
                 player.sendSystemMessage(getTranslatableString(
                         "message.aegis_ascension.madoka_homura.converted_damage_reduction",
                         amount
@@ -137,7 +139,7 @@ public final class ShrineMaidenDance {
 
     public static Component description() {
         MutableComponent description = getTranslatableString(
-                "perk.aegis_ascension.r_shrine_maiden_dance.description"
+                "perk.aegis_ascension.perk_shrine_maiden_dance.description"
         );
         for (Outcome outcome : CATALOG.outcomes.stream()
                 .filter(Outcome::enabled)
@@ -145,7 +147,7 @@ public final class ShrineMaidenDance {
             description.append("\n").append(describe(outcome));
         }
         return description.append("\n").append(getTranslatableString(
-                "perk.aegis_ascension.r_shrine_maiden_dance.description.footer"
+                "perk.aegis_ascension.perk_shrine_maiden_dance.description.footer"
         ));
     }
 
@@ -179,7 +181,8 @@ public final class ShrineMaidenDance {
                 notify(player, "lightning");
             }
             case ALL_SKILL_PENALTY -> {
-                data.addCustomStat(
+                data.addAttributedCustomStat(
+                        PERK_SHRINE_MAIDEN_DANCE,
                         ALL_SKILL_ENHANCEMENT_ATTRIBUTE,
                         settings.allSkillEnhancementAttributePenalty
                 );
@@ -190,7 +193,8 @@ public final class ShrineMaidenDance {
                 notify(player, "items");
             }
             case DAMAGE_REDUCTION_PENALTY -> {
-                data.addCustomStat(
+                data.addAttributedCustomStat(
+                        PERK_SHRINE_MAIDEN_DANCE,
                         DAMAGE_REDUCTION,
                         settings.damageReductionPenalty
                 );
@@ -280,7 +284,7 @@ public final class ShrineMaidenDance {
 
     private static Component describe(Outcome outcome) {
         Settings settings = CATALOG.settings;
-        String key = "perk.aegis_ascension.r_shrine_maiden_dance.outcome."
+        String key = "perk.aegis_ascension.perk_shrine_maiden_dance.outcome."
                 + outcome.id();
         String weight = formatPercent(outcome.weight());
         return switch (outcome.id()) {

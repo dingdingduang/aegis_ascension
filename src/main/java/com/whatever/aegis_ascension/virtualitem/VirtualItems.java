@@ -1,6 +1,8 @@
 package com.whatever.aegis_ascension.virtualitem;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
+import com.whatever.aegis_ascension.aegis.AegisConstants;
+import com.whatever.aegis_ascension.aegis.DevourAegis;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.util.GeneralCommonMethods;
@@ -15,9 +17,11 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.whatever.aegis_ascension.util.GeneralCommonMethods.formatPercent;
 
@@ -29,7 +33,8 @@ import static com.whatever.aegis_ascension.util.GeneralCommonMethods.formatPerce
  * <p>Each definition's {@code maxUses} is a <em>lifetime cap per player</em>, not a stack
  * limit — banking twenty HP books does not let a player exceed twenty uses, and the cap
  * survives spending, rebuying, and relogging because the use counter is stored on the
- * player rather than on the item row.</p>
+ * player rather than on the item row. Devour Aegis Cores are the deliberate exception:
+ * their one-use history resets together with Aegis progression.</p>
  *
  * <p>A player's bonus is always recomputed as {@code uses * amount} rather than being
  * banked as a number when the book is consumed. That keeps the config authoritative: retune
@@ -39,6 +44,14 @@ import static com.whatever.aegis_ascension.util.GeneralCommonMethods.formatPerce
  */
 public final class VirtualItems {
     public static final String SWISS_ROLL = "swiss_roll";
+    public static final String DEVOUR_AEGIS_CORE_I = "devour_aegis_core_i";
+    public static final String DEVOUR_AEGIS_CORE_II = "devour_aegis_core_ii";
+    public static final String DEVOUR_AEGIS_CORE_III = "devour_aegis_core_iii";
+    private static final List<String> DEVOUR_AEGIS_CORES = List.of(
+            DEVOUR_AEGIS_CORE_I,
+            DEVOUR_AEGIS_CORE_II,
+            DEVOUR_AEGIS_CORE_III
+    );
 
     /** Config keys understood by multi-stat virtual items such as the Swiss Roll. */
     public static final String ATTACK_DAMAGE = "attack_damage";
@@ -55,7 +68,8 @@ public final class VirtualItems {
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
             .resolve("virtual_item_setting.json");
 
-    private static Map<String, Definition> definitions;
+    private static volatile Map<String, Definition> localDefinitions;
+    private static volatile Map<String, Definition> syncedDefinitions;
 
     private VirtualItems() {
     }
@@ -72,6 +86,8 @@ public final class VirtualItems {
         COMPOSITE_STATS,
         /** Extra distinct item-type slots in the virtual storage, on top of the config cap. */
         STORAGE_SLOTS,
+        /** One of three unique, sequential upgrades to the Devour Aegis item limit. */
+        DEVOUR_AEGIS_CORE,
         /**
          * One-shot action, not a passive bonus: clears every Devoured item and its
          * inherited attributes. Contributes nothing to {@link #bonus}.
@@ -114,6 +130,8 @@ public final class VirtualItems {
          * convenient master switch.
          */
         public boolean appearsInShop = true;
+        /** Once bought, this item cannot be stocked again until progression is reset. */
+        public boolean uniquePurchase = false;
         /**
          * Require an explicit confirmation before this book is consumed. Meant for the
          * irreversible ones (a full progression wipe); an ordinary stat book doesn't need
@@ -186,6 +204,10 @@ public final class VirtualItems {
                         formatPercent(stat(FINAL_DAMAGE))
                 };
             }
+            if (effect == Effect.DEVOUR_AEGIS_CORE) {
+                int targetLevel = devourCoreTargetLevel(id);
+                return new Object[]{targetLevel, DevourAegis.itemLimitForLevel(targetLevel)};
+            }
             return new Object[]{GeneralCommonMethods.compact(amount), maxUses};
         }
 
@@ -209,15 +231,30 @@ public final class VirtualItems {
     }
 
     private static Map<String, Definition> definitions() {
-        if (definitions == null) {
-            definitions = load();
+        Map<String, Definition> synced = syncedDefinitions;
+        if (synced != null) {
+            return synced;
         }
-        return definitions;
+        return localDefinitions();
+    }
+
+    private static Map<String, Definition> localDefinitions() {
+        Map<String, Definition> local = localDefinitions;
+        if (local == null) {
+            synchronized (VirtualItems.class) {
+                local = localDefinitions;
+                if (local == null) {
+                    local = load();
+                    localDefinitions = local;
+                }
+            }
+        }
+        return local;
     }
 
     /** Drops the cached catalog so the next lookup re-reads the file. */
     public static void reload() {
-        definitions = null;
+        localDefinitions = null;
     }
 
     public static List<Definition> all() {
@@ -230,6 +267,28 @@ public final class VirtualItems {
 
     public static boolean exists(String id) {
         return byId(id) != null;
+    }
+
+    /** Serializes the server's effective virtual-item definitions for the login snapshot. */
+    public static String exportCatalogJson() {
+        Catalog catalog = new Catalog();
+        catalog.items = new ArrayList<>(localDefinitions().values());
+        return GSON.toJson(catalog);
+    }
+
+    /** Installs a server-authoritative catalog in client memory without touching local files. */
+    public static void installSyncedCatalog(String json) {
+        Catalog catalog = Objects.requireNonNull(
+                GSON.fromJson(json, Catalog.class),
+                "Synchronized virtual item catalog was empty"
+        );
+        Objects.requireNonNull(catalog.items, "Missing items");
+        syncedDefinitions = normalize(catalog);
+    }
+
+    /** Restores this installation's own catalog after leaving a remote server. */
+    public static void resetSyncedCatalog() {
+        syncedDefinitions = null;
     }
 
     private static Map<String, Definition> load() {
@@ -259,6 +318,10 @@ public final class VirtualItems {
             catalog.items = defaults();
         }
 
+        return normalize(catalog);
+    }
+
+    private static Map<String, Definition> normalize(Catalog catalog) {
         Map<String, Definition> byId = new LinkedHashMap<>();
         for (Definition definition : catalog.items) {
             if (definition == null || definition.id == null || definition.id.isBlank()) {
@@ -270,7 +333,7 @@ public final class VirtualItems {
             }
             byId.put(definition.id, definition);
         }
-        return byId;
+        return Collections.unmodifiableMap(byId);
     }
 
     private static List<Definition> defaults() {
@@ -303,7 +366,45 @@ public final class VirtualItems {
         swissRoll.bonuses.put(DAMAGE_BONUS, 0.05D);
         swissRoll.bonuses.put(FINAL_DAMAGE, 0.05D);
         list.add(swissRoll);
+        list.addAll(devourCoreDefaults());
         return list;
+    }
+
+    private static List<Definition> devourCoreDefaults() {
+        List<Definition> cores = new ArrayList<>();
+        Definition coreI = define(
+                DEVOUR_AEGIS_CORE_I,
+                "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_core_i.png",
+                Effect.DEVOUR_AEGIS_CORE,
+                1.0D,
+                1
+        );
+        coreI.tier = "SR";
+        coreI.uniquePurchase = true;
+        cores.add(coreI);
+
+        Definition coreII = define(
+                DEVOUR_AEGIS_CORE_II,
+                "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_core_ii.png",
+                Effect.DEVOUR_AEGIS_CORE,
+                1.0D,
+                1
+        );
+        coreII.tier = "SSR";
+        coreII.uniquePurchase = true;
+        cores.add(coreII);
+
+        Definition coreIII = define(
+                DEVOUR_AEGIS_CORE_III,
+                "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_core_iii.png",
+                Effect.DEVOUR_AEGIS_CORE,
+                1.0D,
+                1
+        );
+        coreIII.tier = "SSR";
+        coreIII.uniquePurchase = true;
+        cores.add(coreIII);
+        return cores;
     }
 
     private static Definition define(String id, String icon, Effect effect,
@@ -373,5 +474,52 @@ public final class VirtualItems {
     public static boolean isUncapped(String id) {
         Definition definition = byId(id);
         return definition != null && definition.maxUses <= 0;
+    }
+
+    public static List<String> devourCoreIds() {
+        return DEVOUR_AEGIS_CORES;
+    }
+
+    public static boolean isDevourAegisCore(String id) {
+        return DEVOUR_AEGIS_CORES.contains(id);
+    }
+
+    /** Level a specific numbered core grants; zero means the id is not a core. */
+    public static int devourCoreTargetLevel(String id) {
+        if (DEVOUR_AEGIS_CORE_I.equals(id)) {
+            return 1;
+        }
+        if (DEVOUR_AEGIS_CORE_II.equals(id)) {
+            return 2;
+        }
+        if (DEVOUR_AEGIS_CORE_III.equals(id)) {
+            return 3;
+        }
+        return 0;
+    }
+
+    /** Number of distinct sequential Devour Cores consumed, clamped to levels 0-3. */
+    public static int devourCoreLevel(PlayerPerkData data) {
+        int level = 0;
+        for (String coreId : DEVOUR_AEGIS_CORES) {
+            level += Math.min(1, data.getVirtualItemUses(coreId));
+        }
+        return Math.min(3, level);
+    }
+
+    /** Server-authoritative eligibility for a virtual item to enter this player's shop. */
+    public static boolean canAppearInShop(PlayerPerkData data, String id) {
+        Definition definition = byId(id);
+        if (definition == null || !definition.appearsInShop) {
+            return false;
+        }
+        if (definition.uniquePurchase && data.isUniqueVirtualItemAcquired(id)) {
+            return false;
+        }
+        if (definition.effect == Effect.DEVOUR_AEGIS_CORE) {
+            return data.hasAegis(AegisConstants.DEVOUR)
+                    && devourCoreTargetLevel(id) == devourCoreLevel(data) + 1;
+        }
+        return true;
     }
 }

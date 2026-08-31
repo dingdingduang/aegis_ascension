@@ -80,7 +80,7 @@ public final class MysteriousDoll {
     /** Builds the talent tooltip from the same JSON entries used by the server roll. */
     public static Component description() {
         MutableComponent description = getTranslatableString(
-                "perk.aegis_ascension.r_mysterious_doll.description"
+                "perk.aegis_ascension.perk_mysterious_doll.description"
         );
         for (Outcome outcome : OUTCOMES.stream()
                 .filter(Outcome::enabled)
@@ -91,7 +91,7 @@ public final class MysteriousDoll {
             description.append("\n").append(describe(outcome));
         }
         return description.append("\n").append(getTranslatableString(
-                "perk.aegis_ascension.r_mysterious_doll.description.footer"
+                "perk.aegis_ascension.perk_mysterious_doll.description.footer"
         ));
     }
 
@@ -214,23 +214,23 @@ public final class MysteriousDoll {
         String weight = formatPercent(outcome.weight());
         return switch (outcome.type()) {
             case CUSTOM_STAT -> getTranslatableString(
-                    "perk.aegis_ascension.r_mysterious_doll.outcome.custom_stat",
+                    "perk.aegis_ascension.perk_mysterious_doll.outcome.custom_stat",
                     weight,
                     statName(outcome),
                     formatSignedAmount(outcome)
             );
             case RANDOM_AEGIS -> getTranslatableString(
-                    "perk.aegis_ascension.r_mysterious_doll.outcome.random_aegis",
+                    "perk.aegis_ascension.perk_mysterious_doll.outcome.random_aegis",
                     weight,
                     nonNegativeCount(outcome.amount())
             );
             case RANDOM_ITEM -> getTranslatableString(
-                    "perk.aegis_ascension.r_mysterious_doll.outcome.random_item",
+                    "perk.aegis_ascension.perk_mysterious_doll.outcome.random_item",
                     weight,
                     nonNegativeCount(outcome.amount())
             );
             case RANDOM_TALENT -> getTranslatableString(
-                    "perk.aegis_ascension.r_mysterious_doll.outcome.random_talent",
+                    "perk.aegis_ascension.perk_mysterious_doll.outcome.random_talent",
                     weight,
                     nonNegativeCount(outcome.amount()),
                     outcome.tier()

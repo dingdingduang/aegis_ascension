@@ -30,8 +30,10 @@ final class ACGDrawer {
         DEVOURED(ACGPerkSelectionScreen.UIMode.DEVOURED),
         PLAYER_CUSTOM_STAT(ACGPerkSelectionScreen.UIMode.PLAYER_CUSTOM_STAT),
         CUSTOM_SHOP(ACGPerkSelectionScreen.UIMode.CUSTOM_SHOP),
+        QUEST_CENTER(ACGPerkSelectionScreen.UIMode.QUEST_CENTER),
         STORAGE(ACGPerkSelectionScreen.UIMode.STORAGE),
         INVENTORY_AND_CRAFTING(null),
+        SERVER_SETTINGS(ACGPerkSelectionScreen.UIMode.SERVER_SETTINGS),
         CLIENT_SETTINGS(ACGPerkSelectionScreen.UIMode.CLIENT_SETTINGS);
 
         private final ACGPerkSelectionScreen.UIMode pageMode;
@@ -180,11 +182,17 @@ final class ACGDrawer {
                 "screen.aegis_ascension.acg.nav.custom_shop",
                 Destination.CUSTOM_SHOP);
         addItem(miscellaneousItems,
+                "screen.aegis_ascension.acg.nav.quest_center",
+                Destination.QUEST_CENTER);
+        addItem(miscellaneousItems,
                 "screen.aegis_ascension.acg.nav.storage",
                 Destination.STORAGE);
         addItem(miscellaneousItems,
                 "screen.aegis_ascension.acg.nav.inventory_crafting",
                 Destination.INVENTORY_AND_CRAFTING);
+        addItem(miscellaneousItems,
+                "screen.aegis_ascension.acg.nav.server_settings",
+                Destination.SERVER_SETTINGS);
         addItem(miscellaneousItems,
                 "screen.aegis_ascension.acg.nav.client_settings",
                 Destination.CLIENT_SETTINGS);

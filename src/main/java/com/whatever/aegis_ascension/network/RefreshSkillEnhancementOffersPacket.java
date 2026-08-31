@@ -4,6 +4,7 @@ import static com.whatever.aegis_ascension.perk.TalentConstants.SOUL_LOGISTICS_C
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
 import com.whatever.aegis_ascension.data.PerkData;
+import com.whatever.aegis_ascension.mechanic.GoldCurrency;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -41,21 +42,27 @@ public record RefreshSkillEnhancementOffersPacket() {
                 );
                 boolean free = data.hasActiveSoulLink(SOUL_LOGISTICS_COMBO);
                 int chargedCost = free ? 0 : configuredCost;
+                long currencyCost = Math.max(0L, chargedCost);
 
                 if (data.getSkillEnhancementCharges() <= 0
                         || data.getPendingSkillEnhancementOffers().isEmpty()) {
                     sender.displayClientMessage(getTranslatableString(
                             "message.aegis_ascension.skill_enhancement_refresh.unavailable"
                     ), true);
-                } else if (sender.totalExperience < chargedCost) {
+                } else if (GoldCurrency.enabled()
+                        ? !free && !GoldCurrency.canAfford(data, currencyCost)
+                        : sender.totalExperience < chargedCost) {
                     sender.displayClientMessage(getTranslatableString(
-                            "message.aegis_ascension.skill_enhancement_refresh.insufficient_experience",
-                            chargedCost,
-                            sender.totalExperience
+                            GoldCurrency.enabled()
+                                    ? "message.aegis_ascension.skill_enhancement_refresh.insufficient_gold"
+                                    : "message.aegis_ascension.skill_enhancement_refresh.insufficient_experience",
+                            currencyCost,
+                            GoldCurrency.enabled() ? data.getGoldCurrency() : sender.totalExperience
                     ), true);
                 } else if (data.refreshSkillEnhancementOffers(sender)) {
                     if (chargedCost > 0) {
-                        sender.giveExperiencePoints(-chargedCost);
+                        if (GoldCurrency.enabled()) GoldCurrency.trySpend(data, currencyCost);
+                        else sender.giveExperiencePoints(-chargedCost);
                     }
                 } else {
                     sender.displayClientMessage(getTranslatableString(

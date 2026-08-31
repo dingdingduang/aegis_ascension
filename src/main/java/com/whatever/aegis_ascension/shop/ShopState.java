@@ -1,5 +1,6 @@
 package com.whatever.aegis_ascension.shop;
 
+import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -26,9 +27,22 @@ public final class ShopState {
     private static final String REFRESH_COUNT_TAG = "RefreshCount";
     private static final long UNSCHEDULED = Long.MIN_VALUE;
 
+    private final ShopType shopType;
     private List<ShopOffer> offers = new ArrayList<>();
     private long nextAutoRefreshGameTime = UNSCHEDULED;
     private int refreshCount;
+
+    public ShopState() {
+        this(ShopType.COMMON);
+    }
+
+    public ShopState(ShopType shopType) {
+        this.shopType = shopType == null ? ShopType.COMMON : shopType;
+    }
+
+    public ShopType shopType() {
+        return shopType;
+    }
 
     public List<ShopOffer> getOffers() {
         return List.copyOf(offers);
@@ -41,14 +55,17 @@ public final class ShopState {
     /** Ticks until the next automatic restock, for the GUI's countdown. */
     public long ticksUntilReset(Level level) {
         if (nextAutoRefreshGameTime == UNSCHEDULED) {
-            return ShopConfig.get().autoRefreshIntervalTicks();
+            return ShopConfig.get().autoRefreshIntervalTicks(shopType);
         }
         return Math.max(0L, nextAutoRefreshGameTime - level.getGameTime());
     }
 
     /** Manual rerolls still available before the next automatic restock refills them. */
     public int getRemainingManualRefreshes() {
-        return Math.max(0, ShopConfig.get().maxManualRefreshes - refreshCount);
+        if (!ShopConfig.get().isEnabled(shopType)) {
+            return 0;
+        }
+        return Math.max(0, ShopConfig.get().maxManualRefreshes(shopType) - refreshCount);
     }
 
     public boolean canManualRefresh() {
@@ -60,13 +77,21 @@ public final class ShopState {
      *
      * @return true if the stock changed and the owner needs a resync.
      */
-    public boolean tickAutoRefresh(Level level) {
+    public boolean tickAutoRefresh(Level level, PlayerPerkData data) {
+        if (!ShopConfig.get().isEnabled(shopType)) {
+            boolean changed = !offers.isEmpty() || refreshCount != 0
+                    || nextAutoRefreshGameTime != UNSCHEDULED;
+            offers = new ArrayList<>();
+            refreshCount = 0;
+            nextAutoRefreshGameTime = UNSCHEDULED;
+            return changed;
+        }
         long now = level.getGameTime();
-        long interval = ShopConfig.get().autoRefreshIntervalTicks();
+        long interval = ShopConfig.get().autoRefreshIntervalTicks(shopType);
         if (nextAutoRefreshGameTime != UNSCHEDULED && now < nextAutoRefreshGameTime) {
             return false;
         }
-        reroll(level.getRandom());
+        reroll(level.getRandom(), data);
         // The automatic restock is free, so it also refills the paid-reroll allowance.
         refreshCount = 0;
         nextAutoRefreshGameTime = now + interval;
@@ -74,8 +99,8 @@ public final class ShopState {
     }
 
     /** Unconditional reroll, used by the automatic restock and by a paid manual refresh. */
-    public void reroll(RandomSource random) {
-        offers = new ArrayList<>(ShopGenerator.roll(random));
+    public void reroll(RandomSource random, PlayerPerkData data) {
+        offers = new ArrayList<>(ShopGenerator.roll(random, data, shopType));
     }
 
     /**
@@ -86,11 +111,11 @@ public final class ShopState {
      *
      * @return false if no manual refreshes remain.
      */
-    public boolean manualRefresh(RandomSource random) {
-        if (!canManualRefresh()) {
+    public boolean manualRefresh(RandomSource random, PlayerPerkData data) {
+        if (!ShopConfig.get().isEnabled(shopType) || !canManualRefresh()) {
             return false;
         }
-        reroll(random);
+        reroll(random, data);
         refreshCount++;
         return true;
     }
@@ -107,6 +132,19 @@ public final class ShopState {
     public void markPurchased(int slotIndex) {
         if (isValidSlot(slotIndex)) {
             offers.set(slotIndex, offers.get(slotIndex).asPurchased());
+        }
+    }
+
+    /** Reopens retained slots for a unique virtual item whose acquisition was reset. */
+    public void reopenVirtualOffer(String virtualId) {
+        if (virtualId == null || virtualId.isBlank()) {
+            return;
+        }
+        for (int index = 0; index < offers.size(); index++) {
+            ShopOffer offer = offers.get(index);
+            if (offer.purchased() && virtualId.equals(offer.virtualId())) {
+                offers.set(index, offer.asAvailable());
+            }
         }
     }
 

@@ -7,6 +7,7 @@ import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.client.ClientLifecycle;
 import com.whatever.aegis_ascension.client.ClientSettings;
 import com.whatever.aegis_ascension.client.ClientStorageState;
+import com.whatever.aegis_ascension.client.ClientPerkState;
 import com.whatever.aegis_ascension.client.screen.acg.ACGButton;
 import com.whatever.aegis_ascension.client.screen.acg.ACGEditBox;
 import com.whatever.aegis_ascension.client.screen.acg.ACGInventoryStyle;
@@ -435,7 +436,9 @@ final class ACGStoragePage implements ACGPage {
             int unit = ClientStorageState.getSellUnitValue(selection);
             drawCenteredString(graphics, context.font(),
                     getTranslatableString(
-                            "screen.aegis_ascension.acg.storage.sell_value", unit),
+                            ClientPerkState.usesGoldCurrency()
+                                    ? "screen.aegis_ascension.acg.storage.sell_value_gold"
+                                    : "screen.aegis_ascension.acg.storage.sell_value", unit),
                     centerX, ringY + 84,
                     unit > 0 ? ACGInventoryStyle.ACCENT_ORANGE
                             : ACGInventoryStyle.TEXT_DIM);

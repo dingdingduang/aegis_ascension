@@ -28,6 +28,7 @@ import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.perk.SkillEnhancement;
 import com.whatever.aegis_ascension.perk.SoulLink;
 import com.whatever.aegis_ascension.perk.talents.FairTrade;
+import com.whatever.aegis_ascension.util.StatAttribution;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -36,6 +37,7 @@ import net.minecraft.resources.ResourceLocation;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Per-source attribution for a Custom Stat: which owned Perk, active Soul Link, enabled
@@ -74,12 +76,12 @@ public final class ACGStatSourceBreakdown {
                 if (isPrimaryStatTarget(ATTACK_DAMAGE)) {
                     multiplier += perk.stat(PRIMARY_ATTRIBUTE_MULTIPLIER) * rank;
                 }
-                if (perk.id().equals(SR_GREAT_FAIRY)) {
+                if (perk.id().equals(PERK_GREAT_FAIRY)) {
                     multiplier += perk.stat(ATTACK_MULTIPLIER_PER_OWNED_TALENT)
                             * ClientPerkState.getUsedTalentSlots()
                             * mistyLakeGreatFairyMultiplier();
                 }
-                if (perk.id().equals(R_SHIROKO)) {
+                if (perk.id().equals(PERK_SHIROKO)) {
                     int chargesPerStack = Math.max(1, (int) Math.round(perk.stat(
                             UNSPENT_SKILL_ENHANCEMENT_CHARGES_PER_STACK
                     )));
@@ -104,7 +106,7 @@ public final class ACGStatSourceBreakdown {
 
             addYuzusoftAccumulatedSources(
                     sources,
-                    R_YOSHINO_CIALLO,
+                    PERK_YOSHINO_CIALLO,
                     CIALLO_ATTACK_MULTIPLIER,
                     Format.PERCENT
             );
@@ -202,7 +204,7 @@ public final class ACGStatSourceBreakdown {
                     ));
             addCustomPerkSource(
                     sources,
-                    SR_RIGHTEOUS_KNIGHT,
+                    PERK_RIGHTEOUS_KNIGHT,
                     KNIGHT_ATTACK_SPEED_FLAT,
                     Format.NUMBER
             );
@@ -290,6 +292,10 @@ public final class ACGStatSourceBreakdown {
             );
         }
 
+        // Runs before the remainder below so attributed gains shrink it rather
+        // than being double-counted alongside it.
+        addAccumulatedSources(sources, statKey);
+
         if (!ATTACK_DAMAGE.equals(statKey)
                 && !ARMOR.equals(statKey)
                 && !ATTACK_SPEED.equals(statKey)) {
@@ -315,6 +321,84 @@ public final class ACGStatSourceBreakdown {
             }
         }
         return sources;
+    }
+
+    /**
+     * Lists gradual gains against the talent, Aegis, or Soul Link that granted them.
+     *
+     * <p>A Breakthrough bonus or a Shrine Maiden Dance penalty is folded into one
+     * shared custom stat, so previously only the total survived and the panel could
+     * report it solely as an unattributed remainder. The server now also records each
+     * grant under its source, and this reads those records back.</p>
+     *
+     * <p>The records are display bookkeeping: gameplay reads the shared stat, so a
+     * record that is missing just falls back into the remainder exactly as before.
+     * Source ids come from the catalog JSON, so a talent the server owner renamed or
+     * deleted can leave one behind; rather than dropping the value it is listed as
+     * coming from a talent that is no longer installed.</p>
+     */
+    private static void addAccumulatedSources(List<Source> sources, String statKey) {
+        String prefix = "__custom." + StatAttribution.PREFIX;
+        String suffix = StatAttribution.SEPARATOR + statKey;
+        List<Map.Entry<String, Double>> records = ClientPerkState.getDisplayStats()
+                .entrySet().stream()
+                .filter(entry -> entry.getKey().startsWith(prefix)
+                        && entry.getKey().endsWith(suffix))
+                .toList();
+        for (Map.Entry<String, Double> record : records) {
+            String key = record.getKey();
+            String sourceId = key.substring(
+                    prefix.length(), key.length() - suffix.length()
+            );
+            if (sourceId.isEmpty()
+                    || sourceId.indexOf(StatAttribution.SEPARATOR) >= 0) {
+                continue;
+            }
+            double value = record.getValue();
+            Perk perk = Perk.byId(sourceId).orElse(null);
+            if (perk != null) {
+                addAccumulatedSource(sources, perk.title(), perk.iconTexture(),
+                        28, value, statKey);
+                continue;
+            }
+            Aegis aegis = Aegis.byId(sourceId).orElse(null);
+            if (aegis != null) {
+                addAccumulatedSource(sources, aegis.title(), aegis.iconTexture(),
+                        128, value, statKey);
+                continue;
+            }
+            SoulLink soulLink = Perk.soulLinkById(sourceId).orElse(null);
+            if (soulLink != null) {
+                addAccumulatedSource(sources, soulLink.title(), soulLink.iconTexture(),
+                        28, value, statKey);
+                continue;
+            }
+            addSource(
+                    sources,
+                    getTranslatableString(
+                            "screen.aegis_ascension.collection.stat.removed_source"
+                    ),
+                    null,
+                    28,
+                    value,
+                    statFormat(statKey)
+            );
+        }
+    }
+
+    private static void addAccumulatedSource(List<Source> sources, Component name,
+                                             ResourceLocation icon, int iconTextureSize,
+                                             double value, String statKey) {
+        addSource(
+                sources,
+                getTranslatableString(
+                        "screen.aegis_ascension.collection.stat.accumulated_source", name
+                ),
+                icon,
+                iconTextureSize,
+                value,
+                statFormat(statKey)
+        );
     }
 
     private static Format statFormat(String statKey) {
@@ -353,63 +437,63 @@ public final class ACGStatSourceBreakdown {
                     * ClientPerkState.getDisplayStat(SUMMON_COUNT);
         }
         if (FINAL_DAMAGE.equals(statKey)) {
-            if (perk.id().equals(R_KOKONA)) {
+            if (perk.id().equals(PERK_KOKONA)) {
                 value += perk.stat(FINAL_DAMAGE_PER_OWNED_TALENT)
                         * ClientPerkState.getUsedTalentSlots();
             }
-            if (perk.id().equals(SSR_FIREFLY_FLAME)
+            if (perk.id().equals(PERK_FIREFLY_FLAME)
                     && ClientPerkState.getDisplayStat(LUCKY_STRIKE)
                     > perk.stat(LUCKY_STRIKE_THRESHOLD)) {
                 value += perk.stat(FINAL_DAMAGE_ABOVE_THRESHOLD);
             }
-            if (perk.id().equals(R_PERFECT_AND_ELEGANT_SERVANT)) {
+            if (perk.id().equals(PERK_PERFECT_AND_ELEGANT_SERVANT)) {
                 value += ClientPerkState.getDisplayStat(
                         "__custom." + PERFECTION_STACKS
                 ) * perk.stat(PERFECTION_FINAL_DAMAGE_PER_STACK);
             }
-            if (perk.id().equals(SR_PECORINES_BLESSING)) {
+            if (perk.id().equals(PERK_PECORINES_BLESSING)) {
                 value += ClientPerkState.getDisplayStat(
                         "__custom." + PECORINE_ACTIVE_FINAL_DAMAGE
                 );
             }
         }
         if (CRITICAL_CHANCE.equals(statKey)
-                && perk.id().equals(R_PERFECT_AND_ELEGANT_SERVANT)) {
+                && perk.id().equals(PERK_PERFECT_AND_ELEGANT_SERVANT)) {
             value += ClientPerkState.getDisplayStat(
                     "__custom." + PERFECTION_STACKS
             ) * perk.stat(PERFECTION_CRITICAL_CHANCE_PER_STACK);
         }
         if (CRITICAL_DAMAGE.equals(statKey)
-                && perk.id().equals(R_PERFECT_AND_ELEGANT_SERVANT)) {
+                && perk.id().equals(PERK_PERFECT_AND_ELEGANT_SERVANT)) {
             value += ClientPerkState.getDisplayStat(
                     "__custom." + PERFECTION_STACKS
             ) * perk.stat(PERFECTION_CRITICAL_DAMAGE_PER_STACK);
         }
         if (PHYSICAL_DAMAGE_AMPLIFICATION.equals(statKey)
-                && perk.id().equals(SR_COLLECTOR)) {
+                && perk.id().equals(PERK_COLLECTOR)) {
             value += perk.stat(PHYSICAL_DAMAGE_AMPLIFICATION_PER_SOUL_LINK)
                     * activeSoulLinkCount() * makeUpCollectorMultiplier();
         }
-        if (SPELL_DAMAGE_AMPLIFICATION.equals(statKey)
-                && perk.id().equals(SR_COLLECTOR)) {
-            value += perk.stat(SPELL_DAMAGE_AMPLIFICATION_PER_SOUL_LINK)
+        if (MAGIC_DAMAGE_AMPLIFICATION.equals(statKey)
+                && perk.id().equals(PERK_COLLECTOR)) {
+            value += perk.stat(MAGIC_DAMAGE_AMPLIFICATION_PER_SOUL_LINK)
                     * activeSoulLinkCount() * makeUpCollectorMultiplier();
         }
         if (SKILL_DAMAGE.equals(statKey)) {
-            if (perk.id().equals(R_CLEAR_MIND_STATE)) {
+            if (perk.id().equals(PERK_CLEAR_MIND_STATE)) {
                 value += perk.stat(EVASION_FLAT) * perk.stat(SKILL_DAMAGE_PER_EVASION);
             }
-            if (perk.id().equals(SR_METEOR_SPARKLE)) {
+            if (perk.id().equals(PERK_METEOR_SPARKLE)) {
                 value += ClientPerkState.getDisplayStat(LUCKY_STRIKE)
                         * perk.stat(SKILL_DAMAGE_PER_LUCKY_STRIKE);
             }
-            if (perk.id().equals(SR_GREAT_FAIRY)) {
+            if (perk.id().equals(PERK_GREAT_FAIRY)) {
                 value += perk.stat(SKILL_DAMAGE_PER_OWNED_TALENT)
                         * ClientPerkState.getUsedTalentSlots()
                         * mistyLakeGreatFairyMultiplier();
             }
         }
-        if (value < 0.0D && ClientPerkState.owns(SSR_LAW_OF_THE_CYCLE)) {
+        if (value < 0.0D && ClientPerkState.owns(PERK_LAW_OF_THE_CYCLE)) {
             if (ClientPerkState.isSoulLinkActive(requiredSoulLink(
                     SOUL_MADOKA_WITH_HOMURA
             ))) {
@@ -425,7 +509,7 @@ public final class ACGStatSourceBreakdown {
                 value = 0.0D;
             }
         } else if (CRITICAL_CHANCE.equals(statKey)
-                && perk.id().equals(R_KOHARUS_BLESSING)
+                && perk.id().equals(PERK_KOHARUS_BLESSING)
                 && ClientPerkState.isSoulLinkActive(requiredSoulLink(
                 SOUL_MAKE_UP_WORK_CLUB
         ))) {
@@ -512,7 +596,7 @@ public final class ACGStatSourceBreakdown {
         double aronaRanks = ClientPerkState.getDisplayStat(
                 "__custom." + ARONA_PRIMARY_FLAT
         );
-        var arona = Perk.byId(R_ARONA)
+        var arona = Perk.byId(PERK_ARONA)
                 .filter(perk -> ClientPerkState.owns(perk.id()));
         double effectiveAronaRanks = arona
                 .map(perk -> aronaRanks
@@ -546,7 +630,7 @@ public final class ACGStatSourceBreakdown {
                 value,
                 format
         );
-        Perk.byId(R_MYSTERIOUS_DOLL).ifPresent(perk -> addSource(
+        Perk.byId(PERK_MYSTERIOUS_DOLL).ifPresent(perk -> addSource(
                 sources,
                 perk.title(),
                 perk.iconTexture(),
@@ -585,7 +669,7 @@ public final class ACGStatSourceBreakdown {
     private static void addMysteriousDollRewardSources(
             List<Source> sources,
             String statKey) {
-        Perk.byId(R_MYSTERIOUS_DOLL).ifPresent(perk -> {
+        Perk.byId(PERK_MYSTERIOUS_DOLL).ifPresent(perk -> {
             double directValue = ClientPerkState.getDisplayStat(
                     "__custom." + MYSTERIOUS_DOLL_REWARD_SOURCE_PREFIX + statKey
             );
@@ -717,29 +801,27 @@ public final class ACGStatSourceBreakdown {
         long ssr = ClientPerkState.getOwnedPerks().stream()
                 .filter(perk -> perk.tier() == Perk.Tier.SSR).count();
         return 1.0D
-                + r * aegis.stat(AegisConstants.R_TALENT_SCALING)
-                + sr * aegis.stat(AegisConstants.SR_TALENT_SCALING)
-                + ssr * aegis.stat(AegisConstants.SSR_TALENT_SCALING);
+                + r * aegis.stat(AegisConstants.PERK_R_TALENT_SCALING)
+                + sr * aegis.stat(AegisConstants.PERK_SR_TALENT_SCALING)
+                + ssr * aegis.stat(AegisConstants.PERK_SSR_TALENT_SCALING);
     }
 
     private static void addKnownAccumulatedSources(List<Source> sources,
                                                     String statKey,
                                                     Format format) {
         if (DAMAGE_BONUS.equals(statKey)) {
-            addCustomPerkSource(sources, R_MUNDANE_STROLL, WALK_DAMAGE, format);
-            addCustomPerkSource(sources, R_LUNAR_GODDESSS_BLESSING, LUNAR_DAMAGE, format);
-            addCustomPerkSource(sources, SR_RIGHTEOUS_KNIGHT, KNIGHT_DAMAGE, format);
-            addCustomPerkSource(sources, SR_I_SHALL_INTERPRET_THE_RADIANCE,
+            addCustomPerkSource(sources, PERK_MUNDANE_STROLL, WALK_DAMAGE, format);
+            addCustomPerkSource(sources, PERK_I_SHALL_INTERPRET_THE_RADIANCE,
                     FROSTBITE_DAMAGE, format);
-            addCustomPerkSource(sources, SSR_INNATE_DREAM, INNATE_DAMAGE, format);
-            addCustomPerkSource(sources, SSR_TOP_PLAYER, TOP_DAMAGE, format);
+            addCustomPerkSource(sources, PERK_INNATE_DREAM, INNATE_DAMAGE, format);
+            addCustomPerkSource(sources, PERK_TOP_PLAYER, TOP_DAMAGE, format);
             addCustomPerkSource(
                     sources,
-                    SSR_DOMINUS_LAPIDIS,
+                    PERK_DOMINUS_LAPIDIS,
                     DOMINUS_SHIELD_DAMAGE_BONUS,
                     format
             );
-            Perk.byId(R_TEAM_STAR).ifPresent(perk -> addSource(
+            Perk.byId(PERK_TEAM_STAR).ifPresent(perk -> addSource(
                     sources,
                     perk.title(),
                     perk.iconTexture(),
@@ -749,8 +831,8 @@ public final class ACGStatSourceBreakdown {
                     ),
                     format
             ));
-            if (ClientPerkState.owns(SR_FAIR_TRADE)) {
-                Perk.byId(SR_FAIR_TRADE).ifPresent(perk -> addSource(
+            if (ClientPerkState.owns(PERK_FAIR_TRADE)) {
+                Perk.byId(PERK_FAIR_TRADE).ifPresent(perk -> addSource(
                         sources,
                         perk.title(),
                         perk.iconTexture(),
@@ -762,36 +844,44 @@ public final class ACGStatSourceBreakdown {
                 ));
             }
         }
+        if (ATTACK_DAMAGE_AMPLIFICATION.equals(statKey)) {
+            addCustomPerkSource(
+                    sources,
+                    PERK_RIGHTEOUS_KNIGHT,
+                    KNIGHT_DAMAGE,
+                    format
+            );
+        }
         if (BREAKTHROUGH_EFFECT.equals(statKey)) {
             addCustomPerkSource(
                     sources,
-                    R_SHRINE_MAIDEN_DANCE,
+                    PERK_SHRINE_MAIDEN_DANCE,
                     BREAKTHROUGH_EFFECT_MULTIPLIER_BONUS,
                     format
             );
         }
         if (SKILL_DAMAGE.equals(statKey)) {
-            addCustomPerkSource(sources, SSR_INNATE_DREAM,
+            addCustomPerkSource(sources, PERK_INNATE_DREAM,
                     INNATE_SKILL_DAMAGE, format);
         }
         if (PHYSICAL_DAMAGE_AMPLIFICATION.equals(statKey)
-                || SPELL_DAMAGE_AMPLIFICATION.equals(statKey)) {
-            addCustomPerkSource(sources, R_LUNAR_GODDESSS_BLESSING, LUNAR_DAMAGE, format);
+                || MAGIC_DAMAGE_AMPLIFICATION.equals(statKey)) {
+            addCustomPerkSource(sources, PERK_LUNAR_GODDESSS_BLESSING, LUNAR_DAMAGE, format);
             addYuzusoftAccumulatedSources(
                     sources,
-                    R_CONGYU_CIALLO,
+                    PERK_CONGYU_CIALLO,
                     PHYSICAL_DAMAGE_AMPLIFICATION.equals(statKey)
                             ? CIALLO_PHYSICAL_DAMAGE_AMPLIFICATION
-                            : CIALLO_SPELL_DAMAGE_AMPLIFICATION,
+                            : CIALLO_MAGIC_DAMAGE_AMPLIFICATION,
                     format
             );
         }
         if (FINAL_DAMAGE.equals(statKey)) {
-            addCustomPerkSource(sources, SR_BLAZING_FEATHER_STARWEAVER,
+            addCustomPerkSource(sources, PERK_BLAZING_FEATHER_STARWEAVER,
                     BLAZING_BREAKTHROUGH_DAMAGE, format);
             addYuzusoftAccumulatedSources(
                     sources,
-                    R_SHIZURU_CIALLO,
+                    PERK_SHIZURU_CIALLO,
                     CIALLO_FINAL_DAMAGE,
                     format
             );
@@ -805,20 +895,20 @@ public final class ACGStatSourceBreakdown {
             );
         }
         if (CRITICAL_DAMAGE.equals(statKey)) {
-            addCustomPerkSource(sources, R_HALF_HUMAN_HALF_PHANTOM_GARDENER,
+            addCustomPerkSource(sources, PERK_HALF_HUMAN_HALF_PHANTOM_GARDENER,
                     GARDENER_CRITICAL_DAMAGE, format);
-            addCustomPerkSource(sources, SSR_INNATE_DREAM,
+            addCustomPerkSource(sources, PERK_INNATE_DREAM,
                     INNATE_CRITICAL_DAMAGE, format);
-            addCustomPerkSource(sources, SSR_TOP_PLAYER, TOP_CRITICAL_DAMAGE, format);
+            addCustomPerkSource(sources, PERK_TOP_PLAYER, TOP_CRITICAL_DAMAGE, format);
         }
         if (LUCKY_STRIKE.equals(statKey)) {
-            addCustomPerkSource(sources, R_BOUNDARY_OF_LIFE_AND_DEATH, REVIVE_LUCK, format);
+            addCustomPerkSource(sources, PERK_BOUNDARY_OF_LIFE_AND_DEATH, REVIVE_LUCK, format);
         }
         if (LUCK.equals(statKey)) {
-            addCustomPerkSource(sources, R_ALICE, ALICE_LUCK, format);
+            addCustomPerkSource(sources, PERK_ALICE, ALICE_LUCK, format);
             addYuzusoftAccumulatedSources(
                     sources,
-                    R_NANAMI_CIALLO,
+                    PERK_NANAMI_CIALLO,
                     CIALLO_LUCK,
                     format
             );
@@ -826,19 +916,19 @@ public final class ACGStatSourceBreakdown {
         if (ALL_SKILL_ENHANCEMENT_ATTRIBUTE.equals(statKey)) {
             addCustomPerkSource(
                     sources,
-                    SR_PLANA,
+                    PERK_PLANA,
                     ALL_SKILL_ENHANCEMENT_ATTRIBUTE,
                     format
             );
         }
         if (DAMAGE_REDUCTION.equals(statKey)) {
-            addCustomPerkSource(sources, SR_I_SHALL_INTERPRET_THE_RADIANCE,
+            addCustomPerkSource(sources, PERK_I_SHALL_INTERPRET_THE_RADIANCE,
                     FROSTBITE_DAMAGE_TAKEN, format);
         }
         if (COOLDOWN_REDUCTION.equals(statKey)) {
             addYuzusoftAccumulatedSources(
                     sources,
-                    R_NINGNING_CIALLO,
+                    PERK_NINGNING_CIALLO,
                     CIALLO_COOLDOWN_REDUCTION,
                     format
             );
@@ -1019,6 +1109,11 @@ public final class ACGStatSourceBreakdown {
     }
 
     private static void renderIcon(GuiGraphics graphics, Source source, int x, int y) {
+        if (source.icon() == null) {
+            // A source with no icon still deserves its row; a contribution left behind
+            // by a talent that is no longer installed has nothing to draw.
+            return;
+        }
         int textureSize = source.iconTextureSize();
         float scale = 16.0F / textureSize;
         graphics.pose().pushPose();

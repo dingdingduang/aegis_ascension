@@ -287,9 +287,9 @@ final class ACGPerkSelectionPage implements ACGAwaitingPage {
 
     private static ResourceLocation cardTextureFor(Perk.Tier tier) {
         return switch (tier) {
-            case R -> ACGTheme.R_CARD;
-            case SR -> ACGTheme.SR_CARD;
-            case SSR -> ACGTheme.SSR_CARD;
+            case R -> ACGTheme.PERK_R_CARD;
+            case SR -> ACGTheme.PERK_SR_CARD;
+            case SSR -> ACGTheme.PERK_SSR_CARD;
         };
     }
 

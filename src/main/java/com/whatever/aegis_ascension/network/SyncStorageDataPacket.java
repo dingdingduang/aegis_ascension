@@ -28,7 +28,11 @@ public record SyncStorageDataPacket(List<StoredItem> items,
     }
 
     public static SyncStorageDataPacket decode(FriendlyByteBuf buffer) {
-        int count = buffer.readVarInt();
+        int count = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_STORAGE_ROWS,
+                "storage row"
+        );
         List<StoredItem> items = new ArrayList<>(count);
         List<Integer> values = new ArrayList<>(count);
         for (int i = 0; i < count; i++) {

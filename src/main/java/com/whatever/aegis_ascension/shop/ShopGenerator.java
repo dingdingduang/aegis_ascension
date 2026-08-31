@@ -1,25 +1,47 @@
 package com.whatever.aegis_ascension.shop;
 
+import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.util.GeneralConstants;
+import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
+import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /** Rolls a fresh set of shop offers from {@link ShopConfig}. Pure logic, no side effects. */
 public final class ShopGenerator {
     private ShopGenerator() {
     }
 
-    public static List<ShopOffer> roll(RandomSource random) {
+    public static List<ShopOffer> roll(
+            RandomSource random,
+            PlayerPerkData data,
+            ShopType shopType
+    ) {
+        return shopType == ShopType.DISCOVERY
+                ? rollDiscovery(random)
+                : roll(random, data);
+    }
+
+    public static List<ShopOffer> roll(RandomSource random, PlayerPerkData data) {
         ShopConfig config = ShopConfig.get();
         List<ShopOffer> offers = new ArrayList<>();
+        Set<String> uniqueVirtualsInRoll = new HashSet<>();
 
         // --- Guaranteed slots -------------------------------------------------
         // Shuffled and drawn without replacement so a pool larger than minimumSlots
@@ -27,7 +49,7 @@ public final class ShopGenerator {
         List<ShopConfig.FixedEntry> guaranteed = new ArrayList<>();
         for (ShopConfig.FixedEntry entry : config.guaranteedItems) {
             if (ShopConfig.isVirtual(entry.virtualId)) {
-                if (isStockableVirtual(entry.virtualId)) {
+                if (isStockableVirtual(data, entry.virtualId)) {
                     guaranteed.add(entry);
                 }
                 continue;
@@ -42,7 +64,12 @@ public final class ShopGenerator {
             if (offers.size() >= config.minimumSlots) {
                 break;
             }
-            if (isStockableVirtual(entry.virtualId)) {
+            if (isStockableVirtual(data, entry.virtualId)) {
+                VirtualItems.Definition definition = VirtualItems.byId(entry.virtualId);
+                if (definition.uniquePurchase
+                        && !uniqueVirtualsInRoll.add(entry.virtualId)) {
+                    continue;
+                }
                 offers.add(virtualOffer(entry.virtualId, entry.count, entry.experienceCost));
                 continue;
             }
@@ -68,10 +95,15 @@ public final class ShopGenerator {
             // Virtual books bypass the item blacklist/whitelist: they aren't real items, so
             // a whitelist naming only real ids would otherwise silently drop every book.
             if (ShopConfig.isVirtual(entry.virtualId)) {
-                if (!isStockableVirtual(entry.virtualId)) {
+                if (!isStockableVirtual(data, entry.virtualId)) {
                     continue;
                 }
-                tier = VirtualItems.byId(entry.virtualId).parsedTier();
+                VirtualItems.Definition definition = VirtualItems.byId(entry.virtualId);
+                if (definition.uniquePurchase
+                        && uniqueVirtualsInRoll.contains(entry.virtualId)) {
+                    continue;
+                }
+                tier = definition.parsedTier();
             } else {
                 Item item = ShopConfig.resolveItem(entry.item);
                 if (item == null || !config.isItemAllowed(item)) {
@@ -96,13 +128,18 @@ public final class ShopGenerator {
             if (picked == null) {
                 continue;
             }
-            if (isStockableVirtual(picked.virtualId)) {
+            if (isStockableVirtual(data, picked.virtualId)) {
                 // Books stack freely in storage, so the count range applies without the
                 // real-item max-stack clamp rollCount() would otherwise impose.
                 int min = Math.max(1, picked.minCount);
                 int max = Math.max(min, picked.maxCount);
                 int count = min >= max ? min : min + random.nextInt(max - min + 1);
                 offers.add(virtualOffer(picked.virtualId, count, picked.experienceCost));
+                VirtualItems.Definition definition = VirtualItems.byId(picked.virtualId);
+                if (definition.uniquePurchase) {
+                    uniqueVirtualsInRoll.add(picked.virtualId);
+                    removeUniqueVirtualFromPool(byTier, picked.virtualId);
+                }
                 continue;
             }
             Item item = ShopConfig.resolveItem(picked.item);
@@ -113,6 +150,259 @@ public final class ShopGenerator {
                     picked.experienceCost, GeneralConstants.rarityColor(picked.tier)));
         }
         return offers;
+    }
+
+    /**
+     * Selects one real item from the same tiered candidate pool used by a shop.
+     * Quest rewards use this instead of rolling shop stock, so they share filters,
+     * classification, and weights without changing or selling out a player's offers.
+     */
+    public static Optional<Item> rollRewardItem(RandomSource random, ShopType shopType,
+                                                String requestedTier,
+                                                Predicate<Item> eligibility) {
+        if (random == null) return Optional.empty();
+        ShopType source = shopType == null ? ShopType.COMMON : shopType;
+        String tier = GeneralConstants.normalizeTier(requestedTier);
+        Predicate<Item> allowed = eligibility == null ? item -> true : eligibility;
+        return source == ShopType.DISCOVERY
+                ? rollDiscoveryRewardItem(random, tier, allowed)
+                : rollCommonRewardItem(random, tier, allowed);
+    }
+
+    private static Optional<Item> rollCommonRewardItem(RandomSource random, String tier,
+                                                       Predicate<Item> eligibility) {
+        ShopConfig config = ShopConfig.get();
+        List<WeightedRewardItem> candidates = new ArrayList<>();
+        for (ShopConfig.RandomEntry entry : config.randomItems) {
+            if (entry == null || entry.weight <= 0 || ShopConfig.isVirtual(entry.virtualId)
+                    || !tier.equals(GeneralConstants.normalizeTier(entry.tier))) {
+                continue;
+            }
+            Item item = ShopConfig.resolveItem(entry.item);
+            if (item != null && config.isItemAllowed(item) && eligibility.test(item)) {
+                candidates.add(new WeightedRewardItem(item, entry.weight));
+            }
+        }
+        return pickWeightedRewardItem(candidates, random);
+    }
+
+    private static Optional<Item> rollDiscoveryRewardItem(RandomSource random, String tier,
+                                                          Predicate<Item> eligibility) {
+        ShopConfig.DiscoveryShop config = ShopConfig.get().discoveryShop;
+        if (!config.enabled) return Optional.empty();
+        List<WeightedRewardItem> candidates = new ArrayList<>();
+        for (Item item : GeneralServerMethods.getAllItems()) {
+            if (item == null || !config.isItemAllowed(item) || !eligibility.test(item)) {
+                continue;
+            }
+            ItemStack probe = new ItemStack(item);
+            if (probe.isEmpty() || probe.getMaxStackSize() <= 0) continue;
+            EquipmentPower power = equipmentPower(probe);
+            ShopConfig.DiscoveryOfferSettings settings = config.settingsFor(
+                    item, power.attackDamage(), power.armor());
+            if (settings.selectionWeight() > 0.0D && tier.equals(settings.tier())) {
+                candidates.add(new WeightedRewardItem(item, settings.selectionWeight()));
+            }
+        }
+        return pickWeightedRewardItem(candidates, random);
+    }
+
+    private static Optional<Item> pickWeightedRewardItem(
+            List<WeightedRewardItem> candidates, RandomSource random) {
+        double totalWeight = 0.0D;
+        for (WeightedRewardItem candidate : candidates) {
+            totalWeight += candidate.weight();
+        }
+        if (!(totalWeight > 0.0D) || !Double.isFinite(totalWeight)) {
+            return Optional.empty();
+        }
+        double target = random.nextDouble() * totalWeight;
+        for (int index = 0; index < candidates.size(); index++) {
+            WeightedRewardItem candidate = candidates.get(index);
+            target -= candidate.weight();
+            if (target <= 0.0D || index == candidates.size() - 1) {
+                return Optional.of(candidate.item());
+            }
+        }
+        return Optional.empty();
+    }
+
+    private record WeightedRewardItem(Item item, double weight) {
+    }
+
+    /**
+     * Samples real items from the complete live item registry, including mod-owned entries.
+     * Candidates are shuffled and consumed without replacement, so one restock cannot show
+     * the same item twice. Filters and ordered price/count/tier rules come from
+     * {@code discoveryShop} in shopsetting.json.
+     */
+    private static List<ShopOffer> rollDiscovery(RandomSource random) {
+        ShopConfig.DiscoveryShop config = ShopConfig.get().discoveryShop;
+        if (!config.enabled) {
+            return List.of();
+        }
+
+        Map<String, List<DiscoveryCandidate>> candidatesByTier = new LinkedHashMap<>();
+        int candidateCount = 0;
+        for (Item item : GeneralServerMethods.getAllItems()) {
+            if (item == null || !config.isItemAllowed(item)) {
+                continue;
+            }
+            ItemStack probe = new ItemStack(item);
+            if (probe.isEmpty() || probe.getMaxStackSize() <= 0) {
+                continue;
+            }
+            EquipmentPower power = equipmentPower(probe);
+            ShopConfig.DiscoveryOfferSettings settings = config.settingsFor(
+                    item,
+                    power.attackDamage(),
+                    power.armor()
+            );
+            if (settings.selectionWeight() <= 0.0D) {
+                continue;
+            }
+            candidatesByTier.computeIfAbsent(settings.tier(), ignored -> new ArrayList<>())
+                    .add(new DiscoveryCandidate(item, settings));
+            candidateCount++;
+        }
+
+        int targetSlots = Math.min(config.minimumSlots, candidateCount);
+        for (int slot = config.minimumSlots;
+             slot < config.maximumSlots && targetSlots < candidateCount; slot++) {
+            if (random.nextDouble() < config.additionalSlotChance) {
+                targetSlots++;
+            } else if (config.sequentialSlotUnlock) {
+                break;
+            }
+        }
+
+        List<ShopOffer> offers = new ArrayList<>(targetSlots);
+        for (int index = 0; index < targetSlots; index++) {
+            String tier = pickDiscoveryTier(config, candidatesByTier, random);
+            if (tier == null) {
+                break;
+            }
+            List<DiscoveryCandidate> tierCandidates = candidatesByTier.get(tier);
+            DiscoveryCandidate candidate = takeWeightedDiscoveryCandidate(
+                    tierCandidates,
+                    random
+            );
+            if (tierCandidates.isEmpty()) {
+                candidatesByTier.remove(tier);
+            }
+            Item item = candidate.item();
+            ShopConfig.DiscoveryOfferSettings settings = candidate.settings();
+            int itemMax = Math.max(1, item.getMaxStackSize());
+            int max = Math.max(1, Math.min(settings.maxCount(), itemMax));
+            int min = Math.max(1, Math.min(settings.minCount(), max));
+            int count = min >= max ? min : min + random.nextInt(max - min + 1);
+            offers.add(new ShopOffer(
+                    new ItemStack(item, count),
+                    settings.experienceCost(),
+                    GeneralConstants.rarityColor(settings.tier())
+            ));
+        }
+        return offers;
+    }
+
+    private record DiscoveryCandidate(
+            Item item,
+            ShopConfig.DiscoveryOfferSettings settings
+    ) {
+    }
+
+    private record EquipmentPower(double attackDamage, double armor) {
+    }
+
+    /** Reads the values shown when the default stack is equipped, including mod attributes. */
+    private static EquipmentPower equipmentPower(ItemStack stack) {
+        double attackDamage = maximumEquippedAttribute(stack, Attributes.ATTACK_DAMAGE, 1.0D);
+        double armor = maximumEquippedAttribute(stack, Attributes.ARMOR, 0.0D);
+        if (stack.getItem() instanceof ArmorItem armorItem) {
+            armor = Math.max(armor, armorItem.getDefense());
+        }
+        return new EquipmentPower(
+                Math.max(0.0D, attackDamage),
+                Math.max(0.0D, armor)
+        );
+    }
+
+    /** Highest effective value contributed in any equipment slot by one attribute. */
+    private static double maximumEquippedAttribute(
+            ItemStack stack,
+            Attribute attribute,
+            double baseValue
+    ) {
+        double maximum = 0.0D;
+        for (EquipmentSlot slot : EquipmentSlot.values()) {
+            var modifiers = stack.getAttributeModifiers(slot).get(attribute);
+            if (modifiers.isEmpty()) {
+                continue;
+            }
+            double additions = 0.0D;
+            double multiplyBase = 0.0D;
+            double multiplyTotal = 1.0D;
+            for (AttributeModifier modifier : modifiers) {
+                double amount = modifier.getAmount();
+                if (!Double.isFinite(amount)) {
+                    continue;
+                }
+                switch (modifier.getOperation()) {
+                    case ADDITION -> additions += amount;
+                    case MULTIPLY_BASE -> multiplyBase += amount;
+                    case MULTIPLY_TOTAL -> multiplyTotal *= 1.0D + amount;
+                }
+            }
+            double value = (baseValue + additions + baseValue * multiplyBase) * multiplyTotal;
+            if (Double.isFinite(value)) {
+                maximum = Math.max(maximum, value);
+            }
+        }
+        return maximum;
+    }
+
+    /** Rolls R/SR/SSR using only tiers that still contain candidates. */
+    private static String pickDiscoveryTier(
+            ShopConfig.DiscoveryShop config,
+            Map<String, List<DiscoveryCandidate>> candidatesByTier,
+            RandomSource random
+    ) {
+        int totalWeight = 0;
+        for (String tier : candidatesByTier.keySet()) {
+            totalWeight += config.rarityWeights.weightOf(tier);
+        }
+        if (totalWeight <= 0) {
+            return null;
+        }
+        int target = random.nextInt(totalWeight);
+        for (String tier : candidatesByTier.keySet()) {
+            target -= config.rarityWeights.weightOf(tier);
+            if (target < 0) {
+                return tier;
+            }
+        }
+        return null;
+    }
+
+    /** Weighted sampling without replacement inside one Discovery rarity tier. */
+    private static DiscoveryCandidate takeWeightedDiscoveryCandidate(
+            List<DiscoveryCandidate> candidates,
+            RandomSource random
+    ) {
+        double totalWeight = 0.0D;
+        for (DiscoveryCandidate candidate : candidates) {
+            totalWeight += candidate.settings().selectionWeight();
+        }
+        double target = random.nextDouble() * totalWeight;
+        for (int index = 0; index < candidates.size(); index++) {
+            DiscoveryCandidate candidate = candidates.get(index);
+            target -= candidate.settings().selectionWeight();
+            if (target <= 0.0D || index == candidates.size() - 1) {
+                candidates.remove(index);
+                return candidate;
+            }
+        }
+        throw new IllegalStateException("Discovery candidate pool was empty");
     }
 
     /**
@@ -127,12 +417,19 @@ public final class ShopGenerator {
     }
 
     /** True only for a virtual id that names a book the current config actually defines. */
-    private static boolean isStockableVirtual(String virtualId) {
+    private static boolean isStockableVirtual(PlayerPerkData data, String virtualId) {
         if (!ShopConfig.isVirtual(virtualId)) {
             return false;
         }
-        VirtualItems.Definition definition = VirtualItems.byId(virtualId);
-        return definition != null && definition.appearsInShop;
+        return VirtualItems.canAppearInShop(data, virtualId);
+    }
+
+    private static void removeUniqueVirtualFromPool(
+            Map<String, List<ShopConfig.RandomEntry>> byTier,
+            String virtualId) {
+        byTier.values().forEach(entries -> entries.removeIf(entry ->
+                virtualId.equals(entry.virtualId)));
+        byTier.entrySet().removeIf(entry -> entry.getValue().isEmpty());
     }
 
     private static ShopOffer virtualOffer(String virtualId, int count, int experienceCost) {

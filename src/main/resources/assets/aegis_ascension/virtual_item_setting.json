@@ -66,6 +66,45 @@
       }
     },
     {
+      "id": "devour_aegis_core_i",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_core_i.png",
+      "name": "virtual_item.aegis_ascension.devour_aegis_core_i.name",
+      "description": "virtual_item.aegis_ascension.devour_aegis_core_i.description",
+      "effect": "DEVOUR_AEGIS_CORE",
+      "amount": 1.0,
+      "maxUses": 1,
+      "tier": "SR",
+      "appearsInShop": true,
+      "uniquePurchase": true,
+      "requiresConfirmation": false
+    },
+    {
+      "id": "devour_aegis_core_ii",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_core_ii.png",
+      "name": "virtual_item.aegis_ascension.devour_aegis_core_ii.name",
+      "description": "virtual_item.aegis_ascension.devour_aegis_core_ii.description",
+      "effect": "DEVOUR_AEGIS_CORE",
+      "amount": 1.0,
+      "maxUses": 1,
+      "tier": "SSR",
+      "appearsInShop": true,
+      "uniquePurchase": true,
+      "requiresConfirmation": false
+    },
+    {
+      "id": "devour_aegis_core_iii",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_core_iii.png",
+      "name": "virtual_item.aegis_ascension.devour_aegis_core_iii.name",
+      "description": "virtual_item.aegis_ascension.devour_aegis_core_iii.description",
+      "effect": "DEVOUR_AEGIS_CORE",
+      "amount": 1.0,
+      "maxUses": 1,
+      "tier": "SSR",
+      "appearsInShop": true,
+      "uniquePurchase": true,
+      "requiresConfirmation": false
+    },
+    {
       "id": "devour_reset_book",
       "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_reset.png",
       "name": "virtual_item.aegis_ascension.devour_reset_book.name",

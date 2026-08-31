@@ -1,0 +1,115 @@
+package com.whatever.aegis_ascension.network;
+
+import com.whatever.aegis_ascension.client.ClientPacketHandler;
+import com.whatever.aegis_ascension.quest.QuestCompletionView;
+import com.whatever.aegis_ascension.quest.QuestObjective;
+import com.whatever.aegis_ascension.quest.QuestType;
+import com.whatever.aegis_ascension.quest.QuestView;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.network.NetworkEvent;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Supplier;
+
+public record SyncQuestDataPacket(List<QuestView> quests,
+                                  List<QuestCompletionView> completions,
+                                  boolean penaltyActive, int depositExperienceCost,
+                                  boolean usesMinecraftDefaultLevel,
+                                  boolean autoAcceptEligibleQuests,
+                                  String questCompleteSound) {
+    public static void encode(SyncQuestDataPacket packet, FriendlyByteBuf buffer) {
+        buffer.writeBoolean(packet.penaltyActive);
+        buffer.writeVarInt(Math.max(0, packet.depositExperienceCost));
+        buffer.writeBoolean(packet.usesMinecraftDefaultLevel);
+        buffer.writeBoolean(packet.autoAcceptEligibleQuests);
+        buffer.writeUtf(packet.questCompleteSound == null ? "" : packet.questCompleteSound, 256);
+        buffer.writeVarInt(Math.min(NetworkLimits.MAX_QUESTS, packet.quests.size()));
+        for (QuestView q : packet.quests.subList(
+                0,
+                Math.min(NetworkLimits.MAX_QUESTS, packet.quests.size()))) {
+            buffer.writeUtf(q.id(), 128);
+            buffer.writeEnum(q.type()); buffer.writeEnum(q.objective());
+            buffer.writeUtf(q.title(), 256); buffer.writeUtf(q.description(), 512);
+            buffer.writeUtf(q.targetId(), 256);
+            buffer.writeVarInt(q.progress()); buffer.writeVarInt(q.target());
+            buffer.writeBoolean(q.accepted()); buffer.writeBoolean(q.completed());
+            buffer.writeBoolean(q.cancelled()); buffer.writeBoolean(q.expired());
+            buffer.writeVarLong(Math.max(0L, q.expiresAt()));
+            buffer.writeVarInt(q.experience());
+            buffer.writeVarLong(Math.max(0L, q.goldReward()));
+            buffer.writeUtf(q.rewardSummary(), 512);
+            buffer.writeUtf(q.story(), 1024);
+            buffer.writeUtf(q.profession(), 64);
+            buffer.writeUtf(q.prerequisiteTitle(), 256);
+            buffer.writeBoolean(q.prerequisiteMet());
+            buffer.writeVarInt(Math.max(0, q.securityDepositPaid()));
+            buffer.writeUtf(q.icon(), 256);
+            buffer.writeBoolean(q.repeatable());
+            buffer.writeVarInt(Math.max(0, q.cycle()));
+            buffer.writeVarLong(Math.max(0L, q.rewardReadyAt()));
+        }
+        buffer.writeVarInt(Math.min(
+                NetworkLimits.MAX_QUEST_COMPLETIONS,
+                packet.completions.size()
+        ));
+        for (QuestCompletionView completion : packet.completions.subList(
+                0,
+                Math.min(NetworkLimits.MAX_QUEST_COMPLETIONS, packet.completions.size()))) {
+            buffer.writeUtf(completion.questId(), 128);
+            buffer.writeUtf(completion.title(), 256);
+            buffer.writeEnum(completion.type());
+            buffer.writeEnum(completion.objective());
+            buffer.writeUtf(completion.icon(), 256);
+            buffer.writeUtf(completion.profession(), 64);
+            buffer.writeVarInt(Math.max(0, completion.completions()));
+            buffer.writeVarLong(Math.max(0L, completion.experienceEarned()));
+        }
+    }
+    public static SyncQuestDataPacket decode(FriendlyByteBuf buffer) {
+        boolean penalty = buffer.readBoolean(); int cost = buffer.readVarInt();
+        boolean usesMinecraftDefaultLevel = buffer.readBoolean();
+        boolean autoAcceptEligibleQuests = buffer.readBoolean();
+        String questCompleteSound = buffer.readUtf(256);
+        int count = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_QUESTS,
+                "quest"
+        );
+        List<QuestView> quests = new ArrayList<>(count);
+        for (int i = 0; i < count; i++) {
+            quests.add(new QuestView(buffer.readUtf(128), buffer.readEnum(QuestType.class),
+                    buffer.readEnum(QuestObjective.class), buffer.readUtf(256), buffer.readUtf(512),
+                    buffer.readUtf(256), buffer.readVarInt(), buffer.readVarInt(), buffer.readBoolean(),
+                    buffer.readBoolean(), buffer.readBoolean(), buffer.readBoolean(), buffer.readVarLong(),
+                    buffer.readVarInt(), buffer.readVarLong(), buffer.readUtf(512), buffer.readUtf(1024),
+                    buffer.readUtf(64), buffer.readUtf(256), buffer.readBoolean(),
+                    buffer.readVarInt(), buffer.readUtf(256), buffer.readBoolean(),
+                    buffer.readVarInt(), buffer.readVarLong()));
+        }
+        int completionCount = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_QUEST_COMPLETIONS,
+                "quest completion"
+        );
+        List<QuestCompletionView> completions = new ArrayList<>(completionCount);
+        for (int i = 0; i < completionCount; i++) {
+            completions.add(new QuestCompletionView(
+                    buffer.readUtf(128), buffer.readUtf(256),
+                    buffer.readEnum(QuestType.class), buffer.readEnum(QuestObjective.class),
+                    buffer.readUtf(256), buffer.readUtf(64),
+                    buffer.readVarInt(), buffer.readVarLong()));
+        }
+        return new SyncQuestDataPacket(quests, completions, penalty, cost,
+                usesMinecraftDefaultLevel, autoAcceptEligibleQuests,
+                questCompleteSound);
+    }
+    public static void handle(SyncQuestDataPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
+        NetworkEvent.Context context = contextSupplier.get();
+        context.enqueueWork(() -> DistExecutor.unsafeRunWhenOn(Dist.CLIENT,
+                () -> () -> ClientPacketHandler.handle(packet)));
+        context.setPacketHandled(true);
+    }
+}

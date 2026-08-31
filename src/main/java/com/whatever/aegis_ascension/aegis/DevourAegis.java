@@ -5,6 +5,7 @@ import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.ItemAttributeModifier;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
+import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -36,6 +37,10 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatab
  */
 public final class DevourAegis {
     private static final String MODIFIER_NAME_PREFIX = "aegis_ascension:devour/";
+    public static final int DEFAULT_ITEM_LIMIT_LEVEL_0 = 15;
+    public static final int DEFAULT_ITEM_LIMIT_LEVEL_1 = 30;
+    public static final int DEFAULT_ITEM_LIMIT_LEVEL_2 = 45;
+    public static final int DEFAULT_ITEM_LIMIT_LEVEL_3 = 99_999;
 
     private DevourAegis() {
     }
@@ -69,6 +74,16 @@ public final class DevourAegis {
             player.sendSystemMessage(getTranslatableString(
                     "message.aegis_ascension.devour.already_devoured",
                     stack.getHoverName()
+            ));
+            return false;
+        }
+        int itemLimit = itemLimit(data);
+        if (data.getDevouredItemCount() >= itemLimit) {
+            player.sendSystemMessage(getTranslatableString(
+                    "message.aegis_ascension.devour.limit_reached",
+                    data.getDevouredItemCount(),
+                    itemLimit,
+                    VirtualItems.devourCoreLevel(data)
             ));
             return false;
         }
@@ -200,6 +215,37 @@ public final class DevourAegis {
         return Aegis.byId(AegisConstants.DEVOUR)
                 .map(aegis -> aegis.stat(AegisConstants.DEVOUR_STAT_INHERITANCE))
                 .orElse(1.0D);
+    }
+
+    /** Maximum number of active devoured item IDs at the player's current Core level. */
+    public static int itemLimit(PlayerPerkData data) {
+        return itemLimitForLevel(VirtualItems.devourCoreLevel(data));
+    }
+
+    /** Configured item limit for a Devour Aegis level, clamped to the four supported tiers. */
+    public static int itemLimitForLevel(int level) {
+        Aegis devour = Aegis.byId(AegisConstants.DEVOUR).orElse(null);
+        return switch (Math.max(0, Math.min(3, level))) {
+            case 1 -> configuredLimit(devour, AegisConstants.DEVOUR_ITEM_LIMIT_LEVEL_1,
+                    DEFAULT_ITEM_LIMIT_LEVEL_1);
+            case 2 -> configuredLimit(devour, AegisConstants.DEVOUR_ITEM_LIMIT_LEVEL_2,
+                    DEFAULT_ITEM_LIMIT_LEVEL_2);
+            case 3 -> configuredLimit(devour, AegisConstants.DEVOUR_ITEM_LIMIT_LEVEL_3,
+                    DEFAULT_ITEM_LIMIT_LEVEL_3);
+            default -> configuredLimit(devour, AegisConstants.DEVOUR_ITEM_LIMIT_LEVEL_0,
+                    DEFAULT_ITEM_LIMIT_LEVEL_0);
+        };
+    }
+
+    private static int configuredLimit(Aegis devour, String statKey, int fallback) {
+        if (devour == null) {
+            return fallback;
+        }
+        double configured = devour.stat(statKey);
+        if (!Double.isFinite(configured) || configured <= 0.0D) {
+            return fallback;
+        }
+        return (int) Math.min(Integer.MAX_VALUE, Math.max(1L, Math.round(configured)));
     }
 
     /**

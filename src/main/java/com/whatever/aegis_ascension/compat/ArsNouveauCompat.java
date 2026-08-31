@@ -78,6 +78,18 @@ public final class ArsNouveauCompat {
         }
     }
 
+    /** Restores live Ars Nouveau mana through its public mana capability. */
+    public static void restoreMana(Player player, double amount) {
+        if (!isLoaded() || amount <= 0.0D || !Double.isFinite(amount)) {
+            return;
+        }
+        try {
+            ArsApi.restoreMana(player, amount);
+        } catch (LinkageError | RuntimeException exception) {
+            // Optional API missing or changed: leave the other supported pools usable.
+        }
+    }
+
     /** Direct Ars API references live here and are resolved only after the mod check. */
     private static final class ArsApi {
         private ArsApi() {
@@ -88,6 +100,12 @@ public final class ArsNouveauCompat {
                     0,
                     com.hollingsworth.arsnouveau.api.util.ManaUtil.getMaxMana(player)
             );
+        }
+
+        private static void restoreMana(Player player, double amount) {
+            com.hollingsworth.arsnouveau.setup.registry.CapabilityRegistry
+                    .getMana(player)
+                    .ifPresent(mana -> mana.addMana(amount));
         }
     }
 }

@@ -13,7 +13,7 @@ import java.nio.file.Path;
 
 /**
  * Client-only UI preferences for the ACG screen: drawer position memory, offer-card
- * sizing, and background opacity. Purely cosmetic/local — never touches server state or
+ * sizing, background opacity, quest tracker scale, and tracker page size. Purely cosmetic/local — never touches server state or
  * gameplay values, so it's safe to read/write freely without going through the perk
  * server data sync.
  *
@@ -48,6 +48,11 @@ public final class ClientSettings {
     public static final int MAX_CARD_WIDTH = 200;
     public static final int MIN_CARD_HEIGHT = 90;
     public static final int MAX_CARD_HEIGHT = 300;
+    /** Logical scale for the accepted-quest HUD tracker, persisted per client. */
+    public static final double MIN_QUEST_TRACKER_SCALE = 0.60D;
+    public static final double MAX_QUEST_TRACKER_SCALE = 1.60D;
+    public static final int MIN_QUEST_TRACKER_QUEST_LIMIT = 1;
+    public static final int MAX_QUEST_TRACKER_QUEST_LIMIT = 20;
 
     private static ClientSettings instance;
 
@@ -96,12 +101,25 @@ public final class ClientSettings {
 
     /** Whether to draw the shield amount HUD while the player has a shield. */
     public boolean showShieldHud = true;
+    /** Whether to show the owned Gold balance in the ACG screen's top bar. */
+    public boolean showGoldCurrency = true;
     /** Screen corner the shield HUD anchors to. */
     public HudAnchor shieldHudAnchor = HudAnchor.TOP_RIGHT;
     /** Shield HUD horizontal offset from its anchor, in pixels (positive moves right). */
     public int shieldHudOffsetX = -5;
     /** Shield HUD vertical offset from its anchor, in pixels (positive moves down). */
     public int shieldHudOffsetY = 5;
+
+    /** Scale applied to the accepted-quest tracker overlay. */
+    public double questTrackerScale = 1.0D;
+    /** Maximum accepted quests shown on one tracker page. */
+    public int questTrackerQuestLimit = 8;
+    /** Screen corner the accepted-quest tracker anchors to. */
+    public HudAnchor questTrackerHudAnchor = HudAnchor.TOP_RIGHT;
+    /** Quest Tracker horizontal offset from its anchor, in pixels. */
+    public int questTrackerHudOffsetX = -8;
+    /** Quest Tracker vertical offset from its anchor, in pixels. */
+    public int questTrackerHudOffsetY = 8;
 
     private ClientSettings() {
     }
@@ -157,6 +175,13 @@ public final class ClientSettings {
         cardHeight = Math.max(MIN_CARD_HEIGHT, Math.min(MAX_CARD_HEIGHT, cardHeight));
         backgroundOpacity = Math.max(0.0D, Math.min(1.0D, backgroundOpacity));
         drawerOpacity = Math.max(0.0D, Math.min(1.0D, drawerOpacity));
+        questTrackerScale = Math.max(MIN_QUEST_TRACKER_SCALE,
+                Math.min(MAX_QUEST_TRACKER_SCALE, questTrackerScale));
+        questTrackerQuestLimit = Math.max(MIN_QUEST_TRACKER_QUEST_LIMIT,
+                Math.min(MAX_QUEST_TRACKER_QUEST_LIMIT, questTrackerQuestLimit));
+        if (questTrackerHudAnchor == null) {
+            questTrackerHudAnchor = HudAnchor.TOP_RIGHT;
+        }
         if (shieldHudAnchor == null) {
             shieldHudAnchor = HudAnchor.TOP_RIGHT;
         }

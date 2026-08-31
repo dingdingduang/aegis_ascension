@@ -28,6 +28,14 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
                                  int aegisSelectionCharges,
                                  int aegisRefreshCharges,
                                  boolean liveCustomStatsRefreshAllowed,
+                                 boolean usesMinecraftDefaultLevel,
+                                 boolean usesGoldCurrency,
+                                 long goldCurrency,
+                                 int progressionLevel,
+                                 int aegisAscensionRank,
+                                 long aegisAscensionExperience,
+                                 long aegisAscensionExperienceToNextRank,
+                                 int aegisAscensionMaximumRank,
                                  UUID sharedFortunePartnerId,
                                  String sharedFortunePartnerName,
                                  int sharedFortuneRebindCooldownSeconds,
@@ -81,6 +89,14 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
         buffer.writeVarInt(packet.aegisSelectionCharges);
         buffer.writeVarInt(packet.aegisRefreshCharges);
         buffer.writeBoolean(packet.liveCustomStatsRefreshAllowed);
+        buffer.writeBoolean(packet.usesMinecraftDefaultLevel);
+        buffer.writeBoolean(packet.usesGoldCurrency);
+        buffer.writeVarLong(Math.max(0L, packet.goldCurrency));
+        buffer.writeVarInt(Math.max(0, packet.progressionLevel));
+        buffer.writeVarInt(Math.max(1, packet.aegisAscensionRank));
+        buffer.writeVarLong(Math.max(0L, packet.aegisAscensionExperience));
+        buffer.writeVarLong(Math.max(0L, packet.aegisAscensionExperienceToNextRank));
+        buffer.writeVarInt(Math.max(1, packet.aegisAscensionMaximumRank));
         buffer.writeBoolean(packet.sharedFortunePartnerId != null);
         if (packet.sharedFortunePartnerId != null) {
             buffer.writeUUID(packet.sharedFortunePartnerId);
@@ -130,6 +146,14 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
         int aegisSelectionCharges = Math.max(0, buffer.readVarInt());
         int aegisRefreshCharges = Math.max(0, buffer.readVarInt());
         boolean liveCustomStatsRefreshAllowed = buffer.readBoolean();
+        boolean usesMinecraftDefaultLevel = buffer.readBoolean();
+        boolean usesGoldCurrency = buffer.readBoolean();
+        long goldCurrency = Math.max(0L, buffer.readVarLong());
+        int progressionLevel = Math.max(0, buffer.readVarInt());
+        int aegisAscensionRank = Math.max(1, buffer.readVarInt());
+        long aegisAscensionExperience = Math.max(0L, buffer.readVarLong());
+        long aegisAscensionExperienceToNextRank = Math.max(0L, buffer.readVarLong());
+        int aegisAscensionMaximumRank = Math.max(1, buffer.readVarInt());
         UUID sharedFortunePartnerId = null;
         String sharedFortunePartnerName = "";
         if (buffer.readBoolean()) {
@@ -137,19 +161,22 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
             sharedFortunePartnerName = buffer.readUtf(64);
         }
         int sharedFortuneRebindCooldownSeconds = Math.max(0, buffer.readVarInt());
-        int hiddenTalentCount = buffer.readVarInt();
-        if (hiddenTalentCount < 0 || hiddenTalentCount > Perk.values().size()) {
-            throw new IllegalArgumentException(
-                    "Invalid hidden talent count: " + hiddenTalentCount
-            );
-        }
+        int hiddenTalentCount = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_TALENTS,
+                "hidden talent"
+        );
         Set<String> hiddenTalentIds = new LinkedHashSet<>();
         for (int index = 0; index < hiddenTalentCount; index++) {
             Perk.byId(buffer.readUtf(128)).ifPresent(perk ->
                     hiddenTalentIds.add(perk.id())
             );
         }
-        int count = Math.min(buffer.readVarInt(), Perk.values().size());
+        int count = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_TALENTS,
+                "talent rank"
+        );
         Map<Perk, Integer> ranks = new LinkedHashMap<>();
         for (int index = 0; index < count; index++) {
             String perkId = buffer.readUtf(128);
@@ -160,17 +187,22 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
                 }
             });
         }
-        int enabledCount = Math.min(buffer.readVarInt(), Perk.values().size());
+        int enabledCount = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_TALENTS,
+                "enabled manual talent"
+        );
         Set<String> enabledTalents = new LinkedHashSet<>();
         for (int index = 0; index < enabledCount; index++) {
             String perkId = buffer.readUtf(128);
             Perk.byId(perkId).filter(Perk::manuallyToggleable)
                     .ifPresent(perk -> enabledTalents.add(perk.id()));
         }
-        int statCount = buffer.readVarInt();
-        if (statCount < 0 || statCount > 1024) {
-            throw new IllegalArgumentException("Invalid display stat count: " + statCount);
-        }
+        int statCount = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_DISPLAY_STATS,
+                "display stat"
+        );
         Map<String, Double> displayStats = new LinkedHashMap<>();
         for (int index = 0; index < statCount; index++) {
             String key = buffer.readUtf(128);
@@ -179,13 +211,11 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
                 displayStats.put(key, value);
             }
         }
-        int enhancementRankCount = buffer.readVarInt();
-        if (enhancementRankCount < 0
-                || enhancementRankCount > SkillEnhancement.values().size()) {
-            throw new IllegalArgumentException(
-                    "Invalid skill enhancement rank count: " + enhancementRankCount
-            );
-        }
+        int enhancementRankCount = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_SKILL_ENHANCEMENTS,
+                "skill enhancement rank"
+        );
         Map<SkillEnhancement, Integer> enhancementRanks = new LinkedHashMap<>();
         for (int index = 0; index < enhancementRankCount; index++) {
             String enhancementId = buffer.readUtf(128);
@@ -196,12 +226,11 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
                 }
             });
         }
-        int offerCount = buffer.readVarInt();
-        if (offerCount < 0 || offerCount > SkillEnhancement.values().size()) {
-            throw new IllegalArgumentException(
-                    "Invalid skill enhancement offer count: " + offerCount
-            );
-        }
+        int offerCount = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_SKILL_ENHANCEMENTS,
+                "skill enhancement offer"
+        );
         List<SkillEnhancement> enhancementOffers = new java.util.ArrayList<>();
         for (int index = 0; index < offerCount; index++) {
             SkillEnhancement.byId(buffer.readUtf(128)).ifPresent(enhancement -> {
@@ -214,22 +243,20 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
                 buffer.readUtf(128)
         ).orElseGet(SkillEnhancement::defaultPrimary);
         boolean primarySkillEnhancementChosen = buffer.readBoolean();
-        int chosenAegisCount = buffer.readVarInt();
-        if (chosenAegisCount < 0 || chosenAegisCount > Aegis.values().size()) {
-            throw new IllegalArgumentException(
-                    "Invalid chosen Aegis count: " + chosenAegisCount
-            );
-        }
+        int chosenAegisCount = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_AEGISES,
+                "chosen Aegis"
+        );
         Set<Aegis> chosenAegises = new LinkedHashSet<>();
         for (int index = 0; index < chosenAegisCount; index++) {
             Aegis.byId(buffer.readUtf(128)).ifPresent(chosenAegises::add);
         }
-        int disabledAegisCount = buffer.readVarInt();
-        if (disabledAegisCount < 0 || disabledAegisCount > Aegis.values().size()) {
-            throw new IllegalArgumentException(
-                    "Invalid disabled Aegis count: " + disabledAegisCount
-            );
-        }
+        int disabledAegisCount = NetworkLimits.readBoundedCount(
+                buffer,
+                NetworkLimits.MAX_AEGISES,
+                "disabled Aegis"
+        );
         Set<String> disabledManualAegises = new LinkedHashSet<>();
         for (int index = 0; index < disabledAegisCount; index++) {
             String aegisId = buffer.readUtf(128);
@@ -250,6 +277,14 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
                 aegisSelectionCharges,
                 aegisRefreshCharges,
                 liveCustomStatsRefreshAllowed,
+                usesMinecraftDefaultLevel,
+                usesGoldCurrency,
+                goldCurrency,
+                progressionLevel,
+                aegisAscensionRank,
+                aegisAscensionExperience,
+                aegisAscensionExperienceToNextRank,
+                aegisAscensionMaximumRank,
                 sharedFortunePartnerId,
                 sharedFortunePartnerName,
                 sharedFortuneRebindCooldownSeconds,

@@ -2,7 +2,6 @@ package com.whatever.aegis_ascension.event;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.aegis.AngelsAegis;
-import com.whatever.aegis_ascension.aegis.FoxAegis;
 import com.whatever.aegis_ascension.lifecycle.PlayerDataLifecycle;
 import com.whatever.aegis_ascension.lifecycle.PlayerSessionLifecycle;
 import com.whatever.aegis_ascension.platform.PlatformServices;
@@ -10,9 +9,13 @@ import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import com.whatever.aegis_ascension.mechanic.ServerTickHandler;
 import com.whatever.aegis_ascension.mechanic.ServerGameplayHandler;
 import com.whatever.aegis_ascension.mechanic.ShieldMechanic;
+import com.whatever.aegis_ascension.network.ServerCatalogSync;
+import com.whatever.aegis_ascension.quest.QuestManager;
 import com.whatever.aegis_ascension.perk.talents.KoharuShield;
 import com.whatever.aegis_ascension.perk.talents.HomuraExperienceProtection;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -29,6 +32,11 @@ import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
+import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraft.world.level.block.CropBlock;
+import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
+import net.minecraft.world.Container;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.fml.common.Mod;
@@ -83,6 +91,8 @@ public final class ForgeEvents {
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
         HomuraExperienceProtection.clear();
+        QuestManager.clearTransientState();
+        ServerCatalogSync.clearAll();
         PlayerDataLifecycle.onServerStopped();
     }
 
@@ -153,7 +163,6 @@ public final class ForgeEvents {
         ServerTickHandler.onPlayerTick(player);
         ShieldMechanic.tick(player);
         AngelsAegis.tick(player);
-        FoxAegis.tick(player);
         KoharuShield.tick(player);
     }
 
@@ -312,6 +321,41 @@ public final class ForgeEvents {
         }
         // Homura's XP snapshot is captured by the LOWEST-priority handler below, after
         // every revive path has had a chance to cancel this death.
+    }
+
+    /** Counts genuine player kills after revive handlers have had a chance to cancel death. */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onQuestKill(LivingDeathEvent event) {
+        if (event.isCanceled() || !(event.getSource().getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        QuestManager.onKill(player, event.getEntity());
+    }
+
+    @SubscribeEvent
+    public static void onQuestPlant(BlockEvent.EntityPlaceEvent event) {
+        if (event.isCanceled() || !(event.getEntity() instanceof ServerPlayer player)
+                || !(event.getPlacedBlock().getBlock() instanceof CropBlock)) {
+            return;
+        }
+        QuestManager.onPlant(player, event.getPlacedBlock());
+    }
+
+    @SubscribeEvent
+    public static void onQuestChestOpened(PlayerInteractEvent.RightClickBlock event) {
+        if (event.isCanceled() || event.getHand() != InteractionHand.MAIN_HAND
+                || !(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        var blockEntity = event.getLevel().getBlockEntity(event.getPos());
+        if (!(blockEntity instanceof Container)) return;
+
+        // A generated loot container keeps its LootTable tag until its first access.
+        // RightClickBlock runs before vanilla unpacks that table, so this distinguishes
+        // a newly discovered loot chest from placed or previously opened storage.
+        boolean unopenedGeneratedLoot = blockEntity.saveWithoutMetadata().contains(
+                RandomizableContainerBlockEntity.LOOT_TABLE_TAG, Tag.TAG_STRING);
+        QuestManager.onChestOpened(player, event.getPos(), unopenedGeneratedLoot);
     }
 
     /** Captures only genuine deaths after revive/cancel handlers have finished. */

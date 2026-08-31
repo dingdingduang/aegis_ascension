@@ -69,6 +69,10 @@ public final class TalentStatService {
     private static final UUID LEGACY_ATTACK_SPEED_ID = UUID.fromString("a913dd5f-ae7f-4b66-925a-76a851516802");
     private static final UUID LEGACY_LUCK_ID = UUID.fromString("ac839dc5-550d-49e1-8114-7ca954d23cbb");
     private static final UUID LEGACY_KNOCKBACK_ID = UUID.fromString("79729f8d-bfd0-486e-9dc0-7d634794d0f8");
+    private static final UUID QUEST_HEALTH_PENALTY_ID = UUID.fromString("8f5f0b7d-cf6c-4cc6-9c71-24bdb3e4b1a1");
+    private static final UUID QUEST_MOVEMENT_PENALTY_ID = UUID.fromString("f2f5c654-1b16-45de-80d9-2c18da8cb7a6");
+    private static final UUID QUEST_ARMOR_PENALTY_ID = UUID.fromString("2c16cb5b-a8d6-4d0a-8a68-3d0f56a39116");
+    private static final UUID QUEST_PRIMARY_PENALTY_ID = UUID.fromString("f694a0ba-5f0b-4c95-9a3d-2aa116af37a4");
 
     private TalentStatService() {
     }
@@ -89,8 +93,8 @@ public final class TalentStatService {
                 magicianPrimaryAttributeFlat(player, data)
         );
         AttributeTotals totals = new AttributeTotals();
-        boolean ignoreNegatives = data.owns(SSR_LAW_OF_THE_CYCLE)
-                && stat(SSR_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
+        boolean ignoreNegatives = data.owns(PERK_LAW_OF_THE_CYCLE)
+                && stat(PERK_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
         double magicConversionHealth = magicConversionMaximumHealth(player, data);
 
         for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
@@ -122,12 +126,12 @@ public final class TalentStatService {
                 }
             }
 
-            if (perk.id().equals(SR_GREAT_FAIRY)) {
+            if (perk.id().equals(PERK_GREAT_FAIRY)) {
                 totals.attackMultiplier += perk.stat(ATTACK_MULTIPLIER_PER_OWNED_TALENT)
                         * data.getUniqueTalentCount()
                         * MistyLake.greatFairyMultiplier(data);
             }
-            if (perk.id().equals(R_SHIROKO)) {
+            if (perk.id().equals(PERK_SHIROKO)) {
                 int chargesPerStack = Math.max(1, (int) Math.round(perk.stat(
                         UNSPENT_SKILL_ENHANCEMENT_CHARGES_PER_STACK
                 )));
@@ -196,6 +200,9 @@ public final class TalentStatService {
         removeModifier(player, Attributes.ATTACK_SPEED, LEGACY_ATTACK_SPEED_ID);
         removeModifier(player, Attributes.LUCK, LEGACY_LUCK_ID);
         removeModifier(player, Attributes.KNOCKBACK_RESISTANCE, LEGACY_KNOCKBACK_ID);
+        removeModifier(player, Attributes.MAX_HEALTH, QUEST_HEALTH_PENALTY_ID);
+        removeModifier(player, Attributes.MOVEMENT_SPEED, QUEST_MOVEMENT_PENALTY_ID);
+        removeModifier(player, Attributes.ARMOR, QUEST_ARMOR_PENALTY_ID);
         for (SkillEnhancement enhancement : SkillEnhancement.values()) {
             enhancement.attribute().ifPresent(attribute ->
             {
@@ -321,6 +328,23 @@ public final class TalentStatService {
                 );
             });
         }
+        if (data.isChallengePenaltyActive()) {
+            addModifier(player, Attributes.MAX_HEALTH, QUEST_HEALTH_PENALTY_ID,
+                    "aegis_ascension:quest_challenge_health_penalty", -0.50D,
+                    AttributeOperation.MULTIPLY_TOTAL);
+            addModifier(player, Attributes.MOVEMENT_SPEED, QUEST_MOVEMENT_PENALTY_ID,
+                    "aegis_ascension:quest_challenge_movement_penalty", -0.50D,
+                    AttributeOperation.MULTIPLY_TOTAL);
+            addModifier(player, Attributes.ARMOR, QUEST_ARMOR_PENALTY_ID,
+                    "aegis_ascension:quest_challenge_armor_penalty", -0.50D,
+                    AttributeOperation.MULTIPLY_TOTAL);
+            if (data.hasChosenPrimarySkillEnhancement()) {
+                data.getPrimarySkillEnhancement().attribute().ifPresent(attribute ->
+                        addModifier(player, attribute, QUEST_PRIMARY_PENALTY_ID,
+                                "aegis_ascension:quest_challenge_primary_penalty", -0.50D,
+                                AttributeOperation.MULTIPLY_TOTAL));
+            }
+        }
 
         // Apothic Attributes exposes mapped custom stats in its Attributes GUI.
         // Attack Damage and Luck above are already vanilla attributes, so the
@@ -370,16 +394,16 @@ public final class TalentStatService {
     }
 
     public static double magicConversionMaximumMana(PlayerPerkData data) {
-        return data.owns(R_MAGIC_CONVERSION)
+        return data.owns(PERK_MAGIC_CONVERSION)
                 ? Math.max(0.0D, data.getCustomStat(MAGIC_CONVERSION_MAX_MANA))
                 : 0.0D;
     }
 
     /** Flat Max Health granted by R Magic Conversion from the effective live mana pool. */
     public static double magicConversionMaximumHealth(Player player, PlayerPerkData data) {
-        return data.owns(R_MAGIC_CONVERSION)
+        return data.owns(PERK_MAGIC_CONVERSION)
                 ? ManaCompat.maximumMana(player, data)
-                * Math.max(0.0D, stat(R_MAGIC_CONVERSION, MAX_HEALTH_PER_MAX_MANA))
+                * Math.max(0.0D, stat(PERK_MAGIC_CONVERSION, MAX_HEALTH_PER_MAX_MANA))
                 : 0.0D;
     }
 
@@ -402,9 +426,9 @@ public final class TalentStatService {
     }
 
     public static double frierenMaximumMana(PlayerPerkData data) {
-        return data.owns(SR_FRIEREN)
+        return data.owns(PERK_FRIEREN)
                 ? Math.max(0.0D, data.getCustomStat(PRIMARY_FLAT))
-                * stat(SR_FRIEREN, MANA_PER_PRIMARY_STAT)
+                * stat(PERK_FRIEREN, MANA_PER_PRIMARY_STAT)
                 : 0.0D;
     }
 
@@ -448,8 +472,8 @@ public final class TalentStatService {
     }
 
     private static void clampCappedTriggerProgress(PlayerPerkData data) {
-        if (data.owns(R_LAEVATEIN)) {
-            Perk perk = requiredPerk(R_LAEVATEIN);
+        if (data.owns(PERK_LAEVATEIN)) {
+            Perk perk = requiredPerk(PERK_LAEVATEIN);
             int maximum = maximumTriggerCount(perk);
             clampTriggerCounter(data, LAEVATEIN_TRIGGER_COUNT, maximum);
             clampAccumulatedValue(
@@ -459,8 +483,8 @@ public final class TalentStatService {
                     maximum
             );
         }
-        if (data.owns(R_MAGIC_CONVERSION)) {
-            Perk perk = requiredPerk(R_MAGIC_CONVERSION);
+        if (data.owns(PERK_MAGIC_CONVERSION)) {
+            Perk perk = requiredPerk(PERK_MAGIC_CONVERSION);
             int maximum = maximumTriggerCount(perk);
             clampTriggerCounter(data, MAGIC_CONVERSION_TRIGGER_COUNT, maximum);
             clampAccumulatedValue(
@@ -470,8 +494,8 @@ public final class TalentStatService {
                     maximum
             );
         }
-        if (data.owns(SR_I_SHALL_INTERPRET_THE_RADIANCE)) {
-            Perk perk = requiredPerk(SR_I_SHALL_INTERPRET_THE_RADIANCE);
+        if (data.owns(PERK_I_SHALL_INTERPRET_THE_RADIANCE)) {
+            Perk perk = requiredPerk(PERK_I_SHALL_INTERPRET_THE_RADIANCE);
             int maximum = maximumTriggerCount(perk);
             clampTriggerCounter(data, RADIANCE_TRIGGER_COUNT, maximum);
             clampAccumulatedValue(
@@ -487,8 +511,8 @@ public final class TalentStatService {
                     maximum
             );
         }
-        if (data.owns(SSR_INNATE_DREAM)) {
-            Perk perk = requiredPerk(SSR_INNATE_DREAM);
+        if (data.owns(PERK_INNATE_DREAM)) {
+            Perk perk = requiredPerk(PERK_INNATE_DREAM);
             clampCappedTriggerProgress(
                     data,
                     perk,
@@ -565,15 +589,15 @@ public final class TalentStatService {
     }
 
     static double magicAmplification(PlayerPerkData data) {
-        double amplification = data.getCustomStat(SPELL_DAMAGE_AMPLIFICATION)
+        double amplification = data.getCustomStat(MAGIC_DAMAGE_AMPLIFICATION)
                 + data.getCustomStat(LUNAR_DAMAGE)
-                + data.getCustomStat(CIALLO_SPELL_DAMAGE_AMPLIFICATION)
+                + data.getCustomStat(CIALLO_MAGIC_DAMAGE_AMPLIFICATION)
                 * yuzusoftFanMultiplier(data)
-                + sumOwnedStat(data, SPELL_DAMAGE_AMPLIFICATION);
-        if (data.owns(SR_COLLECTOR)) {
+                + sumOwnedStat(data, MAGIC_DAMAGE_AMPLIFICATION);
+        if (data.owns(PERK_COLLECTOR)) {
             amplification += stat(
-                    SR_COLLECTOR,
-                    SPELL_DAMAGE_AMPLIFICATION_PER_SOUL_LINK
+                    PERK_COLLECTOR,
+                    MAGIC_DAMAGE_AMPLIFICATION_PER_SOUL_LINK
             ) * data.getActiveSoulLinks().size()
                     * MakeUpWorkClub.collectorMultiplier(data);
         }
@@ -587,20 +611,25 @@ public final class TalentStatService {
                 + sumOwnedStat(data, SKILL_DAMAGE)
                 + allSkillEnhancementCustomStatBonus(data, SKILL_DAMAGE)
                 + primaryCustomStatBonus(data, SKILL_DAMAGE);
-        if (data.owns(R_CLEAR_MIND_STATE)) {
+        if (data.owns(PERK_CLEAR_MIND_STATE)) {
             skillDamage += sumOwnedStat(data, EVASION_FLAT)
-                    * stat(R_CLEAR_MIND_STATE, SKILL_DAMAGE_PER_EVASION);
+                    * stat(PERK_CLEAR_MIND_STATE, SKILL_DAMAGE_PER_EVASION);
         }
-        if (data.owns(SR_METEOR_SPARKLE)) {
+        if (data.owns(PERK_METEOR_SPARKLE)) {
             skillDamage += currentLuckyStrike
-                    * stat(SR_METEOR_SPARKLE, SKILL_DAMAGE_PER_LUCKY_STRIKE);
+                    * stat(PERK_METEOR_SPARKLE, SKILL_DAMAGE_PER_LUCKY_STRIKE);
         }
-        if (data.owns(SR_GREAT_FAIRY)) {
-            skillDamage += stat(SR_GREAT_FAIRY, SKILL_DAMAGE_PER_OWNED_TALENT)
+        if (data.owns(PERK_GREAT_FAIRY)) {
+            skillDamage += stat(PERK_GREAT_FAIRY, SKILL_DAMAGE_PER_OWNED_TALENT)
                     * data.getUniqueTalentCount()
                     * MistyLake.greatFairyMultiplier(data);
         }
         return skillDamage;
+    }
+
+    /** Public spell-addon API value; all recognized spell damage uses this calculation. */
+    public static double skillDamageMultiplier(Player player, PlayerPerkData data) {
+        return TalentDamageCalculations.damageSkillCalculation(player, data);
     }
 
     private static double summonCount(PlayerPerkData data) {
@@ -658,18 +687,18 @@ public final class TalentStatService {
                 + PerfectAndElegantServant.finalDamage(data)
                 + TeamRadiance.finalDamageBonus(data)
                 + VirtualItems.statBonus(data, VirtualItems.FINAL_DAMAGE);
-        double pecorineFinalDamage = data.owns(SR_PECORINES_BLESSING)
+        double pecorineFinalDamage = data.owns(PERK_PECORINES_BLESSING)
                 && player.getHealth() >= player.getMaxHealth()
-                ? stat(SR_PECORINES_BLESSING, FULL_HEALTH_FINAL_DAMAGE)
+                ? stat(PERK_PECORINES_BLESSING, FULL_HEALTH_FINAL_DAMAGE)
                 : 0.0D;
         finalDamage += pecorineFinalDamage;
-        if (data.owns(R_KOKONA)) {
-            finalDamage += stat(R_KOKONA, FINAL_DAMAGE_PER_OWNED_TALENT)
+        if (data.owns(PERK_KOKONA)) {
+            finalDamage += stat(PERK_KOKONA, FINAL_DAMAGE_PER_OWNED_TALENT)
                     * data.getUniqueTalentCount();
         }
-        if (data.owns(SSR_FIREFLY_FLAME) && luckyStrike
-                > stat(SSR_FIREFLY_FLAME, LUCKY_STRIKE_THRESHOLD)) {
-            finalDamage += stat(SSR_FIREFLY_FLAME, FINAL_DAMAGE_ABOVE_THRESHOLD);
+        if (data.owns(PERK_FIREFLY_FLAME) && luckyStrike
+                > stat(PERK_FIREFLY_FLAME, LUCKY_STRIKE_THRESHOLD)) {
+            finalDamage += stat(PERK_FIREFLY_FLAME, FINAL_DAMAGE_ABOVE_THRESHOLD);
         }
         if (data.isAegisEnabled(AegisConstants.HARMONY)) {
             finalDamage += aegisStat(AegisConstants.HARMONY, FINAL_DAMAGE)
@@ -684,8 +713,6 @@ public final class TalentStatService {
         }
 
         double damageBonus = data.getCustomStat(WALK_DAMAGE)
-                + data.getCustomStat(LUNAR_DAMAGE)
-                + data.getCustomStat(KNIGHT_DAMAGE)
                 + data.getCustomStat(FROSTBITE_DAMAGE)
                 + data.getCustomStat(INNATE_DAMAGE)
                 + data.getCustomStat(TOP_DAMAGE)
@@ -702,15 +729,28 @@ public final class TalentStatService {
                 + data.getCustomStat(CIALLO_PHYSICAL_DAMAGE_AMPLIFICATION)
                 * yuzusoftMultiplier
                 + sumOwnedStat(data, PHYSICAL_DAMAGE_AMPLIFICATION);
-        double spellAmplification = magicAmplification(data);
-        if (data.owns(SR_COLLECTOR)) {
+        double magicAmplification = magicAmplification(data);
+        if (data.owns(PERK_COLLECTOR)) {
             physicalAmplification += stat(
-                    SR_COLLECTOR, PHYSICAL_DAMAGE_AMPLIFICATION_PER_SOUL_LINK
+                    PERK_COLLECTOR, PHYSICAL_DAMAGE_AMPLIFICATION_PER_SOUL_LINK
             ) * activeSoulLinks * MakeUpWorkClub.collectorMultiplier(data);
         }
 
         double skillDamage = skillDamageBonus(data, luckyStrike);
         double magicDamage = magicDamageBonus(data);
+        double attackDamageAmplification = sumOwnedStat(
+                data,
+                ATTACK_DAMAGE_AMPLIFICATION
+        );
+        if (data.owns(PERK_RIGHTEOUS_KNIGHT)) {
+            attackDamageAmplification += data.getCustomStat(KNIGHT_DAMAGE);
+        }
+        if (data.hasActiveSoulLink(SOUL_COMBO_TECHNIQUE)) {
+            attackDamageAmplification += bonusStat(
+                    SOUL_COMBO_TECHNIQUE,
+                    ATTACK_DAMAGE_AMPLIFICATION
+            );
+        }
 
         double summonPower = data.getCustomStat(SUMMON_POWER)
                 + sumOwnedStat(data, SUMMON_POWER);
@@ -742,9 +782,10 @@ public final class TalentStatService {
                         + sumOwnedStat(data, INDEPENDENT_DAMAGE_AMPLIFICATION)
         );
         stats.put(DAMAGE_BONUS, damageBonus);
+        stats.put(ATTACK_DAMAGE_AMPLIFICATION, attackDamageAmplification);
         stats.put(MAGIC_DAMAGE, magicDamage);
         stats.put(PHYSICAL_DAMAGE_AMPLIFICATION, physicalAmplification);
-        stats.put(SPELL_DAMAGE_AMPLIFICATION, spellAmplification);
+        stats.put(MAGIC_DAMAGE_AMPLIFICATION, magicAmplification);
         stats.put(SKILL_DAMAGE, skillDamage);
         stats.put(AegisConstants.SKILL_AREA, data.getCustomStat(AegisConstants.SKILL_AREA));
         stats.put(AegisConstants.BARRAGE_MISSILE_SPEED,
@@ -848,7 +889,7 @@ public final class TalentStatService {
 
     public static double shieldGainExcludingPerk(Player player, PlayerPerkData data,
                                                   String excludedPerkId) {
-        int level = Math.max(0, player.experienceLevel);
+        int level = AegisExperienceSystem.effectiveLevel(player, data);
         return data.getCustomStat(SHIELD_GAIN)
                 + sumOwnedStatExcludingPerk(data, SHIELD_GAIN, excludedPerkId)
                 + sumOwnedStatExcludingPerk(data, SHIELD_GAIN_PER_LEVEL, excludedPerkId)
@@ -944,14 +985,14 @@ public final class TalentStatService {
                 + allSkillEnhancementCustomStatBonus(data, CRITICAL_CHANCE)
                 + primaryCustomStatBonus(data, CRITICAL_CHANCE);
         chance += PerfectAndElegantServant.criticalChance(data);
-        boolean ignoreNegatives = data.owns(SSR_LAW_OF_THE_CYCLE)
-                && stat(SSR_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
+        boolean ignoreNegatives = data.owns(PERK_LAW_OF_THE_CYCLE)
+                && stat(PERK_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
         for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
             Perk perk = entry.getKey();
-            if (!perk.id().equals(SR_BLAZING_FEATHER_STARWEAVER)
+            if (!perk.id().equals(PERK_BLAZING_FEATHER_STARWEAVER)
                     && (!perk.manuallyToggleable() || data.isTalentEnabled(perk.id()))) {
                 double contribution = perk.stat(CRITICAL_CHANCE) * entry.getValue();
-                boolean koharuNegated = perk.id().equals(R_KOHARUS_BLESSING)
+                boolean koharuNegated = perk.id().equals(PERK_KOHARUS_BLESSING)
                         && MakeUpWorkClub.negatesKoharuPenalty(data);
                 if (contribution >= 0.0D) {
                     chance += contribution;
@@ -967,8 +1008,8 @@ public final class TalentStatService {
         chance += data.getActiveSoulLinks().stream()
                 .mapToDouble(link -> link.bonusStat(CRITICAL_CHANCE))
                 .sum();
-        if (data.owns(SR_BLAZING_FEATHER_STARWEAVER)) {
-            chance += stat(SR_BLAZING_FEATHER_STARWEAVER, CRITICAL_CHANCE);
+        if (data.owns(PERK_BLAZING_FEATHER_STARWEAVER)) {
+            chance += stat(PERK_BLAZING_FEATHER_STARWEAVER, CRITICAL_CHANCE);
         }
         if (data.isAegisEnabled(AegisConstants.FLAME)) {
             chance += aegisStat(AegisConstants.FLAME, CRITICAL_CHANCE);
@@ -1002,8 +1043,8 @@ public final class TalentStatService {
     }
 
     static double damageResistance(PlayerPerkData data) {
-        boolean lawOfCycle = data.owns(SSR_LAW_OF_THE_CYCLE)
-                && stat(SSR_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
+        boolean lawOfCycle = data.owns(PERK_LAW_OF_THE_CYCLE)
+                && stat(PERK_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
         if (!lawOfCycle) {
             return rawDamageResistance(data);
         }
@@ -1050,9 +1091,9 @@ public final class TalentStatService {
         long ssr = data.getPerkRanks().keySet().stream()
                 .filter(perk -> perk.tier() == Perk.Tier.SSR).count();
         return 1.0D
-                + r * aegisStat(AegisConstants.HARMONY, AegisConstants.R_TALENT_SCALING)
-                + sr * aegisStat(AegisConstants.HARMONY, AegisConstants.SR_TALENT_SCALING)
-                + ssr * aegisStat(AegisConstants.HARMONY, AegisConstants.SSR_TALENT_SCALING);
+                + r * aegisStat(AegisConstants.HARMONY, AegisConstants.PERK_R_TALENT_SCALING)
+                + sr * aegisStat(AegisConstants.HARMONY, AegisConstants.PERK_SR_TALENT_SCALING)
+                + ssr * aegisStat(AegisConstants.HARMONY, AegisConstants.PERK_SSR_TALENT_SCALING);
     }
 
     static double criticalDamageBonus(PlayerPerkData data) {
@@ -1098,8 +1139,8 @@ public final class TalentStatService {
 
     private static double allSkillEnhancementAttribute(PlayerPerkData data) {
         double accumulated = data.getCustomStat(ALL_SKILL_ENHANCEMENT_ATTRIBUTE);
-        boolean lawOfCycle = data.owns(SSR_LAW_OF_THE_CYCLE)
-                && stat(SSR_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
+        boolean lawOfCycle = data.owns(PERK_LAW_OF_THE_CYCLE)
+                && stat(PERK_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
         double value = accumulated < 0.0D && lawOfCycle
                 ? MadokaWithHomura.convertPercentagePenalty(data, accumulated)
                 : accumulated;
@@ -1121,16 +1162,19 @@ public final class TalentStatService {
             );
             value += harmonyValue * harmonyScalingFactor(data);
         }
+        if (data.isChallengePenaltyActive()) {
+            value -= 0.25D;
+        }
         return value;
     }
 
     public static double talentOptionBonus(Player player, PlayerPerkData data) {
         double value = data.getCustomStat(OFFER_BONUS)
                 + TeamRadiance.talentOptionBonus(data);
-        if (data.owns(SR_FLOWER_FAIRY)) {
-            double flowerFairy = stat(SR_FLOWER_FAIRY, TALENT_OPTION_BONUS);
-            boolean lawOfCycle = data.owns(SSR_LAW_OF_THE_CYCLE)
-                    && stat(SSR_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
+        if (data.owns(PERK_FLOWER_FAIRY)) {
+            double flowerFairy = stat(PERK_FLOWER_FAIRY, TALENT_OPTION_BONUS);
+            boolean lawOfCycle = data.owns(PERK_LAW_OF_THE_CYCLE)
+                    && stat(PERK_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
             if (flowerFairy >= 0.0D || !lawOfCycle) {
                 value += flowerFairy;
             } else {
