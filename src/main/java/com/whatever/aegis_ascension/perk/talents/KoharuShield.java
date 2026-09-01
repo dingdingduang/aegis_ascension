@@ -3,15 +3,17 @@ package com.whatever.aegis_ascension.perk.talents;
 import static com.whatever.aegis_ascension.perk.TalentConstants.INTERVAL_SECONDS;
 import static com.whatever.aegis_ascension.perk.TalentConstants.SHIELD_GAIN;
 import static com.whatever.aegis_ascension.perk.TalentConstants.SHIELD_GAIN_PER_LEVEL;
+import static com.whatever.aegis_ascension.perk.TalentConstants.SHIELD_PRIMARY_MULTIPLIER;
 import static com.whatever.aegis_ascension.perk.TalentConstants.PERK_KOHARU_SPRITE;
 
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
+import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
 import com.whatever.aegis_ascension.mechanic.ShieldMechanic;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.util.GeneralIronSpellSupportMethods;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
-import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
+import com.whatever.aegis_ascension.util.KoharuShieldMath;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
@@ -22,14 +24,17 @@ import net.minecraft.server.level.ServerPlayer;
  * {@link ShieldMechanic}, which owns decay, stacking, and absorption.</p>
  *
  * <p>While the perk is owned, the player periodically gains a shield equal to the
- * configured fraction of the player's Primary Attribute, plus Spring Blossom's
- * configured fraction per experience level. The shield uses the shared model.
+ * configured fraction of the player's Primary Attribute, scaled by the perk's
+ * {@code shield_primary_multiplier}, plus Spring Blossom's configured fraction per
+ * experience level. The shield uses the shared model.
  * The cadence reads {@code interval_seconds} from the perk when present, otherwise
  * {@link #DEFAULT_INTERVAL_SECONDS}, so it stays tunable from talents.json.</p>
  */
 public final class KoharuShield {
     /** Fallback cadence when the perk defines no {@code interval_seconds} stat. */
     private static final double DEFAULT_INTERVAL_SECONDS = 2.0D;
+    /** Backward-compatible default for configs created before this balancing stat existed. */
+    private static final double DEFAULT_SHIELD_PRIMARY_MULTIPLIER = 0.5D;
 
     private KoharuShield() {
     }
@@ -56,14 +61,29 @@ public final class KoharuShield {
         }
         int rank = Math.max(1, data.getRank(koharu));
         int level = AegisExperienceSystem.effectiveLevel(player, data);
-        double shieldRatio = (koharu.stat(SHIELD_GAIN)
-                + koharu.stat(SHIELD_GAIN_PER_LEVEL) * level) * rank;
-        float amount = (float) Math.max(0.0D,
-                GeneralIronSpellSupportMethods.primaryStat(player, data) * shieldRatio);
+        double primaryMultiplier = koharu.stats().containsKey(SHIELD_PRIMARY_MULTIPLIER)
+                ? koharu.stat(SHIELD_PRIMARY_MULTIPLIER)
+                : DEFAULT_SHIELD_PRIMARY_MULTIPLIER;
+        float amount = (float) KoharuShieldMath.shieldAmount(
+                GeneralIronSpellSupportMethods.primaryStat(player, data),
+                koharu.stat(SHIELD_GAIN),
+                koharu.stat(SHIELD_GAIN_PER_LEVEL),
+                level,
+                primaryMultiplier,
+                rank
+        );
+        Double primaryStatMultiplier = data.hasChosenPrimarySkillEnhancement()
+                && !koharu.primaryStatMultipliers().isEmpty()
+                ? Math.max(0.0D, koharu.primaryStatMultiplier(
+                        data.getPrimarySkillEnhancement().id()
+                ))
+                : null;
 
         // Koharu's two formula stats also participate in the shared Shield Gain total.
         // Exclude this perk only for its own grant so the requested fraction is not
         // counted a second time; other bonuses and Alya's multiplier still apply.
-        ShieldMechanic.addShieldExcludingPerkGain(player, amount, koharu.id());
+        ShieldMechanic.addShieldExcludingPerkGainWithPrimaryStatMultiplier(
+                player, amount, koharu.id(), primaryStatMultiplier
+        );
     }
 }

@@ -6,6 +6,7 @@ import static com.whatever.aegis_ascension.util.GeneralClientMethods.detectTextu
 import static com.whatever.aegis_ascension.util.GeneralClientMethods.drawCenteredString;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
+import com.whatever.aegis_ascension.client.ClientQuestCatalog;
 import com.whatever.aegis_ascension.client.ClientQuestState;
 import com.whatever.aegis_ascension.client.ClientPerkState;
 import com.whatever.aegis_ascension.client.MiscLocalSettings;
@@ -15,11 +16,14 @@ import com.whatever.aegis_ascension.client.screen.acg.ACGButton;
 import com.whatever.aegis_ascension.client.screen.acg.ACGTheme;
 import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.network.QuestActionPacket;
+import com.whatever.aegis_ascension.quest.QuestConfig;
 import com.whatever.aegis_ascension.quest.QuestCompletionView;
 import com.whatever.aegis_ascension.quest.QuestObjective;
+import com.whatever.aegis_ascension.quest.QuestRewardSummary;
 import com.whatever.aegis_ascension.quest.QuestType;
 import com.whatever.aegis_ascension.quest.QuestView;
 import com.whatever.aegis_ascension.util.GeneralClientMethods;
+import com.whatever.aegis_ascension.util.GeneralConstants;
 import com.whatever.aegis_ascension.util.GeneralTextMethods;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.client.Minecraft;
@@ -27,11 +31,14 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /** Shop-style quest catalogue with type tabs, selectable tasks, and a detail pane. */
 final class ACGQuestCenterPage implements ACGPage {
@@ -48,6 +55,8 @@ final class ACGQuestCenterPage implements ACGPage {
     private static final ResourceLocation COMMON_HEADER = texture("quest_common.png");
     private static final ResourceLocation CHUNK_HEADER = texture("quest_chunk.png");
     private static final ResourceLocation SIDE_HEADER = texture("quest_side.png");
+    /** Stand-in art for objectives with no fitting vanilla item texture. */
+    private static final ResourceLocation UNKNOWN_ICON = texture("quest_unknown.png");
     private static final ResourceLocation DONE_HEADER = texture("quest_done.png");
     private static final ResourceLocation FAILED_STATUS = texture("quest_failed.png");
     private static final ResourceLocation COMPLETE_STATUS = texture("quest_complete.png");
@@ -59,8 +68,12 @@ final class ACGQuestCenterPage implements ACGPage {
 
     private QuestTab selectedTab = QuestTab.DAILY;
     private String selectedQuestId = "";
+    private static final int DETAIL_SCROLL_STEP = 12;
     private int taskScroll;
     private int maxTaskScroll;
+    /** Pixels the quest detail panel is scrolled by, and how far it may go. */
+    private int detailScroll;
+    private int maxDetailScroll;
     private int visibleRows = 1;
 
     @Override
@@ -90,7 +103,7 @@ final class ACGQuestCenterPage implements ACGPage {
                         completionRowLabel(completion),
                         ignored -> selectQuest(context, completion.questId()),
                         icon == null ? "" : icon.toString(),
-                        completion.profession());
+                        info(completion).profession);
                 context.add(button.style(completion.questId().equals(selectedQuestId)
                         ? ACGButton.Style.CTA : ACGButton.Style.PLAIN));
             }
@@ -108,7 +121,7 @@ final class ACGQuestCenterPage implements ACGPage {
             int rowY = layout.rowsTop() + row * (ROW_HEIGHT + ROW_GAP);
             ACGButton button = new QuestRowButton(rowX, rowY, rowWidth, ROW_HEIGHT,
                     rowLabel(quest), ignored -> selectQuest(context, quest.id()),
-                    questIcon(quest).toString(), quest.profession());
+                    questIcon(quest).toString(), info(quest).profession);
             context.add(button.style(quest.id().equals(selectedQuestId)
                     ? ACGButton.Style.CTA : ACGButton.Style.PLAIN));
         }
@@ -146,7 +159,7 @@ final class ACGQuestCenterPage implements ACGPage {
                 ? GeneralTextMethods.getTranslatableString(ClientPerkState.usesGoldCurrency()
                 ? "screen.aegis_ascension.acg.quest.accept_deposit_gold"
                 : "screen.aegis_ascension.acg.quest.accept_deposit",
-                ClientQuestState.depositCost())
+                questStake(quest))
                 : GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.accept");
         QuestActionPacket.Action primaryAction = submission
                 ? QuestActionPacket.Action.SUBMIT : QuestActionPacket.Action.ACCEPT;
@@ -155,8 +168,17 @@ final class ACGQuestCenterPage implements ACGPage {
                 .bounds(startX, y, buttonWidth, 20)
                 .build()
                 .style(ACGButton.Style.CTA);
-        accept.active = submission || canAccept(context, quest);
+        // Enabled only when pressing it would actually do something. Submitting stays the
+        // label for an accepted hand-in quest so it does not flip back to "Accept", but a
+        // finished quest, or one whose items are all in, has nothing left to submit.
+        accept.active = submission
+                ? hasOutstandingSubmission(quest) : canAccept(context, quest);
         context.add(accept);
+
+        // The options are listed on the offer, but only a finished quest can claim one.
+        if (quest.completed() && !quest.rewardChoices().isEmpty()) {
+            addRewardChoiceActions(context, layout, quest, y - 24);
+        }
 
         ACGButton cancel = ACGButton.builder(
                         GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.cancel_free"),
@@ -266,6 +288,25 @@ final class ACGQuestCenterPage implements ACGPage {
         graphics.fill(thumbX, thumbY, thumbX + 2, thumbY + thumbHeight, ACGTheme.GOLD_DIM);
     }
 
+    /**
+     * Mirrors the quest list's scrollbar so hidden detail is discoverable. Uses the range
+     * measured on the previous frame, which is one frame stale only on the frame a quest
+     * is first shown.
+     */
+    private void renderDetailScrollbar(GuiGraphics graphics, PageLayout layout,
+                                       int viewTop, int viewBottom) {
+        if (maxDetailScroll <= 0) return;
+        int trackHeight = Math.max(1, viewBottom - viewTop);
+        int contentHeight = trackHeight + maxDetailScroll;
+        int thumbHeight = Math.max(16, trackHeight * trackHeight / contentHeight);
+        int thumbTravel = Math.max(0, trackHeight - thumbHeight);
+        int thumbY = viewTop
+                + Math.round(thumbTravel * (detailScroll / (float) maxDetailScroll));
+        int thumbX = layout.detailX() + layout.detailWidth() - 4;
+        graphics.fill(thumbX, viewTop, thumbX + 2, viewBottom, 0x553E3428);
+        graphics.fill(thumbX, thumbY, thumbX + 2, thumbY + thumbHeight, ACGTheme.GOLD_DIM);
+    }
+
     private void renderDetails(ACGScreenContext context, GuiGraphics graphics,
                                PageLayout layout, QuestView quest) {
         ACGTheme.drawPanel(graphics, layout.detailX(), layout.mainTop(),
@@ -285,7 +326,14 @@ final class ACGQuestCenterPage implements ACGPage {
 
         int x = layout.detailX() + 12;
         int width = Math.max(1, layout.detailWidth() - 24);
-        int y = layout.mainTop() + 10;
+        // A compound quest at a small GUI scale is taller than this panel, so the body
+        // scrolls and is clipped short of the action buttons rather than drawing over them.
+        int viewTop = layout.mainTop() + 4;
+        int viewBottom = Math.max(viewTop + 20, context.contentBottom() - 32);
+        graphics.enableScissor(layout.detailX(), viewTop,
+                layout.detailX() + layout.detailWidth(), viewBottom);
+        int contentTop = layout.mainTop() + 10 - detailScroll;
+        int y = contentTop;
         Component title = questTitle(quest);
         drawQuestIcon(graphics, quest, x, y - 2, 18, 18);
         int trackerButtonReserve = isTrackerEligible(quest) ? 34 : 0;
@@ -293,10 +341,17 @@ final class ACGQuestCenterPage implements ACGPage {
                 Math.max(1, width - 22 - trackerButtonReserve));
         graphics.drawString(context.font(), ACGTheme.asHeader(
                         GeneralTextMethods.getLiteralString(visibleTitle)),
-                x + 22, y, ACGTheme.TEXT_PRIMARY, true);
+                x + 22, y, titleColor(quest), true);
 
         Component status = GeneralTextMethods.getTranslatableString(statusKey(quest));
         graphics.drawString(context.font(), status, x + 22, y + 13, statusColor(quest), false);
+        String tierLabel = tierLabel(quest);
+        if (!tierLabel.isEmpty()) {
+            graphics.drawString(context.font(),
+                    GeneralTextMethods.getLiteralString(tierLabel),
+                    x + 22 + context.font().width(status) + 6, y + 13,
+                    GeneralConstants.rarityColor(quest.tier()), false);
+        }
         if (quest.completed()) {
             blitOpaqueFittedTexture(graphics, COMPLETE_STATUS,
                     layout.detailX() + layout.detailWidth() - 34,
@@ -308,27 +363,37 @@ final class ACGQuestCenterPage implements ACGPage {
         }
 
         int lineY = y + 32;
-        if (quest.type() == QuestType.SIDE && !quest.profession().isBlank()) {
+        if (quest.type() == QuestType.SIDE && !info(quest).profession.isBlank()) {
             lineY = drawSideGiver(context, graphics, quest, x, lineY);
         }
-        if (quest.type() == QuestType.SIDE && !quest.story().isBlank()) {
-            lineY = drawWrapped(context, graphics, GeneralTextMethods.getTranslatableString(quest.story()),
+        if (quest.type() == QuestType.SIDE && !info(quest).story.isBlank()) {
+            lineY = drawWrapped(context, graphics,
+                    GeneralTextMethods.getTranslatableString(info(quest).story),
                     x, lineY, width, ACGTheme.TEXT_SECONDARY, 5);
             lineY += 4;
         }
         lineY = drawWrapped(context, graphics, description(quest),
                 x, lineY, width, ACGTheme.TEXT_SECONDARY, 4);
         lineY += 4;
-        if (!quest.prerequisiteMet() && !quest.prerequisiteTitle().isBlank()) {
-            Component prerequisite = GeneralTextMethods.getTranslatableString(quest.prerequisiteTitle());
+        String prerequisiteTitle = prerequisiteTitle(quest);
+        if (!quest.prerequisiteMet() && !prerequisiteTitle.isBlank()) {
+            Component prerequisite = GeneralTextMethods.getTranslatableString(prerequisiteTitle);
             lineY = drawWrapped(context, graphics,
                     GeneralTextMethods.getTranslatableString(
                             "screen.aegis_ascension.acg.quest.prerequisite", prerequisite),
                     x, lineY, width, 0xFFFF7777, 3);
             lineY += 4;
         }
+        int requirementX = x;
+        int requirementWidth = width;
+        ItemStack targetIcon = targetIconStack(quest);
+        if (!targetIcon.isEmpty()) {
+            drawItemIcon(graphics, targetIcon, x, lineY - 1, 12);
+            requirementX += 14;
+            requirementWidth -= 14;
+        }
         lineY = drawWrapped(context, graphics, requirement(quest),
-                x, lineY, width, ACGTheme.GOLD_BRIGHT, 4);
+                requirementX, lineY, requirementWidth, ACGTheme.GOLD_BRIGHT, 4);
         lineY += 5;
 
         graphics.drawString(context.font(),
@@ -341,8 +406,33 @@ final class ACGQuestCenterPage implements ACGPage {
                 0xFF241F1A, quest.completed() ? 0xFF67D78A : ACGTheme.ORANGE_ACTION);
         lineY += 23;
 
-        drawRewardLine(context, graphics, quest, x, lineY, width);
-        lineY += 18;
+        // A compound quest gets a line and a bar per requirement. One shared bar would
+        // read as nearly finished while a whole other requirement was untouched.
+        for (QuestView.Requirement extra : quest.requirements()) {
+            int extraX = x;
+            int extraWidth = width;
+            ItemStack extraIcon = rewardItemStack(extra.targetId());
+            if (!extraIcon.isEmpty()) {
+                drawItemIcon(graphics, extraIcon, x, lineY - 1, 12);
+                extraX += 14;
+                extraWidth -= 14;
+            }
+            lineY = drawWrapped(context, graphics, extraRequirement(quest, extra),
+                    extraX, lineY, extraWidth, ACGTheme.GOLD_BRIGHT, 3);
+            lineY += 3;
+            graphics.drawString(context.font(),
+                    GeneralTextMethods.getTranslatableString(
+                            "screen.aegis_ascension.acg.quest.progress",
+                            extra.progress(), extra.target()),
+                    x, lineY, ACGTheme.TEXT_MUTED, false);
+            float extraFraction = Math.min(1.0F, extra.progress() / (float) extra.target());
+            ACGTheme.drawProgressBar(graphics, x, lineY + 11, width, 6, extraFraction,
+                    0xFF241F1A, extra.progress() >= extra.target()
+                            ? 0xFF67D78A : ACGTheme.ORANGE_ACTION);
+            lineY += 23;
+        }
+
+        lineY = drawRewardLine(context, graphics, quest, x, lineY, width) + 5;
 
         if (quest.repeatable() && quest.rewardReadyAt() > 0L
                 && context.minecraft().level != null) {
@@ -369,28 +459,61 @@ final class ACGQuestCenterPage implements ACGPage {
             lineY += 12;
         }
 
-        if (quest.type() == QuestType.CHALLENGE) {
-            drawWrapped(context, graphics,
-                    GeneralTextMethods.getTranslatableString(ClientPerkState.usesGoldCurrency()
-                                    ? "screen.aegis_ascension.acg.quest.challenge_warning_gold"
-                                    : "screen.aegis_ascension.acg.quest.challenge_warning",
-                            quest.securityDepositPaid() > 0
-                                    ? quest.securityDepositPaid()
-                                    : ClientQuestState.depositCost()),
+        // Constraints fail the quest the instant they are broken, so they have to be
+        // stated on the offer; a quest that failed for an unstated reason reads as a bug.
+        for (String constraint : info(quest).constraints.split(",")) {
+            String key = constraint.trim();
+            if (key.isEmpty()) continue;
+            lineY = drawWrapped(context, graphics,
+                    GeneralTextMethods.getTranslatableString(
+                            "screen.aegis_ascension.acg.quest.constraint." + key),
+                    x, lineY, width, 0xFFFF7777, 2);
+            lineY += 2;
+        }
+
+        if (!quest.rewardChoices().isEmpty()) {
+            lineY = drawWrapped(context, graphics,
+                    GeneralTextMethods.getTranslatableString(
+                            "screen.aegis_ascension.acg.quest.reward_choice_prompt"),
+                    x, lineY, width, 0xFF67D78A, 2);
+            lineY += 3;
+        }
+
+        // A stake has to be visible before the quest is accepted, so this uses the
+        // amount the server resolved for this quest rather than what has been paid.
+        int stake = questStake(quest);
+        if (quest.type() == QuestType.CHALLENGE || stake > 0) {
+            boolean gold = ClientPerkState.usesGoldCurrency();
+            // Only a Challenge carries the failure penalty, so only it says so.
+            String key = quest.type() == QuestType.CHALLENGE
+                    ? (gold ? "screen.aegis_ascension.acg.quest.challenge_warning_gold"
+                    : "screen.aegis_ascension.acg.quest.challenge_warning")
+                    : (gold ? "screen.aegis_ascension.acg.quest.stake_warning_gold"
+                    : "screen.aegis_ascension.acg.quest.stake_warning");
+            lineY = drawWrapped(context, graphics,
+                    GeneralTextMethods.getTranslatableString(key, stake),
                     x, lineY, width, 0xFFFF7777, 3);
         } else if (quest.type() == QuestType.COMMON) {
-            drawWrapped(context, graphics,
+            lineY = drawWrapped(context, graphics,
                     GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.common_cancel_hint"),
                     x, lineY, width, ACGTheme.TEXT_MUTED, 3);
         } else if (quest.type() == QuestType.SIDE && isItemSubmission(quest)) {
-            drawWrapped(context, graphics,
+            lineY = drawWrapped(context, graphics,
                     GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.side_submit_hint"),
                     x, lineY, width, ACGTheme.TEXT_MUTED, 3);
         } else {
-            drawWrapped(context, graphics,
+            lineY = drawWrapped(context, graphics,
                     GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.cancel_hint"),
                     x, lineY, width, ACGTheme.TEXT_MUTED, 3);
         }
+        graphics.disableScissor();
+        renderDetailScrollbar(graphics, layout, viewTop, viewBottom);
+
+        // Measured from what was just laid out, so the range always matches the content
+        // actually drawn rather than an estimate that can drift as the panel grows.
+        int contentHeight = (lineY + 10) - contentTop;
+        maxDetailScroll = Math.max(0, contentHeight - (viewBottom - viewTop));
+        detailScroll = Math.min(detailScroll, maxDetailScroll);
     }
 
     private void renderCompletionDetails(ACGScreenContext context, GuiGraphics graphics,
@@ -404,7 +527,15 @@ final class ACGQuestCenterPage implements ACGPage {
 
         int x = layout.detailX() + 12;
         int width = Math.max(1, layout.detailWidth() - 24);
-        int y = layout.mainTop() + 12;
+        // This panel's content is short and fixed, unlike the quest detail, so the clip
+        // is mostly insurance against a very small window. It shares the detail scroll
+        // state because the two panels belong to different tabs and never show together.
+        int viewTop = layout.mainTop() + 4;
+        int viewBottom = Math.max(viewTop + 20, context.contentBottom() - 32);
+        graphics.enableScissor(layout.detailX(), viewTop,
+                layout.detailX() + layout.detailWidth(), viewBottom);
+        int contentTop = layout.mainTop() + 12 - detailScroll;
+        int y = contentTop;
         graphics.drawString(context.font(),
                 ACGTheme.asHeader(GeneralTextMethods.getTranslatableString(QuestTab.COMPLETE.titleKey())),
                 x, y, ACGTheme.TEXT_PRIMARY, true);
@@ -423,45 +554,117 @@ final class ACGQuestCenterPage implements ACGPage {
                 x, y + 32, ACGTheme.CYAN_ACCENT, false);
         graphics.fill(x, y + 47, x + width, y + 48, ACGTheme.GOLD_DIM);
 
+        // Lifetime totals: what this player has actually done, counted from every
+        // qualifying event rather than from quest progress. Only objectives with a
+        // total are listed, so an early save shows a short honest list.
+        int statY = y + 53;
+        for (Map.Entry<QuestObjective, Integer> total
+                : ClientQuestState.lifetimeTotals().entrySet()) {
+            graphics.drawString(context.font(),
+                    GeneralTextMethods.getTranslatableString(
+                            "screen.aegis_ascension.acg.quest.lifetime."
+                                    + total.getKey().name().toLowerCase(),
+                            total.getValue()),
+                    x, statY, ACGTheme.TEXT_SECONDARY, false);
+            statY += 11;
+        }
+        if (statY > y + 53) {
+            graphics.fill(x, statY + 2, x + width, statY + 3, ACGTheme.GOLD_DIM);
+            statY += 8;
+        }
+
         if (completion == null) {
             drawCenteredString(graphics, context.font(),
                     GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.complete.select_prompt"),
                     layout.detailX() + layout.detailWidth() / 2,
                     layout.mainTop() + layout.mainHeight() / 2,
                     ACGTheme.TEXT_MUTED);
+            graphics.disableScissor();
+            maxDetailScroll = 0;
+            detailScroll = 0;
             return;
         }
 
-        Component title = completion.title() == null || completion.title().isBlank()
-                ? GeneralTextMethods.getLiteralString(completion.questId())
-                : GeneralTextMethods.getTranslatableString(completion.title());
-        drawCompletionIcon(graphics, completion, x, y + 57, 18, 18);
+        Component title = completionTitle(completion);
+        drawCompletionIcon(graphics, completion, x, statY, 18, 18);
         String visibleTitle = ellipsize(context.font(), title.getString(),
                 Math.max(1, width - 22));
         graphics.drawString(context.font(), ACGTheme.asHeader(
                         GeneralTextMethods.getLiteralString(visibleTitle)),
-                x + 22, y + 60, ACGTheme.TEXT_PRIMARY, true);
+                x + 22, statY + 3, ACGTheme.TEXT_PRIMARY, true);
         graphics.drawString(context.font(),
                 GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.complete.count",
                         completion.completions()),
-                x, y + 77, 0xFF67D78A, false);
+                x, statY + 20, 0xFF67D78A, false);
         graphics.drawString(context.font(),
                 GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.complete.experience",
                         ClientQuestState.experienceDisplayName(),
                         completion.experienceEarned()),
-                x, y + 91, ACGTheme.CYAN_ACCENT, false);
+                x, statY + 34, ACGTheme.CYAN_ACCENT, false);
+        graphics.disableScissor();
+        renderDetailScrollbar(graphics, layout, viewTop, viewBottom);
+
+        int contentHeight = (statY + 44) - contentTop;
+        maxDetailScroll = Math.max(0, contentHeight - (viewBottom - viewTop));
+        detailScroll = Math.min(detailScroll, maxDetailScroll);
     }
 
     private static int drawSideGiver(ACGScreenContext context, GuiGraphics graphics,
                                      QuestView quest, int x, int y) {
-        drawVillagerProfessionIcon(graphics, quest.profession(), x, y - 3);
+        String profession0 = info(quest).profession;
+        drawVillagerProfessionIcon(graphics, profession0, x, y - 3);
         Component profession = GeneralTextMethods.getTranslatableString(
-                "entity.minecraft.villager." + quest.profession().toLowerCase());
+                "entity.minecraft.villager." + profession0.toLowerCase());
         graphics.drawString(context.font(),
-                GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.side.requested_by",
-                        profession),
+                GeneralTextMethods.getTranslatableString(
+                        "screen.aegis_ascension.acg.quest.side.requested_by", profession),
                 x + 20, y + 1, ACGTheme.CYAN_ACCENT, false);
-        return y + 18;
+
+        // Standing with this villager, on its own line under their name so a long
+        // profession name cannot push it off the panel.
+        int reputationY = y + 14;
+        ItemStack icon = rewardItemStack(ClientQuestState.reputationIcon());
+        if (icon.isEmpty()) {
+            blitOpaqueFittedTexture(graphics, OTHER_REWARD, x + 20, reputationY, 12, 12, 116);
+        } else {
+            drawItemIcon(graphics, icon, x + 20, reputationY, 12);
+        }
+        // Shown as current / required when the quest gates on standing, matching the
+        // progress counters elsewhere in this panel. A quest with no requirement shows
+        // the bare figure instead: "5 / 0" would read as a broken counter.
+        int standing = professionReputation(profession0);
+        int required = info(quest).minimumReputation;
+        boolean met = standing >= required;
+        String text = required > 0 ? ": " + standing + " / " + required
+                : ": " + standing;
+        graphics.drawString(context.font(), GeneralTextMethods.getLiteralString(text),
+                x + 34, reputationY + 2,
+                required > 0 && !met ? 0xFFFF7777 : ACGTheme.GOLD_BRIGHT, false);
+        return y + 31;
+    }
+
+    /**
+     * Standing with one profession, counted the same way the server counts it: every
+     * completion of a quest that profession asked for. The completion list already
+     * carries the profession of each finished quest, so this needs nothing from the
+     * server that the client has not already been sent.
+     */
+    /** Whether the player's standing meets what this quest asks of them. */
+    private static boolean reputationMet(QuestView quest) {
+        QuestConfig.CatalogEntry entry = info(quest);
+        return entry.minimumReputation <= 0
+                || professionReputation(entry.profession) >= entry.minimumReputation;
+    }
+
+    private static int professionReputation(String profession) {
+        if (profession == null || profession.isBlank()) return 0;
+        int total = 0;
+        for (QuestCompletionView completion : ClientQuestState.completions()) {
+            if (profession.equals(info(completion).profession)) {
+                total += Math.max(0, completion.completions());
+            }
+        }
+        return total;
     }
 
     private static void drawVillagerProfessionIcon(GuiGraphics graphics, String profession,
@@ -483,9 +686,9 @@ final class ACGQuestCenterPage implements ACGPage {
                                            QuestCompletionView completion,
                                            int x, int y, int width, int height) {
         if (completion == null) return;
-        if (!completion.profession().isBlank()
+        if (!info(completion).profession.isBlank()
                 && QuestIconRenderer.drawVillagerProfessionIcon(
-                graphics, completion.profession(), x, y,
+                graphics, info(completion).profession, x, y,
                 Math.min(width, height), 1.0F)) {
             return;
         }
@@ -509,12 +712,13 @@ final class ACGQuestCenterPage implements ACGPage {
 
     private static ResourceLocation questIcon(QuestView quest) {
         if (quest == null) return null;
-        return resolvedQuestIcon(quest.icon(), quest.objective(), quest.type());
+        return resolvedQuestIcon(info(quest).icon, quest.objective(), quest.type());
     }
 
     private static ResourceLocation completionIcon(QuestCompletionView completion) {
         if (completion == null) return null;
-        return resolvedQuestIcon(completion.icon(), completion.objective(), completion.type());
+        QuestConfig.CatalogEntry entry = info(completion);
+        return resolvedQuestIcon(entry.icon, entry.objective, entry.type);
     }
 
     private static ResourceLocation resolvedQuestIcon(String configuredIcon,
@@ -539,54 +743,88 @@ final class ACGQuestCenterPage implements ACGPage {
 
     /** Default objective art used when a server template omits its optional icon field. */
     private static ResourceLocation objectiveIcon(QuestObjective objective, QuestType type) {
+        // Crafting has no vanilla item texture of its own, so it uses the mod's stand-in.
+        if (objective == QuestObjective.CRAFT_ITEM) return UNKNOWN_ICON;
         String path = switch (objective) {
             case KILL -> type == QuestType.CHALLENGE
                     ? "textures/item/diamond_sword.png" : "textures/item/golden_sword.png";
             case PLANT -> "textures/item/wheat_seeds.png";
             case OPEN_CHEST -> "textures/entity/chest/normal.png";
             case WALK -> "textures/mob_effect/speed.png";
+            case BREAK_BLOCK -> "textures/item/iron_pickaxe.png";
+            case SHOOT_ARROW, HIT_ARROW -> "textures/item/arrow.png";
+            case REACH_LOCATION -> "textures/item/filled_map.png";
             default -> null;
         };
         return path == null ? null : GeneralClientMethods.fromNamespaceAndPath("minecraft", path);
     }
 
-    private void drawRewardLine(ACGScreenContext context, GuiGraphics graphics,
-                                QuestView quest, int x, int y, int width) {
+    /**
+     * Lists the payout one reward per row. A single row ran out of width as soon as
+     * amounts were added to it, and truncating the tail hid rewards the quest actually
+     * pays; a row each also lets the icons line up as a readable column.
+     *
+     * @return the y coordinate below the last row drawn.
+     */
+    private int drawRewardLine(ACGScreenContext context, GuiGraphics graphics,
+                               QuestView quest, int x, int y, int width) {
         Font font = context.font();
         Component label = GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.reward_label");
         graphics.drawString(font, label, x, y + 2, ACGTheme.CYAN_ACCENT, false);
-        int cursor = x + font.width(label) + 3;
-        int right = x + width;
+        int rowY = y + 13;
+        int rowX = x + 4;
+        int textWidth = Math.max(20, width - 22);
 
-        if (quest.experience() > 0 && cursor < right) {
-            blitOpaqueFittedTexture(graphics, OTHER_REWARD, cursor, y, 12, 12, 116);
-            cursor += 13;
-            String experience = quest.experience() + " " + ClientQuestState.experienceLabel();
-            graphics.drawString(font, GeneralTextMethods.getLiteralString(experience),
-                    cursor, y + 2, ACGTheme.CYAN_ACCENT, false);
-            cursor += font.width(experience) + 6;
+        if (quest.experience() > 0) {
+            blitOpaqueFittedTexture(graphics, OTHER_REWARD, rowX, rowY, 12, 12, 116);
+            drawRewardText(graphics, font, quest.experience() + " "
+                    + ClientQuestState.experienceLabel(), rowX + 14, rowY, textWidth);
+            rowY += 13;
         }
 
-        if (ClientPerkState.usesGoldCurrency() && quest.goldReward() > 0L
-                && cursor < right) {
-            blitOpaqueFittedTexture(graphics, GoldCurrency.ICON, cursor, y, 12, 12, 128);
-            cursor += 13;
-            String gold = quest.goldReward() + " Gold";
-            graphics.drawString(font, GeneralTextMethods.getLiteralString(gold),
-                    cursor, y + 2, ACGTheme.CYAN_ACCENT, false);
-            cursor += font.width(gold) + 6;
+        if (ClientPerkState.usesGoldCurrency() && quest.goldReward() > 0L) {
+            blitOpaqueFittedTexture(graphics, GoldCurrency.ICON, rowX, rowY, 12, 12, 128);
+            drawRewardText(graphics, font, quest.goldReward() + " Gold",
+                    rowX + 14, rowY, textWidth);
+            rowY += 13;
         }
 
-        List<String> rewardIds = itemRewardIds(quest);
-        for (String rewardId : rewardIds) {
-            if (cursor >= right) break;
-            drawRewardItemIcon(graphics, rewardId, cursor, y, 12);
-            cursor += 13;
-            String name = ellipsize(font, rewardDisplayName(rewardId), right - cursor);
-            graphics.drawString(font, GeneralTextMethods.getLiteralString(name),
-                    cursor, y + 2, ACGTheme.CYAN_ACCENT, false);
-            cursor += font.width(name) + 6;
+        for (QuestRewardSummary.Entry reward : QuestRewardSummary.merge(itemRewards(quest))) {
+            drawRewardItemIcon(graphics, reward.id(), rowX, rowY, 12);
+            String name = rewardDisplayName(reward.id());
+            drawRewardText(graphics, font,
+                    reward.count() > 1 ? reward.count() + "x " + name : name,
+                    rowX + 14, rowY, textWidth);
+            rowY += 13;
         }
+
+        // Alternatives are listed here too, so the payout is legible on the offer rather
+        // than only once the quest is finished and the buttons appear.
+        List<String> choices = quest.rewardChoices();
+        if (!choices.isEmpty()) {
+            graphics.drawString(font, GeneralTextMethods.getTranslatableString(
+                            "screen.aegis_ascension.acg.quest.reward_choice_count",
+                            choices.size()),
+                    x, rowY + 2, ACGTheme.GOLD_BRIGHT, false);
+            rowY += 13;
+            for (String choice : choices) {
+                QuestRewardSummary.Entry entry = QuestRewardSummary.parse(choice).stream()
+                        .findFirst().orElse(new QuestRewardSummary.Entry(choice, 1));
+                drawRewardItemIcon(graphics, entry.id(), rowX, rowY, 12);
+                String name = rewardDisplayName(entry.id());
+                drawRewardText(graphics, font,
+                        entry.count() > 1 ? entry.count() + "x " + name : name,
+                        rowX + 14, rowY, textWidth);
+                rowY += 13;
+            }
+        }
+        return rowY;
+    }
+
+    private static void drawRewardText(GuiGraphics graphics, Font font, String text,
+                                       int x, int y, int maxWidth) {
+        graphics.drawString(font, GeneralTextMethods.getLiteralString(
+                ellipsize(font, text, maxWidth)), x, y + 2, ACGTheme.CYAN_ACCENT, false);
     }
 
     private static int drawWrapped(ACGScreenContext context, GuiGraphics graphics,
@@ -605,10 +843,17 @@ final class ACGQuestCenterPage implements ACGPage {
     public boolean mouseScrolled(ACGScreenContext context, double mouseX,
                                  double mouseY, double delta) {
         PageLayout layout = layout(context);
-        if (maxTaskScroll <= 0 || Math.abs(delta) <= 1.0E-9D
-                || mouseX < layout.listX() || mouseX >= layout.listX() + layout.listWidth()
+        if (Math.abs(delta) <= 1.0E-9D
                 || mouseY < layout.mainTop()
                 || mouseY >= layout.mainTop() + layout.mainHeight()) {
+            return false;
+        }
+        if (mouseX >= layout.detailX()
+                && mouseX < layout.detailX() + layout.detailWidth()) {
+            return scrollDetails(context, delta);
+        }
+        if (maxTaskScroll <= 0
+                || mouseX < layout.listX() || mouseX >= layout.listX() + layout.listWidth()) {
             return false;
         }
         int direction = delta < 0.0D ? 1 : -1;
@@ -619,11 +864,23 @@ final class ACGQuestCenterPage implements ACGPage {
         return true;
     }
 
+    /** Scrolls the detail panel by roughly one text line per notch. */
+    private boolean scrollDetails(ACGScreenContext context, double delta) {
+        if (maxDetailScroll <= 0) return false;
+        int step = delta < 0.0D ? DETAIL_SCROLL_STEP : -DETAIL_SCROLL_STEP;
+        int next = Math.max(0, Math.min(maxDetailScroll, detailScroll + step));
+        if (next == detailScroll) return true;
+        detailScroll = next;
+        context.rebuild();
+        return true;
+    }
+
     private void selectTab(ACGScreenContext context, QuestTab tab) {
         if (tab == selectedTab) return;
         selectedTab = tab;
         selectedQuestId = "";
         taskScroll = 0;
+        detailScroll = 0;
         context.page(0);
         context.gridScroll(0);
         context.rebuild();
@@ -632,6 +889,7 @@ final class ACGQuestCenterPage implements ACGPage {
     private void selectQuest(ACGScreenContext context, String id) {
         if (id == null || id.equals(selectedQuestId)) return;
         selectedQuestId = id;
+        detailScroll = 0;
         context.rebuild();
     }
 
@@ -677,12 +935,47 @@ final class ACGQuestCenterPage implements ACGPage {
 
     private static boolean canAccept(ACGScreenContext context, QuestView quest) {
         if (quest.accepted() || quest.completed() || quest.cancelled() || quest.expired()
-                || !quest.prerequisiteMet()) return false;
+                || !quest.prerequisiteMet() || !reputationMet(quest)) return false;
         return quest.type() != QuestType.CHALLENGE
                 || context.minecraft().player == null
                 || (ClientPerkState.usesGoldCurrency()
-                ? ClientPerkState.getGoldCurrency() >= ClientQuestState.depositCost()
-                : context.minecraft().player.totalExperience >= ClientQuestState.depositCost());
+                ? ClientPerkState.getGoldCurrency() >= questStake(quest)
+                : context.minecraft().player.totalExperience >= questStake(quest));
+    }
+
+    /**
+     * Whether any item this quest asks for is still outstanding. A quest can be accepted
+     * and still have nothing to hand in: it may be finished, or its submission
+     * requirements may be settled while another requirement is not.
+     */
+    private static boolean hasOutstandingSubmission(QuestView quest) {
+        if (!quest.accepted() || quest.completed() || quest.cancelled() || quest.expired()) {
+            return false;
+        }
+        if (isSubmissionObjective(quest.objective()) && quest.progress() < quest.target()) {
+            return true;
+        }
+        for (QuestView.Requirement requirement : quest.requirements()) {
+            if (isSubmissionObjective(requirement.objective())
+                    && requirement.progress() < requirement.target()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * What accepting this quest will actually cost. The server resolves it from the
+     * template and the rarity the quest rolled at, so the screen must use that figure
+     * rather than the catalogue's unscaled value or the global Challenge default; those
+     * disagree, and the player was being quoted two numbers and charged a third.
+     */
+    private static int questStake(QuestView quest) {
+        if (quest.securityDeposit() > 0) return quest.securityDeposit();
+        // Only a Challenge falls back to the catalogue-wide deposit. Every other type
+        // stakes nothing, and inheriting that default made ordinary quests warn about a
+        // wager the server was never going to take.
+        return quest.type() == QuestType.CHALLENGE ? ClientQuestState.depositCost() : 0;
     }
 
     private static boolean canCancel(QuestView quest) {
@@ -695,33 +988,171 @@ final class ACGQuestCenterPage implements ACGPage {
                 && !quest.cancelled() && !quest.expired();
     }
 
+    /**
+     * Whether this quest has anything to hand in, counting its extra requirements: a
+     * quest whose main objective is fought or mined can still ask for materials too.
+     */
     private static boolean isItemSubmission(QuestView quest) {
-        return quest.objective() == QuestObjective.TRADE_ITEM
-                || quest.objective() == QuestObjective.GIVE_MATERIAL;
+        if (isSubmissionObjective(quest.objective())) return true;
+        for (QuestView.Requirement requirement : quest.requirements()) {
+            if (isSubmissionObjective(requirement.objective())) return true;
+        }
+        return false;
+    }
+
+    private static boolean isSubmissionObjective(QuestObjective objective) {
+        return objective == QuestObjective.TRADE_ITEM
+                || objective == QuestObjective.GIVE_MATERIAL;
+    }
+
+    /**
+     * Ordinary quests keep the usual heading colour; only the rarer tiers are tinted, so
+     * a rare draw stands out instead of every quest carrying a rarity colour.
+     */
+    private static int titleColor(QuestView quest) {
+        return GeneralConstants.TIER_R.equals(GeneralConstants.normalizeTier(quest.tier()))
+                ? ACGTheme.TEXT_PRIMARY : GeneralConstants.rarityColor(quest.tier());
+    }
+
+    /** Blank for R, so only a rare quest is badged. */
+    private static String tierLabel(QuestView quest) {
+        String tier = GeneralConstants.normalizeTier(quest.tier());
+        return GeneralConstants.TIER_R.equals(tier) ? "" : tier;
+    }
+
+    /**
+     * One button per offered reward, shown only while a finished quest still has a choice
+     * open. They sit above the accept/cancel row so the pending decision is the nearest
+     * thing to hand.
+     */
+    private void addRewardChoiceActions(ACGScreenContext context, PageLayout layout,
+                                        QuestView quest, int y) {
+        List<String> choices = quest.rewardChoices();
+        int available = Math.max(1, layout.detailWidth() - 24);
+        int gap = 4;
+        int buttonWidth = Math.max(1,
+                (available - gap * (choices.size() - 1)) / choices.size());
+        int startX = layout.detailX() + 12;
+        for (int index = 0; index < choices.size(); index++) {
+            QuestRewardSummary.Entry entry =
+                    QuestRewardSummary.parse(choices.get(index)).stream().findFirst()
+                            .orElse(new QuestRewardSummary.Entry(choices.get(index), 1));
+            String name = entry.count() > 1
+                    ? entry.count() + "x " + rewardDisplayName(entry.id())
+                    : rewardDisplayName(entry.id());
+            int choiceIndex = index;
+            ACGButton choice = ACGButton.builder(
+                            GeneralTextMethods.getLiteralString(
+                                    ellipsize(context.font(), name, buttonWidth - 8)),
+                            ignored -> sendRewardChoice(quest, choiceIndex))
+                    .bounds(startX + index * (buttonWidth + gap), y, buttonWidth, 20)
+                    .build()
+                    .style(ACGButton.Style.CTA);
+            context.add(choice);
+        }
+    }
+
+    private void sendRewardChoice(QuestView quest, int index) {
+        ModNetworking.sendToServer(new QuestActionPacket(quest.id(),
+                QuestActionPacket.Action.CHOOSE_REWARD, index));
+    }
+
+    /** The server's fixed presentation for a quest, held once instead of per sync. */
+    private static QuestConfig.CatalogEntry info(QuestView quest) {
+        return ClientQuestCatalog.get(quest.id());
+    }
+
+    /**
+     * A completed quest's title, falling back to its id so a record whose template has
+     * since been removed from the catalogue still names something.
+     */
+    private static Component completionTitle(QuestCompletionView completion) {
+        String key = info(completion).title;
+        return key == null || key.isBlank()
+                ? GeneralTextMethods.getLiteralString(completion.questId())
+                : GeneralTextMethods.getTranslatableString(key);
+    }
+
+    /** The same fixed presentation, for a quest known only by its completion record. */
+    private static QuestConfig.CatalogEntry info(QuestCompletionView completion) {
+        return ClientQuestCatalog.get(completion.questId());
+    }
+
+    /** The title of the stage this quest waits on, resolved through the catalog. */
+    private static String prerequisiteTitle(QuestView quest) {
+        String prerequisiteId = info(quest).prerequisiteId;
+        if (prerequisiteId == null || prerequisiteId.isBlank()) return "";
+        String title = ClientQuestCatalog.get(prerequisiteId).title;
+        // Falling back to the id keeps a chain readable even if that stage is missing.
+        return title == null || title.isBlank() ? prerequisiteId : title;
     }
 
     private static Component questTitle(QuestView quest) {
-        Component title = quest.title() == null || quest.title().isBlank()
+        String titleKey = info(quest).title;
+        Component title = titleKey == null || titleKey.isBlank()
                 ? GeneralTextMethods.getLiteralString(quest.objective().name())
-                : GeneralTextMethods.getTranslatableString(quest.title());
+                : GeneralTextMethods.getTranslatableString(titleKey);
         return quest.repeatable()
                 ? title.copy().append(GeneralTextMethods.getTranslatableString(
                 "screen.aegis_ascension.acg.quest.repeat_cycle", quest.cycle()))
                 : title;
     }
 
+    /**
+     * Whether finishing this quest leaves it able to be offered again.
+     *
+     * <p>Common quests are a fixed ladder rather than a draw: a finished rung is
+     * withdrawn and never returns, so they are one-time however their template reads.
+     * Every other type is drawn from a pool, where anything not retired by
+     * once-per-player comes back on a later refresh.</p>
+     */
+    private static boolean isRepeatableOffer(QuestView quest) {
+        return quest.type() != QuestType.COMMON && !info(quest).oncePerPlayer;
+    }
+
     private static Component description(QuestView quest) {
-        return quest.description() == null || quest.description().isBlank()
+        String descriptionKey = info(quest).description;
+        Component text = descriptionKey == null || descriptionKey.isBlank()
                 ? GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.no_description")
-                : GeneralTextMethods.getTranslatableString(quest.description());
+                : GeneralTextMethods.getTranslatableString(descriptionKey);
+        if (!isRepeatableOffer(quest)) return text;
+        return text.copy().append(GeneralTextMethods.getLiteralString(" ")).append(
+                GeneralTextMethods.getTranslatableString(
+                        "screen.aegis_ascension.acg.quest.repeatable_marker"));
     }
 
     private static Component requirement(QuestView quest) {
-        String key = switch (quest.objective()) {
+        return requirementLine(quest.type(), quest.objective(), quest.targetId(),
+                quest.target());
+    }
+
+    /**
+     * Formats one requirement, whether it is the quest's main objective or an extra.
+     *
+     * <p>Both used to have their own copy of this, which is how a submission extra came
+     * to render its raw format placeholders: only one copy knew that submission wording
+     * names the item inline and therefore takes a second argument.</p>
+     */
+    private static Component requirementLine(QuestType type, QuestObjective objective,
+                                             String targetId, int target) {
+        String key = requirementKey(objective, type);
+        Component name = objectiveTargetName(objective, targetId);
+        if (isSubmissionObjective(objective)) {
+            return GeneralTextMethods.getTranslatableString(key, target, name);
+        }
+        Component base = GeneralTextMethods.getTranslatableString(key, target);
+        if (targetId == null || targetId.isBlank()) return base;
+        return base.copy().append(GeneralTextMethods.getLiteralString(" ")).append(
+                GeneralTextMethods.getTranslatableString(
+                        "screen.aegis_ascension.acg.quest.requirement.target", name));
+    }
+
+    private static String requirementKey(QuestObjective objective, QuestType type) {
+        return switch (objective) {
             case KILL -> "screen.aegis_ascension.acg.quest.requirement.kill";
             case PLANT -> "screen.aegis_ascension.acg.quest.requirement.plant";
             case WALK -> "screen.aegis_ascension.acg.quest.requirement.walk";
-            case OPEN_CHEST -> switch (quest.type()) {
+            case OPEN_CHEST -> switch (type) {
                 case DAILY -> "screen.aegis_ascension.acg.quest.requirement.daily_chest";
                 case CHUNK -> "screen.aegis_ascension.acg.quest.requirement.chunk_chest";
                 default -> "screen.aegis_ascension.acg.quest.requirement.chest";
@@ -729,44 +1160,71 @@ final class ACGQuestCenterPage implements ACGPage {
             case EXPLORE_BIOME -> "screen.aegis_ascension.acg.quest.requirement.biome";
             case TRADE_ITEM -> "screen.aegis_ascension.acg.quest.requirement.trade";
             case GIVE_MATERIAL -> "screen.aegis_ascension.acg.quest.requirement.material";
+            case CRAFT_ITEM -> "screen.aegis_ascension.acg.quest.requirement.craft";
+            case BREAK_BLOCK -> "screen.aegis_ascension.acg.quest.requirement.break_block";
+            case SHOOT_ARROW -> "screen.aegis_ascension.acg.quest.requirement.shoot_arrow";
+            case HIT_ARROW -> "screen.aegis_ascension.acg.quest.requirement.hit_arrow";
+            case REACH_LOCATION -> "screen.aegis_ascension.acg.quest.requirement.reach_location";
         };
-        Component target = targetDisplayName(quest);
-        if (isItemSubmission(quest)) {
-            return GeneralTextMethods.getTranslatableString(key, quest.target(), target);
-        }
-        Component base = GeneralTextMethods.getTranslatableString(key, quest.target());
-        if (quest.targetId() == null || quest.targetId().isBlank()) return base;
-        return base.copy().append(GeneralTextMethods.getLiteralString(" ")).append(
-                GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.requirement.target",
-                        target));
+    }
+
+    /** The same requirement wording as the main objective, for one extra requirement. */
+    private static Component extraRequirement(QuestView quest,
+                                              QuestView.Requirement extra) {
+        return requirementLine(quest.type(), extra.objective(), extra.targetId(),
+                extra.target());
     }
 
     private static Component targetDisplayName(QuestView quest) {
-        if (quest.targetId() == null || quest.targetId().isBlank()) return GeneralTextMethods.getEmpty();
-        ResourceLocation location = ResourceLocation.tryParse(quest.targetId());
-        if (location == null) return GeneralTextMethods.getLiteralString(quest.targetId());
-        if (isItemSubmission(quest) || quest.objective() == QuestObjective.PLANT) {
-            Item item = GeneralClientMethods.resolveItem(location);
-            ItemStack stack = item == null ? ItemStack.EMPTY : new ItemStack(item);
-            if (!stack.isEmpty()) return stack.getHoverName();
-        }
-        if (quest.objective() == QuestObjective.KILL) {
-            return GeneralTextMethods.getTranslatableString("entity." + location.getNamespace() + "."
-                    + location.getPath().replace('/', '.'));
-        }
-        return GeneralTextMethods.getLiteralString(quest.targetId());
+        return objectiveTargetName(quest.objective(), quest.targetId());
+    }
+
+    private static Component objectiveTargetName(QuestObjective objective, String targetId) {
+        if (targetId == null || targetId.isBlank()) return GeneralTextMethods.getEmpty();
+        ResourceLocation location = ResourceLocation.tryParse(targetId);
+        if (location == null) return GeneralTextMethods.getLiteralString(targetId);
+        Component name = switch (objective) {
+            // These name a creature, so only the entity translation key describes them.
+            // Structures carry no vanilla display name, so the mod supplies one.
+            case REACH_LOCATION -> GeneralTextMethods.getTranslatableString(
+                    "quest.aegis_ascension.structure." + location.getNamespace() + "."
+                            + location.getPath().replace('/', '.'));
+            case KILL, SHOOT_ARROW, HIT_ARROW -> GeneralTextMethods.getTranslatableString(
+                    "entity." + location.getNamespace() + "."
+                            + location.getPath().replace('/', '.'));
+            // Everything else names a thing that is held or placed. Most blocks carry a
+            // matching BlockItem, so the item name is tried first and the block registry
+            // covers the few that have no item form.
+            default -> {
+                Component itemName = itemName(location);
+                yield itemName != null ? itemName : blockName(location);
+            }
+        };
+        return name == null ? GeneralTextMethods.getLiteralString(targetId) : name;
+    }
+
+    private static Component itemName(ResourceLocation location) {
+        Item item = GeneralClientMethods.resolveItem(location);
+        ItemStack stack = item == null ? ItemStack.EMPTY : new ItemStack(item);
+        return stack.isEmpty() ? null : stack.getHoverName();
+    }
+
+    private static Component blockName(ResourceLocation location) {
+        return BuiltInRegistries.BLOCK.containsKey(location)
+                ? BuiltInRegistries.BLOCK.get(location).getName() : null;
     }
 
     private static Component rowLabel(QuestView quest) {
-        return GeneralTextMethods.getEmpty().append(questTitle(quest)).append(GeneralTextMethods.getLiteralString("  ·  "))
+        String tierLabel = tierLabel(quest);
+        Component label = GeneralTextMethods.getEmpty().append(questTitle(quest))
+                .append(GeneralTextMethods.getLiteralString("  ·  "))
                 .append(GeneralTextMethods.getTranslatableString(statusKey(quest)));
+        return tierLabel.isEmpty() ? label
+                : label.copy().append(GeneralTextMethods.getLiteralString("  ·  " + tierLabel));
     }
 
     private static Component completionRowLabel(QuestCompletionView completion) {
-        Component title = completion.title() == null || completion.title().isBlank()
-                ? GeneralTextMethods.getLiteralString(completion.questId())
-                : GeneralTextMethods.getTranslatableString(completion.title());
-        return GeneralTextMethods.getEmpty().append(title).append(GeneralTextMethods.getLiteralString("  ·  x"))
+        return GeneralTextMethods.getEmpty().append(completionTitle(completion)).append(GeneralTextMethods.getLiteralString("  ·  x"))
                 .append(GeneralTextMethods.getLiteralString(Integer.toString(completion.completions())));
     }
 
@@ -775,7 +1233,9 @@ final class ACGQuestCenterPage implements ACGPage {
         if (quest.expired()) return "screen.aegis_ascension.acg.quest.status.failed";
         if (quest.cancelled()) return "screen.aegis_ascension.acg.quest.status.cancelled";
         if (quest.accepted()) return "screen.aegis_ascension.acg.quest.status.active";
-        if (!quest.prerequisiteMet()) return "screen.aegis_ascension.acg.quest.status.locked";
+        if (!quest.prerequisiteMet() || !reputationMet(quest)) {
+            return "screen.aegis_ascension.acg.quest.status.locked";
+        }
         return "screen.aegis_ascension.acg.quest.status.available";
     }
 
@@ -787,32 +1247,27 @@ final class ACGQuestCenterPage implements ACGPage {
         return ACGTheme.GOLD_BRIGHT;
     }
 
-    private static List<String> itemRewardIds(QuestView quest) {
+    private static List<QuestRewardSummary.Entry> itemRewards(QuestView quest) {
         String summary = quest.rewardSummary() == null ? "" : quest.rewardSummary().trim();
         if (summary.isBlank()) return List.of();
         if (quest.experience() > 0) {
-            String experiencePrefix = quest.experience() + " "
-                    + ClientQuestState.experienceLabel();
-            if (summary.equals(experiencePrefix)) return List.of();
-            String itemPrefix = experiencePrefix + ", ";
-            if (summary.startsWith(itemPrefix)) summary = summary.substring(itemPrefix.length());
+            summary = QuestRewardSummary.stripPrefix(summary,
+                    quest.experience() + " " + ClientQuestState.experienceLabel());
         }
         if (ClientPerkState.usesGoldCurrency() && quest.goldReward() > 0L) {
-            String goldPrefix = quest.goldReward() + " Gold";
-            if (summary.equals(goldPrefix)) return List.of();
-            String itemPrefix = goldPrefix + ", ";
-            if (summary.startsWith(itemPrefix)) summary = summary.substring(itemPrefix.length());
+            summary = QuestRewardSummary.stripPrefix(summary, quest.goldReward() + " Gold");
         }
-        return List.of(summary.split(",")).stream()
-                .map(String::trim)
-                .filter(id -> !id.isBlank())
-                .toList();
+        return QuestRewardSummary.parse(summary);
+    }
+
+    private static void drawRewardItemIcon(GuiGraphics graphics, String id,
+                                           int x, int y, int size) {
+        drawItemIcon(graphics, rewardItemStack(id), x, y, size);
     }
 
     /** Draws the real item model used by inventory/storage UIs when one exists. */
-    private static void drawRewardItemIcon(GuiGraphics graphics, String id,
-                                           int x, int y, int size) {
-        ItemStack stack = rewardItemStack(id);
+    private static void drawItemIcon(GuiGraphics graphics, ItemStack stack,
+                                     int x, int y, int size) {
         Minecraft minecraft = Minecraft.getInstance();
         boolean hasItemModel = !stack.isEmpty()
                 && minecraft.getItemRenderer().getModel(stack, null, null, 0)
@@ -828,6 +1283,16 @@ final class ACGQuestCenterPage implements ACGPage {
         graphics.pose().scale(scale, scale, scale);
         graphics.renderItem(stack, 0, 0);
         graphics.pose().popPose();
+    }
+
+    /**
+     * The item shown beside a quest's requirement line. Entity targets usually have no
+     * item of their own, so those quests simply render without an icon; arrows are the
+     * happy exception, since the entity and the item share an id.
+     */
+    private static ItemStack targetIconStack(QuestView quest) {
+        if (quest.targetId() == null || quest.targetId().isBlank()) return ItemStack.EMPTY;
+        return rewardItemStack(quest.targetId());
     }
 
     private static ItemStack rewardItemStack(String id) {

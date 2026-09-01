@@ -22,6 +22,7 @@ import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.aegis.AegisConstants;
 import com.whatever.aegis_ascension.client.ClientPerkState;
 import com.whatever.aegis_ascension.client.screen.collectiontabs.CustomStats;
+import com.whatever.aegis_ascension.client.screen.collectiontabs.CustomStats.Breakdown;
 import com.whatever.aegis_ascension.client.screen.collectiontabs.CustomStats.Definition;
 import com.whatever.aegis_ascension.client.screen.collectiontabs.CustomStats.Format;
 import com.whatever.aegis_ascension.perk.Perk;
@@ -296,29 +297,53 @@ public final class ACGStatSourceBreakdown {
         // than being double-counted alongside it.
         addAccumulatedSources(sources, statKey);
 
-        if (!ATTACK_DAMAGE.equals(statKey)
-                && !ARMOR.equals(statKey)
-                && !ATTACK_SPEED.equals(statKey)) {
-            double listed = sources.stream().mapToDouble(Source::rawValue).sum();
-            double remainder = ClientPerkState.getDisplayStat(statKey) - listed;
-            if (Math.abs(remainder) > 1.0E-7D) {
-                Definition definition = CustomStats.definitions().stream()
-                        .filter(candidate -> candidate.key().equals(statKey))
-                        .findFirst()
-                        .orElse(null);
-                if (definition != null) {
-                    addSource(
-                            sources,
-                            getTranslatableString(
-                                    "screen.aegis_ascension.collection.stat.other_sources"
-                            ),
-                            definition.icon(),
-                            28,
-                            remainder,
-                            definition.format()
-                    );
-                }
-            }
+        Definition definition = CustomStats.definition(statKey);
+        if (definition == null) {
+            return sources;
+        }
+        if (definition.attributeBacked()) {
+            // A live Minecraft attribute. The rows above are this mod's multipliers,
+            // which share no unit with the attribute's absolute value, so no remainder
+            // can be inferred here. What the server does state exactly is the half of
+            // the value that belongs to nothing in this mod.
+            Breakdown breakdown = CustomStats.breakdown(definition);
+            addSource(
+                    sources,
+                    getTranslatableString(
+                            "screen.aegis_ascension.collection.stat.other_flat_source"
+                    ),
+                    definition.icon(),
+                    28,
+                    breakdown.otherFlat(),
+                    Format.NUMBER
+            );
+            addSource(
+                    sources,
+                    getTranslatableString(
+                            "screen.aegis_ascension.collection.stat.other_percentage_source"
+                    ),
+                    definition.icon(),
+                    28,
+                    breakdown.otherPercentage(),
+                    Format.PERCENT
+            );
+            return sources;
+        }
+        // Every contributor is one of ours and shares the stat's own unit, so whatever
+        // the listed rows do not account for is still an unattributed mod source.
+        double listed = sources.stream().mapToDouble(Source::rawValue).sum();
+        double remainder = ClientPerkState.getDisplayStat(statKey) - listed;
+        if (Math.abs(remainder) > 1.0E-7D) {
+            addSource(
+                    sources,
+                    getTranslatableString(
+                            "screen.aegis_ascension.collection.stat.other_sources"
+                    ),
+                    definition.icon(),
+                    28,
+                    remainder,
+                    definition.format()
+            );
         }
         return sources;
     }
@@ -338,7 +363,7 @@ public final class ACGStatSourceBreakdown {
      * coming from a talent that is no longer installed.</p>
      */
     private static void addAccumulatedSources(List<Source> sources, String statKey) {
-        String prefix = "__custom." + StatAttribution.PREFIX;
+        String prefix = StatAttribution.SYNCED_PREFIX;
         String suffix = StatAttribution.SEPARATOR + statKey;
         List<Map.Entry<String, Double>> records = ClientPerkState.getDisplayStats()
                 .entrySet().stream()

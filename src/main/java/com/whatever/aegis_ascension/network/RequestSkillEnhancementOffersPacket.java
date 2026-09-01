@@ -21,7 +21,8 @@ public record RequestSkillEnhancementOffersPacket() {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer sender = context.getSender();
-            if (sender == null) {
+            if (sender == null || !ServerCatalogSync.isReady(sender)
+                    || !ProgressionRequestLimiter.tryAcquireSkillOffers(sender)) {
                 return;
             }
             PerkData.get(sender).ifPresent(data -> {

@@ -33,8 +33,8 @@ import static com.whatever.aegis_ascension.util.GeneralCommonMethods.formatPerce
  * <p>Each definition's {@code maxUses} is a <em>lifetime cap per player</em>, not a stack
  * limit — banking twenty HP books does not let a player exceed twenty uses, and the cap
  * survives spending, rebuying, and relogging because the use counter is stored on the
- * player rather than on the item row. Devour Aegis Cores are the deliberate exception:
- * their one-use history resets together with Aegis progression.</p>
+ * player rather than on the item row. Progression-owned rewards are deliberate exceptions:
+ * Trinity Tea Party Swiss Rolls and Devour Aegis Cores reset together with progression.</p>
  *
  * <p>A player's bonus is always recomputed as {@code uses * amount} rather than being
  * banked as a number when the book is consumed. That keeps the config authoritative: retune
@@ -64,6 +64,8 @@ public final class VirtualItems {
     public static final String FINAL_DAMAGE = "final_damage";
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final int MAX_CATALOG_ENTRIES = 512;
+    private static final int MAX_WIRE_ID_LENGTH = 128;
     private static final Path FILE = PlatformServices.paths()
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
             .resolve("virtual_item_setting.json");
@@ -279,7 +281,7 @@ public final class VirtualItems {
     /** Installs a server-authoritative catalog in client memory without touching local files. */
     public static void installSyncedCatalog(String json) {
         Catalog catalog = Objects.requireNonNull(
-                GSON.fromJson(json, Catalog.class),
+                GSON.fromJson(Objects.requireNonNull(json, "json"), Catalog.class),
                 "Synchronized virtual item catalog was empty"
         );
         Objects.requireNonNull(catalog.items, "Missing items");
@@ -322,16 +324,48 @@ public final class VirtualItems {
     }
 
     private static Map<String, Definition> normalize(Catalog catalog) {
+        Objects.requireNonNull(catalog.items, "Missing virtual items");
+        if (catalog.items.size() > MAX_CATALOG_ENTRIES) {
+            throw new IllegalStateException("Too many virtual items: " + catalog.items.size());
+        }
         Map<String, Definition> byId = new LinkedHashMap<>();
         for (Definition definition : catalog.items) {
             if (definition == null || definition.id == null || definition.id.isBlank()) {
-                continue;
+                throw new IllegalStateException("Virtual item is missing an id");
             }
-            definition.maxUses = Math.max(0, definition.maxUses);
+            if (definition.id.length() > MAX_WIRE_ID_LENGTH) {
+                throw new IllegalStateException(
+                        "Virtual item id exceeds " + MAX_WIRE_ID_LENGTH + " characters"
+                );
+            }
+            if (definition.effect == null) {
+                throw new IllegalStateException("Virtual item " + definition.id + " has no effect");
+            }
+            if (!Double.isFinite(definition.amount)) {
+                throw new IllegalStateException(
+                        "Virtual item " + definition.id + " has a non-finite amount"
+                );
+            }
+            if (definition.maxUses < 0) {
+                throw new IllegalStateException(
+                        "Virtual item " + definition.id + " has a negative maxUses"
+                );
+            }
             if (definition.bonuses == null) {
                 definition.bonuses = new LinkedHashMap<>();
             }
-            byId.put(definition.id, definition);
+            definition.bonuses.forEach((key, value) -> {
+                if (key == null || key.isBlank() || key.length() > MAX_WIRE_ID_LENGTH
+                        || value == null || !Double.isFinite(value)) {
+                    throw new IllegalStateException(
+                            "Virtual item " + definition.id + " has invalid bonus "
+                                    + key + "=" + value
+                    );
+                }
+            });
+            if (byId.put(definition.id, definition) != null) {
+                throw new IllegalStateException("Duplicate virtual item id: " + definition.id);
+            }
         }
         return Collections.unmodifiableMap(byId);
     }

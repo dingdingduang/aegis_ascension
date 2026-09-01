@@ -3,7 +3,8 @@
   "value_conventions": {
     "weight": "Relative selection weight. The default weights total 1.0.",
     "percentages": "Decimal fractions: 0.50 means 50%; -1.0 means -100%.",
-    "item_rolls": "Each roll independently chooses one enabled registered item type."
+    "item_rolls": "Each roll independently chooses one enabled registered item type.",
+    "title_ticks": "20 ticks = 1 second. Timings for the on-screen result banner."
   },
   "settings": {
     "zombie_max_health": 10000,
@@ -17,15 +18,19 @@
     "random_item_rolls": 3,
     "damage_reduction_penalty": -1.00,
     "skill_enhancement_charges_min": 1,
-    "skill_enhancement_charges_max": 10
+    "skill_enhancement_charges_max": 10,
+    "title_fade_in_ticks": 10,
+    "title_stay_ticks": 70,
+    "title_fade_out_ticks": 20
   },
   "outcomes": [
     { "id": "hostile_zombie", "enabled": true, "weight": 0.05 },
     { "id": "breakthrough_effect", "enabled": true, "weight": 0.10 },
     { "id": "divine_punishment", "enabled": true, "weight": 0.20 },
     { "id": "all_skill_penalty", "enabled": true, "weight": 0.25 },
-    { "id": "random_items", "enabled": true, "weight": 0.10 },
+    { "id": "random_items", "enabled": true, "weight": 0.08 },
     { "id": "damage_reduction_penalty", "enabled": true, "weight": 0.20 },
-    { "id": "skill_enhancement_charges", "enabled": true, "weight": 0.10 }
+    { "id": "skill_enhancement_charges", "enabled": true, "weight": 0.10 },
+    { "id": "random_aegis", "enabled": true, "weight": 0.02 }
   ]
 }

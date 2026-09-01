@@ -23,6 +23,10 @@ package com.whatever.aegis_ascension.util;
 public final class StatAttribution {
     /** Marks a custom-stat key as a per-source record rather than a gameplay value. */
     public static final String PREFIX = "__from.";
+    /** Prefix the server puts on raw custom-stat keys when building the display map. */
+    public static final String CUSTOM_STAT_PREFIX = "__custom.";
+    /** The display-map prefix a per-source record arrives under on the client. */
+    public static final String SYNCED_PREFIX = CUSTOM_STAT_PREFIX + PREFIX;
     /** Separates the source id from the stat key. Neither may contain this character. */
     public static final char SEPARATOR = '/';
 

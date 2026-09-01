@@ -14,9 +14,11 @@ import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.network.RequestShopDataPacket;
 import com.whatever.aegis_ascension.shop.ShopOffer;
 import com.whatever.aegis_ascension.shop.ShopType;
+import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /** Server-authoritative Common and registry-backed Discovery shop page. */
@@ -24,6 +26,12 @@ final class ACGShopPage implements ACGPage {
     private static final int CARD_GAP = 8;
     private static final int SLOT_SIZE = 76;
     private ShopType selectedShop = ShopType.COMMON;
+    /**
+     * The slots built this pass, so the hovered one can be found when the tooltip is
+     * drawn. Tooltips cannot be drawn from inside a slot: they would be painted over by
+     * whichever slots render after it, so they are left until the page has finished.
+     */
+    private final List<ACGShopSlotWidget> slots = new ArrayList<>();
 
     void requestSelectedShop() {
         ModNetworking.sendToServer(new RequestShopDataPacket(selectedShop));
@@ -35,6 +43,7 @@ final class ACGShopPage implements ACGPage {
                 && !ClientShopState.isEnabled(ShopType.DISCOVERY)) {
             selectedShop = ShopType.COMMON;
         }
+        slots.clear();
         List<ShopOffer> offers = ClientShopState.getOffers(selectedShop);
         int refreshCost = ClientShopState.getRefreshExperienceCost(selectedShop);
         int centerX = context.contentX() + context.contentWidth() / 2;
@@ -88,11 +97,13 @@ final class ACGShopPage implements ACGPage {
                     + (local % layout.columns()) * (layout.cardWidth() + CARD_GAP);
             int y = layout.startY()
                     + (local / layout.columns()) * (layout.cardHeight() + CARD_GAP);
-            context.add(new ACGShopSlotWidget(
+            ACGShopSlotWidget slot = new ACGShopSlotWidget(
                     x, y, layout.cardWidth(), layout.cardHeight(), index, offer,
                     ClientShopState.canPurchase(selectedShop, index),
                     slotIndex -> ModNetworking.sendToServer(
-                            new BuyShopItemPacket(visibleShop, slotIndex))));
+                            new BuyShopItemPacket(visibleShop, slotIndex)));
+            slots.add(slot);
+            context.add(slot);
         }
         context.addPaginationButtons(
                 context.contentX() + context.contentWidth() / 2,
@@ -159,5 +170,50 @@ final class ACGShopPage implements ACGPage {
                     (context.contentTop() + context.contentBottom()) / 2,
                     ACGTheme.TEXT_MUTED);
         }
+    }
+
+    /**
+     * Draws the full item tooltip for whichever slot the cursor is over, the way the
+     * inventory does, so an item's stats can be read before it is bought rather than
+     * after.
+     *
+     * <p>Called by the screen after every widget has drawn, not from this page's own
+     * render: that runs before the widgets and the tooltip would be painted over.</p>
+     *
+     * @return true when a tooltip was drawn, so the screen can stop looking
+     */
+    boolean renderHoveredTooltip(net.minecraft.client.gui.Font font, GuiGraphics graphics,
+                                 int mouseX, int mouseY) {
+        for (ACGShopSlotWidget slot : slots) {
+            if (!slot.isHoveredNow()) continue;
+            ShopOffer offer = slot.offer();
+            if (offer.isVirtual()) {
+                // A virtual book's stack is only its icon, so its own text is shown
+                // instead of the icon item's.
+                graphics.renderComponentTooltip(font,
+                        virtualTooltip(offer.virtualId()), mouseX, mouseY);
+            } else if (!offer.stack().isEmpty()) {
+                graphics.renderTooltip(font, offer.stack(), mouseX, mouseY);
+            } else {
+                continue;
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private static List<Component> virtualTooltip(String virtualId) {
+        List<Component> lines = new ArrayList<>();
+        VirtualItems.Definition definition = VirtualItems.byId(virtualId);
+        if (definition == null) {
+            lines.add(getTranslatableString(virtualId));
+            return lines;
+        }
+        lines.add(getTranslatableString(definition.nameKey()));
+        String description = definition.descriptionKey();
+        if (description != null && !description.isBlank()) {
+            lines.add(getTranslatableString(description));
+        }
+        return lines;
     }
 }

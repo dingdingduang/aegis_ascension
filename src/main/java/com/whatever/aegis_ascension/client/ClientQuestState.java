@@ -14,6 +14,9 @@ public final class ClientQuestState {
     private static List<QuestCompletionView> completions = List.of();
     private static boolean penalty;
     private static int depositCost;
+    private static String reputationIcon = "minecraft:emerald";
+    private static java.util.Map<com.whatever.aegis_ascension.quest.QuestObjective, Integer>
+            lifetimeTotals = java.util.Map.of();
     private static boolean usesMinecraftDefaultLevel = true;
     private static boolean autoAcceptEligibleQuests = true;
     private ClientQuestState() {}
@@ -26,20 +29,24 @@ public final class ClientQuestState {
         completions = List.copyOf(packet.completions());
         penalty = packet.penaltyActive();
         depositCost = packet.depositExperienceCost();
+        reputationIcon = packet.reputationIcon() == null || packet.reputationIcon().isBlank()
+                ? "minecraft:emerald" : packet.reputationIcon();
+        lifetimeTotals = packet.lifetimeTotals();
         usesMinecraftDefaultLevel = packet.usesMinecraftDefaultLevel();
         autoAcceptEligibleQuests = packet.autoAcceptEligibleQuests();
     }
-    public static boolean applyProgress(Map<String, Integer> progressByQuestId) {
+    public static boolean applyProgress(Map<String, List<Integer>> progressByQuestId) {
         if (progressByQuestId == null || progressByQuestId.isEmpty()) return false;
         boolean changed = false;
         List<QuestView> updated = new ArrayList<>(quests.size());
         for (QuestView quest : quests) {
-            Integer progress = progressByQuestId.get(quest.id());
-            if (progress == null || progress == quest.progress()) {
+            List<Integer> counters = progressByQuestId.get(quest.id());
+            QuestView next = counters == null ? quest : quest.withCounters(counters);
+            if (next.equals(quest)) {
                 updated.add(quest);
                 continue;
             }
-            updated.add(quest.withProgress(progress));
+            updated.add(next);
             changed = true;
         }
         if (changed) quests = List.copyOf(updated);
@@ -62,6 +69,9 @@ public final class ClientQuestState {
     }
     public static boolean penaltyActive() { return penalty; }
     public static int depositCost() { return depositCost; }
+    public static String reputationIcon() { return reputationIcon; }
+    public static java.util.Map<com.whatever.aegis_ascension.quest.QuestObjective, Integer>
+            lifetimeTotals() { return lifetimeTotals; }
     public static boolean usesMinecraftDefaultLevel() { return usesMinecraftDefaultLevel; }
     public static boolean autoAcceptEligibleQuests() { return autoAcceptEligibleQuests; }
     public static String experienceLabel() {

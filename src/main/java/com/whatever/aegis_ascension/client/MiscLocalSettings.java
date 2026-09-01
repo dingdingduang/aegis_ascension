@@ -33,6 +33,12 @@ public final class MiscLocalSettings {
     private static MiscLocalSettings instance;
 
     private List<String> hiddenQuestTrackerIds = new ArrayList<>();
+    /**
+     * Whether the Quest Tracker overlay is shown at all. Distinct from the per-quest
+     * list above: that hides individual quests from a visible tracker, this is the
+     * keybound on/off for the whole overlay.
+     */
+    private boolean questTrackerOverlayShown = true;
 
     private MiscLocalSettings() {
     }
@@ -42,6 +48,17 @@ public final class MiscLocalSettings {
             instance = load();
         }
         return instance;
+    }
+
+    public boolean isQuestTrackerOverlayShown() {
+        return questTrackerOverlayShown;
+    }
+
+    /** Persists immediately, so the choice survives a crash as well as a clean exit. */
+    public void setQuestTrackerOverlayShown(boolean shown) {
+        if (questTrackerOverlayShown == shown) return;
+        questTrackerOverlayShown = shown;
+        save();
     }
 
     public boolean isQuestTrackerVisible(String questId) {

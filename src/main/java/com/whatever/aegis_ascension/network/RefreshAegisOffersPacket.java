@@ -21,7 +21,7 @@ public record RefreshAegisOffersPacket() {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null) {
+            if (player == null || !ServerCatalogSync.isReady(player)) {
                 return;
             }
             if (!RefreshRequestLimiter.tryAcquire(player)) {

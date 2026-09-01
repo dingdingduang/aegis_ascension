@@ -1,0 +1,356 @@
+[
+  {
+    "id": "daily_kill",
+    "objective": "KILL",
+    "target": 8,
+    "targetMin": 8,
+    "targetMax": 15,
+    "weight": 10,
+    "icon": "minecraft:textures/item/golden_sword.png",
+    "title": "quest.aegis_ascension.daily.kill.title",
+    "description": "quest.aegis_ascension.daily.kill.description",
+    "experience": 100,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_plant",
+    "objective": "PLANT",
+    "target": 8,
+    "targetMin": 8,
+    "targetMax": 16,
+    "weight": 10,
+    "icon": "minecraft:textures/item/wheat_seeds.png",
+    "title": "quest.aegis_ascension.daily.plant.title",
+    "description": "quest.aegis_ascension.daily.plant.description",
+    "experience": 100,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_walk",
+    "objective": "WALK",
+    "target": 400,
+    "targetMin": 400,
+    "targetMax": 900,
+    "weight": 10,
+    "icon": "minecraft:textures/mob_effect/speed.png",
+    "title": "quest.aegis_ascension.daily.walk.title",
+    "description": "quest.aegis_ascension.daily.walk.description",
+    "experience": 100,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_chest",
+    "objective": "OPEN_CHEST",
+    "target": 2,
+    "targetMin": 2,
+    "targetMax": 4,
+    "weight": 7,
+    "icon": "minecraft:textures/entity/chest/normal.png",
+    "title": "quest.aegis_ascension.daily.chest.title",
+    "description": "quest.aegis_ascension.daily.chest.description",
+    "experience": 125,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 7,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_biome",
+    "objective": "EXPLORE_BIOME",
+    "target": 1,
+    "targetMin": 1,
+    "targetMax": 3,
+    "weight": 7,
+    "icon": "minecraft:textures/block/oak_sapling.png",
+    "title": "quest.aegis_ascension.daily.biome.title",
+    "description": "quest.aegis_ascension.daily.biome.description",
+    "experience": 125,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 7,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_hunt_undead",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:zombie",
+      "minecraft:skeleton",
+      "minecraft:husk",
+      "minecraft:stray",
+      "minecraft:drowned"
+    ],
+    "target": 10,
+    "targetMin": 10,
+    "targetMax": 20,
+    "weight": 8,
+    "icon": "minecraft:textures/item/bone.png",
+    "title": "quest.aegis_ascension.daily.hunt_undead.title",
+    "description": "quest.aegis_ascension.daily.hunt_undead.description",
+    "experience": 140,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 7,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_trade",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:emerald",
+      "minecraft:wheat",
+      "minecraft:coal",
+      "minecraft:paper"
+    ],
+    "target": 8,
+    "targetMin": 8,
+    "targetMax": 24,
+    "weight": 6,
+    "icon": "minecraft:textures/item/emerald.png",
+    "title": "quest.aegis_ascension.daily.trade.title",
+    "description": "quest.aegis_ascension.daily.trade.description",
+    "experience": 150,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 8,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_deliver",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:iron_ingot",
+      "minecraft:copper_ingot",
+      "minecraft:leather",
+      "minecraft:gold_ingot"
+    ],
+    "target": 12,
+    "targetMin": 12,
+    "targetMax": 32,
+    "weight": 6,
+    "icon": "minecraft:textures/item/iron_ingot.png",
+    "title": "quest.aegis_ascension.daily.deliver.title",
+    "description": "quest.aegis_ascension.daily.deliver.description",
+    "experience": 150,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 8,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_craft_any",
+    "objective": "CRAFT_ITEM",
+    "target": 24,
+    "targetMin": 24,
+    "targetMax": 64,
+    "weight": 10,
+    "icon": "aegis_ascension:textures/gui/quest_ui/quest_unknown.png",
+    "title": "quest.aegis_ascension.daily.craft_any.title",
+    "description": "quest.aegis_ascension.daily.craft_any.description",
+    "experience": 110,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_craft_gear",
+    "objective": "CRAFT_ITEM",
+    "targetIds": [
+      "minecraft:iron_pickaxe",
+      "minecraft:iron_axe",
+      "minecraft:iron_sword",
+      "minecraft:iron_helmet",
+      "minecraft:iron_chestplate",
+      "minecraft:shield"
+    ],
+    "target": 2,
+    "targetMin": 2,
+    "targetMax": 5,
+    "weight": 5,
+    "icon": "aegis_ascension:textures/gui/quest_ui/quest_unknown.png",
+    "title": "quest.aegis_ascension.daily.craft_gear.title",
+    "description": "quest.aegis_ascension.daily.craft_gear.description",
+    "experience": 160,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 8,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_mine_stone",
+    "objective": "BREAK_BLOCK",
+    "targetIds": [
+      "minecraft:stone",
+      "minecraft:deepslate",
+      "minecraft:tuff",
+      "minecraft:andesite",
+      "minecraft:granite",
+      "minecraft:diorite"
+    ],
+    "target": 64,
+    "targetMin": 64,
+    "targetMax": 160,
+    "weight": 10,
+    "icon": "minecraft:textures/item/iron_pickaxe.png",
+    "title": "quest.aegis_ascension.daily.mine_stone.title",
+    "description": "quest.aegis_ascension.daily.mine_stone.description",
+    "experience": 100,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_mine_ore",
+    "objective": "BREAK_BLOCK",
+    "targetIds": [
+      "minecraft:coal_ore",
+      "minecraft:iron_ore",
+      "minecraft:copper_ore",
+      "minecraft:gold_ore",
+      "minecraft:deepslate_coal_ore",
+      "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate_copper_ore"
+    ],
+    "target": 8,
+    "targetMin": 8,
+    "targetMax": 20,
+    "weight": 5,
+    "icon": "minecraft:textures/item/raw_iron.png",
+    "title": "quest.aegis_ascension.daily.mine_ore.title",
+    "description": "quest.aegis_ascension.daily.mine_ore.description",
+    "experience": 170,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 4,
+        "countMax": 9,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_chop_log",
+    "objective": "BREAK_BLOCK",
+    "targetIds": [
+      "minecraft:oak_log",
+      "minecraft:birch_log",
+      "minecraft:spruce_log",
+      "minecraft:jungle_log",
+      "minecraft:acacia_log",
+      "minecraft:dark_oak_log"
+    ],
+    "target": 24,
+    "targetMin": 24,
+    "targetMax": 64,
+    "weight": 9,
+    "icon": "minecraft:textures/item/wooden_axe.png",
+    "title": "quest.aegis_ascension.daily.chop_log.title",
+    "description": "quest.aegis_ascension.daily.chop_log.description",
+    "experience": 100,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_shoot_arrow",
+    "objective": "SHOOT_ARROW",
+    "target": 20,
+    "targetMin": 20,
+    "targetMax": 50,
+    "weight": 9,
+    "icon": "minecraft:textures/item/arrow.png",
+    "title": "quest.aegis_ascension.daily.shoot_arrow.title",
+    "description": "quest.aegis_ascension.daily.shoot_arrow.description",
+    "experience": 110,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "daily_snipe",
+    "objective": "HIT_ARROW",
+    "target": 10,
+    "targetMin": 10,
+    "targetMax": 25,
+    "weight": 4,
+    "icon": "minecraft:textures/item/spectral_arrow.png",
+    "title": "quest.aegis_ascension.daily.snipe.title",
+    "description": "quest.aegis_ascension.daily.snipe.description",
+    "experience": 180,
+    "goldRewardMin": 40,
+    "goldRewardMax": 120,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 4,
+        "countMax": 9,
+        "tier": "R"
+      }
+    ]
+  }
+]

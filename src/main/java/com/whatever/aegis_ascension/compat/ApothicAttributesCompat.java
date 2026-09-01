@@ -7,6 +7,7 @@ import com.whatever.aegis_ascension.perk.ApothicAttributeMapping;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.util.AegisModifiers;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
@@ -26,13 +27,13 @@ public final class ApothicAttributesCompat {
     private static final ResourceLocation CRIT_DAMAGE_ATTRIBUTE =
             PlatformServices.resources().create(MOD_ID, CRIT_DAMAGE);
     private static final UUID CRIT_CHANCE_MODIFIER_ID =
-            UUID.fromString("407cebb7-4ff4-4a3d-a805-fd79cd86b753");
+            AegisModifiers.adopt("407cebb7-4ff4-4a3d-a805-fd79cd86b753");
     private static final UUID CRIT_DAMAGE_MODIFIER_ID =
-            UUID.fromString("3be8eb03-d9ca-45dc-89fd-9b8582b2bfb9");
+            AegisModifiers.adopt("3be8eb03-d9ca-45dc-89fd-9b8582b2bfb9");
     private static final UUID FLAME_CRIT_DAMAGE_MODIFIER_ID =
-            UUID.fromString("457004cf-5d91-4308-a11f-aae87b93664c");
+            AegisModifiers.adopt("457004cf-5d91-4308-a11f-aae87b93664c");
     private static final UUID MILLENNIUM_OVERFLOW_MODIFIER_ID =
-            UUID.fromString("79b5f43d-9883-4f77-89c8-9165cf4f75ea");
+            AegisModifiers.adopt("79b5f43d-9883-4f77-89c8-9165cf4f75ea");
 
     private ApothicAttributesCompat() {
     }

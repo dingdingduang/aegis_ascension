@@ -17,6 +17,7 @@ import com.whatever.aegis_ascension.shop.ShopState;
 import com.whatever.aegis_ascension.shop.ShopType;
 import com.whatever.aegis_ascension.storage.PlayerStorage;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
+import com.whatever.aegis_ascension.util.MagicBladeMath;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import com.whatever.aegis_ascension.quest.QuestState;
 import com.whatever.aegis_ascension.util.StatAttribution;
@@ -147,6 +148,8 @@ public final class PlayerPerkData {
     }
     private final Map<String, Integer> virtualItemUses = new LinkedHashMap<>();
     private final Set<String> uniqueVirtualPurchases = new LinkedHashSet<>();
+    /** Transient next-allowed tick for Magic Blade's on-hit mana restoration. */
+    private long magicBladeManaRestoreAvailableAtTick = Long.MIN_VALUE;
     private final Set<String> devouredItems = new LinkedHashSet<>();
     private final List<DevourAegis.InheritedAttribute> devouredAttributes = new ArrayList<>();
     private final QuestState questState = new QuestState();
@@ -158,12 +161,12 @@ public final class PlayerPerkData {
         return selectionCharges;
     }
 
-    /** Current server-authoritative Aegis Ascension rank, starting at rank 1. */
+    // AAE Level
     public int getAegisAscensionRank() {
         return aegisAscensionRank;
     }
 
-    /** Experience earned toward the next Aegis Ascension rank. */
+    // Experience earned toward the next Aegis Ascension rank.
     public long getAegisAscensionExperience() {
         return aegisAscensionExperience;
     }
@@ -188,7 +191,7 @@ public final class PlayerPerkData {
         return true;
     }
 
-    /** Internal progression setter used by the Aegis Ascension experience service. */
+    // Internal progression setter used by the Aegis Ascension experience service.
     public void setAegisAscensionProgress(int rank, long experience) {
         aegisAscensionRank = Math.max(1, Math.min(1000, rank));
         aegisAscensionExperience = Math.max(0L, experience);
@@ -218,7 +221,7 @@ public final class PlayerPerkData {
         }
     }
 
-    /** Grants the Perk refresh rewards that occur once per actual Breakthrough. */
+    // Grants the Perk refresh rewards that occur once per actual Breakthrough.
     public void grantBreakthroughPerkRefreshCharges() {
         double refreshCharges = 0.0D;
         if (isAegisEnabled(AegisConstants.FORTUNE)) {
@@ -323,7 +326,7 @@ public final class PlayerPerkData {
         );
     }
 
-    /** Grants one random enabled, unowned Aegis without spending a selection charge. */
+    // Grants one random enabled, unowned Aegis without spending a selection charge.
     public Optional<Aegis> grantRandomUnownedAegis(ServerPlayer player) {
         List<Aegis> pool = Aegis.values().stream()
                 .filter(aegis -> !chosenAegises.contains(aegis))
@@ -374,17 +377,17 @@ public final class PlayerPerkData {
         return List.copyOf(devouredAttributes);
     }
 
-    /** This player's daily shop stock, reroll counter, and rollover tracking. */
+    // This player's daily shop stock, reroll counter, and rollover tracking.
     public ShopState getShopState() {
         return shopState;
     }
 
-    /** The requested independently persisted Common or Discovery shop state. */
+    // The requested independently persisted Common or Discovery shop state.
     public ShopState getShopState(ShopType shopType) {
         return shopType == ShopType.DISCOVERY ? discoveryShopState : shopState;
     }
 
-    /** This player's virtual item bank, where shop purchases land. */
+    // This player's virtual item bank, where shop purchases land.
     public PlayerStorage getStorage() {
         return storage;
     }
@@ -401,12 +404,12 @@ public final class PlayerPerkData {
         questState.setPenalty(false);
     }
 
-    /** How many times this player has consumed a given virtual book, for its lifetime cap. */
+    // How many times this player has consumed a given virtual book, for its lifetime cap.
     public int getVirtualItemUses(String virtualId) {
         return Math.max(0, virtualItemUses.getOrDefault(virtualId, 0));
     }
 
-    /** Records one consumption. The cap itself is enforced by the caller against the config. */
+    // Records one consumption. The cap itself is enforced by the caller against the config.
     public void addVirtualItemUse(String virtualId, int amount) {
         if (virtualId == null || virtualId.isEmpty() || amount <= 0) {
             return;
@@ -432,7 +435,7 @@ public final class PlayerPerkData {
                 || storage.containsVirtual(virtualId);
     }
 
-    /** Records a successful shop purchase of an item configured as unique. */
+    // Records a successful shop purchase of an item configured as unique.
     public void recordUniqueVirtualPurchase(String virtualId) {
         VirtualItems.Definition definition = VirtualItems.byId(virtualId);
         if (definition != null && definition.uniquePurchase) {
@@ -444,7 +447,7 @@ public final class PlayerPerkData {
         return devouredItems.size();
     }
 
-    /** Records one item ID and its immutable attribute snapshot exactly once. */
+    // Records one item ID and its immutable attribute snapshot exactly once.
     public boolean recordDevouredItem(
             String itemId,
             List<DevourAegis.InheritedAttribute> inheritedAttributes) {
@@ -456,7 +459,7 @@ public final class PlayerPerkData {
         return true;
     }
 
-    /** Removes an item's inherited bonuses and applies the configured history policy. */
+    // Removes an item's inherited bonuses and applies the configured history policy.
     public boolean discardDevouredItemAttributes(String itemId) {
         if (!devouredItems.contains(itemId)) {
             return false;
@@ -488,7 +491,7 @@ public final class PlayerPerkData {
         return true;
     }
 
-    /** Returns true when the requested state belongs to an owned toggleable Aegis. */
+    // Returns true when the requested state belongs to an owned toggleable Aegis.
     public boolean setAegisEnabled(Aegis aegis, boolean enabled) {
         if (!aegis.manuallyToggleable() || !chosenAegises.contains(aegis)) {
             return false;
@@ -536,7 +539,7 @@ public final class PlayerPerkData {
                 && enabledManualTalents.contains(perkId);
     }
 
-    /** Returns true when the requested state was valid, even if it was already set. */
+    // Returns true when the requested state was valid, even if it was already set.
     public boolean setTalentEnabled(Perk perk, boolean enabled) {
         if (PlatformServices.config().isTalentHidden(perk.id())
                 || !perk.manuallyToggleable() || getRank(perk) <= 0) {
@@ -611,7 +614,7 @@ public final class PlayerPerkData {
         return (int) Math.min(Integer.MAX_VALUE, configuredSlots);
     }
 
-    /** Hook for future talents or systems that permanently grant talent slots. */
+    // Hook for future talents or systems that permanently grant talent slots.
     public void addTalentSlots(int amount) {
         if (amount > 0) {
             addCustomStat(ADDITIONAL_TALENT_SLOTS, amount);
@@ -674,7 +677,7 @@ public final class PlayerPerkData {
         );
     }
 
-    /** Grants one random available talent of the requested tier without a charge. */
+    // Grants one random available talent of the requested tier without a charge.
     public Optional<Perk> grantRandomTalentOfTier(ServerPlayer player, Perk.Tier tier) {
         List<Perk> pool = Perk.values().stream()
                 .filter(perk -> perk.tier() == tier)
@@ -688,8 +691,7 @@ public final class PlayerPerkData {
         return Optional.of(granted);
     }
 
-    /** Grants a Shared Fortune copy without treating it as another manual selection. */
-    public boolean grantSharedFortuneCopy(ServerPlayer player, Perk perk) {
+    public boolean grantTalent(ServerPlayer player, Perk perk) {
         if (!canAcquireTalent(perk)) {
             return false;
         }
@@ -697,6 +699,24 @@ public final class PlayerPerkData {
         applyChosenPerks(player);
         releaseRemainingBreakthroughsIfNeeded(player);
         return true;
+    }
+
+    // Grants a Shared Fortune copy without treating it as another manual selection.
+    public boolean grantSharedFortuneCopy(ServerPlayer player, Perk perk) {
+        return grantTalent(player, perk);
+    }
+
+    //Drops every rank of a talent, returning it to the offer pool
+    public boolean removeTalent(Perk perk) {
+        if (perkRanks.remove(perk) == null) {
+            return false;
+        }
+        enabledManualTalents.remove(perk.id());
+        return true;
+    }
+
+    public boolean removeTalent(String perkId) {
+        return Perk.byId(perkId).map(this::removeTalent).orElse(false);
     }
 
     public List<SoulLink> getActiveSoulLinks() {
@@ -732,6 +752,25 @@ public final class PlayerPerkData {
         double updated = getCustomStat(key) + amount;
         setCustomStat(key, updated);
         return updated;
+    }
+
+    /**
+     * Reserves Magic Blade's mana restoration trigger when its cooldown has elapsed.
+     *
+     * <p>The timestamp is intentionally transient: it is a combat debounce, not player
+     * progression, and persisting it would make a world/server restart affect the first
+     * attack after login.</p>
+     */
+    public boolean tryReserveMagicBladeManaRestore(long gameTime, double cooldownSeconds) {
+        if (!Double.isFinite(cooldownSeconds) || cooldownSeconds < 0.0D
+                || gameTime < magicBladeManaRestoreAvailableAtTick) {
+            return false;
+        }
+        long cooldownTicks = MagicBladeMath.cooldownTicks(cooldownSeconds);
+        magicBladeManaRestoreAvailableAtTick = gameTime > Long.MAX_VALUE - cooldownTicks
+                ? Long.MAX_VALUE
+                : gameTime + cooldownTicks;
+        return true;
     }
 
     /**
@@ -944,7 +983,7 @@ public final class PlayerPerkData {
         return granted;
     }
 
-    /** Grants one starting Aegis charge, then one per configured level interval. */
+    // Grants one starting Aegis charge, then one per configured level interval.
     public int awardAegisChargesForLevel(int progressionLevel) {
         highestAegisLevel = Math.max(highestAegisLevel, Math.max(0, progressionLevel));
         int interval = PlatformServices.config().aegisLevelsPerCharge();
@@ -969,7 +1008,7 @@ public final class PlayerPerkData {
         return granted;
     }
 
-    /** Rolls unique options using workbook rarity weights: R 90%, SR 8%, SSR 2%. */
+    // Rolls unique options using workbook rarity weights: R 90%, SR 8%, SSR 2%.
     public List<Perk> rollOffers(ServerPlayer player) {
         pendingOffers.clear();
         if (selectionCharges <= 0) {
@@ -1009,7 +1048,7 @@ public final class PlayerPerkData {
         return List.copyOf(pendingOffers);
     }
 
-    /** Spends one refresh charge and guarantees at least one different perk option. */
+    // Spends one refresh charge and guarantees at least one different perk option.
     public List<Perk> refreshPerkOffers(ServerPlayer player) {
         List<Perk> previous = getPendingOffers();
         if (previous.isEmpty()) {
@@ -1065,7 +1104,7 @@ public final class PlayerPerkData {
         return List.copyOf(pendingSkillEnhancementOffers);
     }
 
-    /** Rolls distinct, repeatable enhancement choices and locks them until selection. */
+    // Rolls distinct, repeatable enhancement choices and locks them until selection.
     public List<SkillEnhancement> rollSkillEnhancementOffers(ServerPlayer player) {
         pendingSkillEnhancementOffers.clear();
         if (skillEnhancementCharges <= 0) {
@@ -1084,7 +1123,7 @@ public final class PlayerPerkData {
         return List.copyOf(pendingSkillEnhancementOffers);
     }
 
-    /** Replaces a locked enhancement roll and guarantees a different option set. */
+    // Replaces a locked enhancement roll and guarantees a different option set.
     public boolean refreshSkillEnhancementOffers(ServerPlayer player) {
         List<SkillEnhancement> previous = getPendingSkillEnhancementOffers();
         if (skillEnhancementCharges <= 0 || previous.isEmpty()) {
@@ -1129,7 +1168,7 @@ public final class PlayerPerkData {
         return List.copyOf(pendingAegisOffers);
     }
 
-    /** Rolls distinct choices, including talent-configured option bonuses. */
+    // Rolls distinct choices, including talent-configured option bonuses.
     public List<Aegis> rollAegisOffers(ServerPlayer player) {
         pendingAegisOffers.clear();
         if (aegisSelectionCharges <= 0) {
@@ -1150,7 +1189,7 @@ public final class PlayerPerkData {
         return List.copyOf(pendingAegisOffers);
     }
 
-    /** Spends one refresh charge and guarantees at least one different Aegis option. */
+    // Spends one refresh charge and guarantees at least one different Aegis option.
     public List<Aegis> refreshAegisOffers(ServerPlayer player) {
         List<Aegis> previous = getPendingAegisOffers();
         if (previous.isEmpty()) {
@@ -1296,7 +1335,7 @@ public final class PlayerPerkData {
         return true;
     }
 
-    /** Converts one current perk choice into configured Skill Enhancement charges. */
+    // Converts one current perk choice into configured Skill Enhancement charges.
     public boolean exchangePerkChargeForSkillEnhancements(ServerPlayer player) {
         if (selectionCharges <= 0 || pendingOffers.isEmpty()) {
             return false;
@@ -1395,7 +1434,7 @@ public final class PlayerPerkData {
         }
     }
 
-    /** Shun rolls once per paid perk selection; granted talents never recurse. */
+    // Shun rolls once per paid perk selection; granted talents never recurse.
     private void grantSunoharaShunBonusTalent(ServerPlayer player) {
         if (!owns(PERK_SUNOHARA_SHUN)) {
             return;
@@ -1475,7 +1514,7 @@ public final class PlayerPerkData {
         return true;
     }
 
-    /** Applies the one-time reward when Kokona and Shun first activate their Soul Link. */
+    // Applies the one-time reward when Kokona and Shun first activate their Soul Link.
     private void grantPlumBlossomGardenRewards(ServerPlayer player) {
         SoulLink plumBlossomGarden = Perk.soulLinkById(SOUL_PLUM_BLOSSOM_GARDEN)
                 .orElseThrow();
@@ -1643,7 +1682,7 @@ public final class PlayerPerkData {
         }
     }
 
-    /** Grants every missing talent required by one random inactive Soul Link. */
+    // Grants every missing talent required by one random inactive Soul Link.
     public boolean grantRandomInactiveSoulLinkSet(ServerPlayer player) {
         if (!isAegisEnabled(AegisConstants.LUCKY)) {
             return false;
@@ -1698,8 +1737,29 @@ public final class PlayerPerkData {
         TalentEffects.recalculateAttributes(player, this);
     }
 
-    /** Clears every system and its milestone history, matching a full death reset. */
+    // Clears every system and its milestone history, matching a full death reset.
+    /**
+     * Clears the player's choices and the progression track that paid for them. A death
+     * reset takes the Aegis Ascension rank and banked AAE as well, so there is nothing
+     * left to re-earn charges from - that is what makes it a punishment rather than a
+     * respec.
+     */
     public void resetAll() {
+        resetChoices();
+        aegisAscensionRank = 1;
+        aegisAscensionExperience = 0L;
+    }
+
+    /**
+     * Clears the player's choices while keeping the progression track that paid for them.
+     *
+     * <p>The award counters go back to zero alongside the charges, so the next
+     * {@code awardMilestones} re-grants exactly what the player's level entitles them to
+     * and every charge they had spent returns. This is the respec behind {@code /perk
+     * reset} and Lethe's River Water; the Minecraft-level progression source has always
+     * behaved this way, because a reset never touched vanilla experience.</p>
+     */
+    public void resetChoices() {
         selectionCharges = 0;
         perkRefreshCharges = 0;
         highestPerkLevel = 0;
@@ -1711,6 +1771,7 @@ public final class PlayerPerkData {
         pendingOffers.clear();
         customStats.clear();
         enabledManualTalents.clear();
+        magicBladeManaRestoreAvailableAtTick = Long.MIN_VALUE;
         sharedFortunePartnerId = null;
         sharedFortunePartnerName = "";
         sharedFortuneRebindAvailableAtMillis = 0L;
@@ -1733,20 +1794,20 @@ public final class PlayerPerkData {
         disabledManualAegises.clear();
         devouredItems.clear();
         devouredAttributes.clear();
-        // Stat-book history and ordinary storage are retained. Cores are part of Devour
-        // progression, so a reset removes consumed levels, banked copies, and purchase
+        // Stat-book history and ordinary storage are retained. Swiss Rolls are cleared
+        // because Trinity Tea Party earns them through progression; retaining them would
+        // make reset/reacquisition an unlimited stat source. Cores are part of Devour
+        // progression, so a reset also removes consumed levels, banked copies, and purchase
         // locks. Any retained Core shop slot is reopened, and otherwise the Core becomes
         // eligible for a future Daily Shop roll after Devour Aegis is acquired again.
         // Gold is an inventory-like economy balance, so it is retained with storage.
-        for (String coreId : VirtualItems.devourCoreIds()) {
-            virtualItemUses.remove(coreId);
-            storage.removeAllVirtual(coreId);
-            uniqueVirtualPurchases.remove(coreId);
-            shopState.reopenVirtualOffer(coreId);
-        }
+        ProgressionVirtualItemReset.apply(
+                virtualItemUses::remove,
+                storage::removeAllVirtual,
+                uniqueVirtualPurchases::remove,
+                shopState::reopenVirtualOffer
+        );
         questState.resetOnProgressionReset();
-        aegisAscensionRank = 1;
-        aegisAscensionExperience = 0L;
     }
 
     public CompoundTag serializeNBT() {

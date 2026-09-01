@@ -264,9 +264,13 @@ public final class AegisAscensionConfig {
     public static final ForgeConfigSpec.LongValue AEGIS_ASCENSION_BASE_XP = BUILDER
             .comment(
                     "Aegis Ascension Experience required to advance from Rank 1 to Rank 2.",
-                    "The next-rank requirement is BaseXP * (GrowthRate ^ (CurrentRank - 1))."
+                    "The next-rank requirement is BaseXP * (GrowthRate ^ (CurrentRank - 1)).",
+                    "Sized against quest income: at 500 a rank costs roughly one good side",
+                    "quest, and the rank 20 gate that governs SSR quests takes about",
+                    "twenty-five quests. At the old default of 100 a single Challenge",
+                    "carried a new player past every rank gate in the catalogue at once."
             )
-            .defineInRange("aegisAscensionBaseXP", 100L, 1L, 100_000_000L);
+            .defineInRange("aegisAscensionBaseXP", 500L, 1L, 100_000_000L);
 
     public static final ForgeConfigSpec.DoubleValue AEGIS_ASCENSION_GROWTH_RATE = BUILDER
             .comment(

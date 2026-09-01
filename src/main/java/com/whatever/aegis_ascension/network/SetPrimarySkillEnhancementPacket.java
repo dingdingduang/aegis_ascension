@@ -24,7 +24,8 @@ public record SetPrimarySkillEnhancementPacket(String enhancementId) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null || !ToggleRequestLimiter.tryAcquire(player)) {
+            if (player == null || !ServerCatalogSync.isReady(player)
+                    || !ToggleRequestLimiter.tryAcquire(player)) {
                 return;
             }
             PerkData.get(player).ifPresent(data -> {

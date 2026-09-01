@@ -42,6 +42,12 @@ public final class ServerTickHandler {
             if (player.tickCount % 20 == 0) {
                 QuestManager.onBiomeVisited(player);
             }
+            if (player.tickCount % 40 == 0) {
+                QuestManager.onLocationVisited(player, data);
+            }
+            if (player.tickCount % 20 == 0 && QuestManager.onArmorChecked(player, data)) {
+                questStructureChanged = true;
+            }
             TalentEffects.onPlayerTick(player, data);
             AegisExperienceSystem.MilestoneResult milestones =
                     AegisExperienceSystem.awardMilestones(player, data, true);

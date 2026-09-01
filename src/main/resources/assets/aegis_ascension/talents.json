@@ -603,8 +603,8 @@
       "description": "perk.aegis_ascension.perk_magic_blade.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_magic_blade.png",
       "stats": {
-        "max_mana_restore_per_attack": 0.02,
-        "restore_cooldown_seconds": 0.1,
+        "max_mana_restore_per_attack": 0.1,
+        "restore_cooldown_seconds": 0.5,
         "magic_damage_per_max_mana": 0.4
       },
       "maxRank": 1,
@@ -992,10 +992,16 @@
       "description": "perk.aegis_ascension.perk_koharu_sprite.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_koharu_sprite.png",
       "stats": {
-        "primary_attribute_multiplier": 0.05,
+        "primary_attribute_multiplier": 0.1,
         "interval_seconds": 2,
+        "shield_primary_multiplier": 1,
         "shield_gain": 0.2,
         "shield_gain_per_level": 0.005
+      },
+      "primary_stat_multipliers": {
+        "attack_damage": 0.5,
+        "armor": 0.4,
+        "default": 1
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -1270,7 +1276,7 @@
         "triple_damage_multiplier": 3
       },
       "maxRank": 1,
-      "manualToggle": false,
+      "manualToggle": true,
       "source_row": 96
     },
     {

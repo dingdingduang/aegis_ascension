@@ -24,7 +24,10 @@ import com.whatever.aegis_ascension.perk.soullink.MakeUpWorkClub;
 import com.whatever.aegis_ascension.perk.soullink.MistyLake;
 import com.whatever.aegis_ascension.perk.soullink.TeamRadiance;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
+import com.whatever.aegis_ascension.util.AegisModifiers;
+import com.whatever.aegis_ascension.util.DisplayStatScope;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
+import com.whatever.aegis_ascension.util.StatAttribution;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -36,6 +39,7 @@ import net.minecraft.world.entity.player.Player;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 
 /**
@@ -43,36 +47,36 @@ import java.util.UUID;
  * compatibility modifiers, and synchronized Custom Stats values.
  */
 public final class TalentStatService {
-    private static final UUID ATTACK_FLAT_ID = UUID.fromString("34da31ad-36dc-4b7e-a886-c2cd640cb844");
-    private static final UUID ATTACK_MULTIPLIER_ID = UUID.fromString("dffbdf80-d85f-4087-bf2d-191b0169c34f");
+    private static final UUID ATTACK_FLAT_ID = AegisModifiers.adopt("34da31ad-36dc-4b7e-a886-c2cd640cb844");
+    private static final UUID ATTACK_MULTIPLIER_ID = AegisModifiers.adopt("dffbdf80-d85f-4087-bf2d-191b0169c34f");
     private static final UUID PRIMARY_SELECTED_FLAT_ID =
-            UUID.fromString("71f2bd98-b69b-4ca8-8a7c-35e278d353cf");
+            AegisModifiers.adopt("71f2bd98-b69b-4ca8-8a7c-35e278d353cf");
     private static final UUID PRIMARY_SELECTED_MULTIPLIER_ID =
-            UUID.fromString("8c5f019a-15ab-4ca6-bd45-41410659dd80");
-    private static final UUID HEALTH_FLAT_ID = UUID.fromString("675f47f5-97e0-4bca-85cd-057f9a386e6b");
-    private static final UUID HEALTH_MULTIPLIER_ID = UUID.fromString("ec9a8473-cc62-4184-9a5b-a9ebd7706043");
+            AegisModifiers.adopt("8c5f019a-15ab-4ca6-bd45-41410659dd80");
+    private static final UUID HEALTH_FLAT_ID = AegisModifiers.adopt("675f47f5-97e0-4bca-85cd-057f9a386e6b");
+    private static final UUID HEALTH_MULTIPLIER_ID = AegisModifiers.adopt("ec9a8473-cc62-4184-9a5b-a9ebd7706043");
     private static final UUID MAGIC_CONVERSION_HEALTH_ID =
-            UUID.fromString("7fdd5555-44ad-47ea-88f9-c009b451fa26");
-    private static final UUID MOVEMENT_MULTIPLIER_ID = UUID.fromString("3d118a4f-1668-4cf1-b9a7-b3fe82c3ebd6");
-    private static final UUID ATTACK_SPEED_MULTIPLIER_ID = UUID.fromString("076e967c-a078-4775-a1ae-124a50cbcc4c");
+            AegisModifiers.adopt("7fdd5555-44ad-47ea-88f9-c009b451fa26");
+    private static final UUID MOVEMENT_MULTIPLIER_ID = AegisModifiers.adopt("3d118a4f-1668-4cf1-b9a7-b3fe82c3ebd6");
+    private static final UUID ATTACK_SPEED_MULTIPLIER_ID = AegisModifiers.adopt("076e967c-a078-4775-a1ae-124a50cbcc4c");
     private static final UUID ATTACK_SPEED_FLAT_ID =
-            UUID.fromString("4f9386ea-2d38-4ff9-bd88-bfc9064683d8");
+            AegisModifiers.adopt("4f9386ea-2d38-4ff9-bd88-bfc9064683d8");
     private static final UUID ATTACK_RANGE_ID =
-            UUID.fromString("174f34a7-5201-4526-a18c-166327aecf76");
-    private static final UUID LUCK_FLAT_ID = UUID.fromString("b937a6e2-9e1c-4fe8-ad1f-a06389568a7b");
+            AegisModifiers.adopt("174f34a7-5201-4526-a18c-166327aecf76");
+    private static final UUID LUCK_FLAT_ID = AegisModifiers.adopt("b937a6e2-9e1c-4fe8-ad1f-a06389568a7b");
     private static final UUID AEGIS_LUCK_MULTIPLIER_ID =
-            UUID.fromString("1a404ff9-a81e-4d66-b345-f02f54a980d7");
-    private static final UUID LEGACY_MOVEMENT_ID = UUID.fromString("79f5c26b-b99e-4fc8-a628-2a8d8cbbd944");
-    private static final UUID LEGACY_HEALTH_ID = UUID.fromString("f2a78cb5-a53b-4cc7-a798-ce723ed69d4f");
-    private static final UUID LEGACY_ATTACK_ID = UUID.fromString("edbe3297-7765-4769-87d4-f3c2156d391b");
-    private static final UUID LEGACY_ARMOR_ID = UUID.fromString("fa30a8bb-dba4-4cab-9248-96e183f4a7bc");
-    private static final UUID LEGACY_ATTACK_SPEED_ID = UUID.fromString("a913dd5f-ae7f-4b66-925a-76a851516802");
-    private static final UUID LEGACY_LUCK_ID = UUID.fromString("ac839dc5-550d-49e1-8114-7ca954d23cbb");
-    private static final UUID LEGACY_KNOCKBACK_ID = UUID.fromString("79729f8d-bfd0-486e-9dc0-7d634794d0f8");
-    private static final UUID QUEST_HEALTH_PENALTY_ID = UUID.fromString("8f5f0b7d-cf6c-4cc6-9c71-24bdb3e4b1a1");
-    private static final UUID QUEST_MOVEMENT_PENALTY_ID = UUID.fromString("f2f5c654-1b16-45de-80d9-2c18da8cb7a6");
-    private static final UUID QUEST_ARMOR_PENALTY_ID = UUID.fromString("2c16cb5b-a8d6-4d0a-8a68-3d0f56a39116");
-    private static final UUID QUEST_PRIMARY_PENALTY_ID = UUID.fromString("f694a0ba-5f0b-4c95-9a3d-2aa116af37a4");
+            AegisModifiers.adopt("1a404ff9-a81e-4d66-b345-f02f54a980d7");
+    private static final UUID LEGACY_MOVEMENT_ID = AegisModifiers.adopt("79f5c26b-b99e-4fc8-a628-2a8d8cbbd944");
+    private static final UUID LEGACY_HEALTH_ID = AegisModifiers.adopt("f2a78cb5-a53b-4cc7-a798-ce723ed69d4f");
+    private static final UUID LEGACY_ATTACK_ID = AegisModifiers.adopt("edbe3297-7765-4769-87d4-f3c2156d391b");
+    private static final UUID LEGACY_ARMOR_ID = AegisModifiers.adopt("fa30a8bb-dba4-4cab-9248-96e183f4a7bc");
+    private static final UUID LEGACY_ATTACK_SPEED_ID = AegisModifiers.adopt("a913dd5f-ae7f-4b66-925a-76a851516802");
+    private static final UUID LEGACY_LUCK_ID = AegisModifiers.adopt("ac839dc5-550d-49e1-8114-7ca954d23cbb");
+    private static final UUID LEGACY_KNOCKBACK_ID = AegisModifiers.adopt("79729f8d-bfd0-486e-9dc0-7d634794d0f8");
+    private static final UUID QUEST_HEALTH_PENALTY_ID = AegisModifiers.adopt("8f5f0b7d-cf6c-4cc6-9c71-24bdb3e4b1a1");
+    private static final UUID QUEST_MOVEMENT_PENALTY_ID = AegisModifiers.adopt("f2f5c654-1b16-45de-80d9-2c18da8cb7a6");
+    private static final UUID QUEST_ARMOR_PENALTY_ID = AegisModifiers.adopt("2c16cb5b-a8d6-4d0a-8a68-3d0f56a39116");
+    private static final UUID QUEST_PRIMARY_PENALTY_ID = AegisModifiers.adopt("f694a0ba-5f0b-4c95-9a3d-2aa116af37a4");
 
     private TalentStatService() {
     }
@@ -651,7 +655,43 @@ public final class TalentStatService {
         return attackRange;
     }
 
-    public static Map<String, Double> buildDisplayStats(Player player, PlayerPerkData data) {
+    /**
+     * Display values screens other than Custom Stats depend on.
+     *
+     * <p>These ride along with every routine progression sync, because the screens that
+     * read them are opened by a server push and so cannot ask first. Everything else in
+     * the display map is fetched by the Collection screen when it needs it.</p>
+     */
+    private static final Set<String> ESSENTIAL_DISPLAY_STATS = Set.of(
+            TEAM_RADIANCE_RANK,
+            StatAttribution.CUSTOM_STAT_PREFIX + AegisConstants.AUTHORITY_SELECT_ALL_USES
+    );
+
+    /**
+     * @param scope how much of the map the receiver needs. Building the whole thing and
+     *              filtering keeps one code path, so a stat can never appear under one
+     *              scope and silently vanish under another.
+     */
+    public static Map<String, Double> buildDisplayStats(Player player, PlayerPerkData data,
+                                                        DisplayStatScope scope) {
+        Map<String, Double> complete = buildCompleteDisplayStats(
+                player, data, scope.includesAttribution()
+        );
+        if (scope != DisplayStatScope.ESSENTIAL) {
+            return complete;
+        }
+        Map<String, Double> essential = new LinkedHashMap<>();
+        ESSENTIAL_DISPLAY_STATS.forEach(key -> {
+            Double value = complete.get(key);
+            if (value != null) {
+                essential.put(key, value);
+            }
+        });
+        return Map.copyOf(essential);
+    }
+
+    private static Map<String, Double> buildCompleteDisplayStats(
+            Player player, PlayerPerkData data, boolean includeAttribution) {
         Map<String, Double> stats = new LinkedHashMap<>();
 
         double activeSoulLinks = data.getActiveSoulLinks().size();
@@ -827,9 +867,13 @@ public final class TalentStatService {
                 data.getCustomStat(INDEPENDENT_SKILL_AREA));
         double accumulatedDamageReduction = damageResistance(data);
         stats.put(DAMAGE_REDUCTION, effectiveDamageResistance(data));
+        // Mod-only: nothing outside Aegis Ascension feeds this, so the "other" halves
+        // are zero and the accumulated total is entirely ours.
         stats.put(DISPLAY_FLAT_PREFIX + DAMAGE_REDUCTION, 0.0D);
         stats.put(DISPLAY_PERCENT_PREFIX + DAMAGE_REDUCTION,
                 accumulatedDamageReduction);
+        stats.put(DISPLAY_OTHER_FLAT_PREFIX + DAMAGE_REDUCTION, 0.0D);
+        stats.put(DISPLAY_OTHER_PERCENT_PREFIX + DAMAGE_REDUCTION, 0.0D);
         stats.put(SHIELD_GAIN, shieldGain(player, data));
         stats.put(REVIVES_REMAINING, data.getCustomStat(REVIVES_REMAINING));
         stats.put(TALENT_OPTION_BONUS, talentOptionBonus(player, data));
@@ -837,9 +881,12 @@ public final class TalentStatService {
         // Internal accumulated values let the client separate direct talent bonuses
         // from bonuses earned over time. Keys beginning with this prefix are never
         // rendered as their own Custom Stats cards.
-        data.getCustomStats().forEach((key, value) ->
-                stats.put("__custom." + key, value)
-        );
+        data.getCustomStats().forEach((key, value) -> {
+            if (!includeAttribution && StatAttribution.isRecord(key)) {
+                return;
+            }
+            stats.put(StatAttribution.CUSTOM_STAT_PREFIX + key, value);
+        });
         stats.put(
                 "__custom." + PECORINE_ACTIVE_FINAL_DAMAGE,
                 pecorineFinalDamage
@@ -847,6 +894,36 @@ public final class TalentStatService {
         return Map.copyOf(stats);
     }
 
+    /**
+     * Splits a live Minecraft attribute into this mod's share and everything else.
+     *
+     * <p>These four stats are not mod-only: Attack Damage carries the held weapon, Armor
+     * the worn pieces, and either may carry a potion or another mod. Ownership is settled
+     * by modifier identity rather than by arithmetic, because a diamond sword's {@code +7}
+     * is additive in exactly the way a talent's flat bonus is — only the id tells them
+     * apart.</p>
+     *
+     * <p>The four published components reconstruct the real value exactly:</p>
+     * <pre>final = (flat + otherFlat) * (1 + percentage) * (1 + otherPercentage)</pre>
+     *
+     * <p>{@code flat} and {@code percentage} are this mod's own, measured directly from
+     * the modifiers it owns. {@code otherFlat} is the vanilla base value plus every
+     * additive modifier we do not own. {@code otherPercentage} is then whatever remains,
+     * which is why the equation closes.</p>
+     *
+     * <p>The two percentages multiply rather than sum, because this mod expresses its
+     * own percentages as {@code MULTIPLY_TOTAL}, which Minecraft applies in turn. Adding
+     * them would understate the result whenever anything outside also contributes a
+     * multiplier.</p>
+     *
+     * <p>{@code otherPercentage} is taken as a remainder so the identity holds by
+     * construction. Today it also equals the outside contribution measured directly,
+     * because Minecraft sums {@code MULTIPLY_BASE} into one shared factor and this mod
+     * contributes none of that operation to these attributes — so the two sides
+     * separate cleanly with no cross-term. Applying a {@code MULTIPLY_BASE} modifier to
+     * one of them would introduce one; the identity would still hold, but the
+     * interaction would then be charged to the "other" half rather than being zero.</p>
+     */
     private static void putAttributeDisplayStats(Map<String, Double> stats,
                                                  String statKey,
                                                  Player player,
@@ -855,21 +932,54 @@ public final class TalentStatService {
             stats.put(statKey, 0.0D);
             stats.put(DISPLAY_FLAT_PREFIX + statKey, 0.0D);
             stats.put(DISPLAY_PERCENT_PREFIX + statKey, 0.0D);
+            stats.put(DISPLAY_OTHER_FLAT_PREFIX + statKey, 0.0D);
+            stats.put(DISPLAY_OTHER_PERCENT_PREFIX + statKey, 0.0D);
             return;
         }
-        double flat = GeneralServerMethods.getAttributeBaseValue(player, attribute, 0.0D);
+        double flat = 0.0D;
+        double multiplyBase = 0.0D;
+        double multiplyTotal = 1.0D;
+        double otherFlat = GeneralServerMethods.getAttributeBaseValue(player, attribute, 0.0D);
         for (AttributeModifier modifier : GeneralServerMethods.getAttributeModifiers(
-                player, attribute, AttributeOperation.ADDITION
+                player, attribute
         )) {
-            flat += modifier.getAmount();
+            double amount = modifier.getAmount();
+            if (!Double.isFinite(amount)) {
+                continue;
+            }
+            boolean ours = AegisModifiers.isOurs(modifier.getId());
+            switch (GeneralServerMethods.getAttributeOperation(modifier)) {
+                case ADDITION -> {
+                    if (ours) {
+                        flat += amount;
+                    } else {
+                        otherFlat += amount;
+                    }
+                }
+                case MULTIPLY_BASE -> {
+                    if (ours) {
+                        multiplyBase += amount;
+                    }
+                }
+                case MULTIPLY_TOTAL -> {
+                    if (ours) {
+                        multiplyTotal *= 1.0D + amount;
+                    }
+                }
+            }
         }
+        double percentage = (1.0D + multiplyBase) * multiplyTotal - 1.0D;
         double finalValue = GeneralServerMethods.getAttributeValue(player, attribute);
-        double percentage = Math.abs(flat) > 1.0E-9D
-                ? finalValue / flat - 1.0D
+        double accountedFor = (flat + otherFlat) * (1.0D + percentage);
+        double otherPercentage = Math.abs(accountedFor) > 1.0E-9D
+                ? finalValue / accountedFor - 1.0D
                 : 0.0D;
+
         stats.put(statKey, finalValue);
         stats.put(DISPLAY_FLAT_PREFIX + statKey, flat);
         stats.put(DISPLAY_PERCENT_PREFIX + statKey, percentage);
+        stats.put(DISPLAY_OTHER_FLAT_PREFIX + statKey, otherFlat);
+        stats.put(DISPLAY_OTHER_PERCENT_PREFIX + statKey, otherPercentage);
     }
 
     public static double cooldownReduction(PlayerPerkData data) {

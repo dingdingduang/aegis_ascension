@@ -9,13 +9,17 @@ import net.minecraftforge.network.NetworkEvent;
 import java.util.Objects;
 import java.util.function.Supplier;
 
-/** One login-time snapshot of the four catalogs used by catalog-dependent packets and UI. */
+/** One login-time snapshot of every catalog used by catalog-dependent packets and UI. */
 public record SyncServerCatalogPacket(
         String hash,
         String talentsJson,
         String aegisesJson,
         String skillEnhancementsJson,
-        String virtualItemsJson
+        String virtualItemsJson,
+        String soulLinksJson,
+        String mysteriousDollJson,
+        String shrineMaidenDanceJson,
+        String questsJson
 ) {
     public SyncServerCatalogPacket {
         hash = Objects.requireNonNull(hash, "hash");
@@ -26,7 +30,20 @@ public record SyncServerCatalogPacket(
                 "skillEnhancementsJson"
         );
         virtualItemsJson = Objects.requireNonNull(virtualItemsJson, "virtualItemsJson");
+        soulLinksJson = Objects.requireNonNull(soulLinksJson, "soulLinksJson");
+        mysteriousDollJson = Objects.requireNonNull(
+                mysteriousDollJson,
+                "mysteriousDollJson"
+        );
+        shrineMaidenDanceJson = Objects.requireNonNull(
+                shrineMaidenDanceJson,
+                "shrineMaidenDanceJson"
+        );
+        questsJson = Objects.requireNonNull(questsJson, "questsJson");
         requireLength(hash, NetworkLimits.MAX_CATALOG_HASH_CHARS, "catalog hash");
+        if (!hash.matches("[0-9a-f]{64}")) {
+            throw new IllegalArgumentException("Catalog hash is not a SHA-256 hex digest");
+        }
         requireLength(talentsJson, NetworkLimits.MAX_CATALOG_JSON_CHARS, "talent catalog");
         requireLength(aegisesJson, NetworkLimits.MAX_CATALOG_JSON_CHARS, "Aegis catalog");
         requireLength(
@@ -39,10 +56,25 @@ public record SyncServerCatalogPacket(
                 NetworkLimits.MAX_CATALOG_JSON_CHARS,
                 "virtual item catalog"
         );
+        requireLength(soulLinksJson, NetworkLimits.MAX_CATALOG_JSON_CHARS, "Soul Link catalog");
+        requireLength(questsJson, NetworkLimits.MAX_CATALOG_JSON_CHARS, "quest catalog");
+        requireLength(
+                mysteriousDollJson,
+                NetworkLimits.MAX_CATALOG_JSON_CHARS,
+                "Mysterious Doll catalog"
+        );
+        requireLength(
+                shrineMaidenDanceJson,
+                NetworkLimits.MAX_CATALOG_JSON_CHARS,
+                "Shrine Maiden Dance catalog"
+        );
         long totalLength = (long) talentsJson.length()
                 + aegisesJson.length()
                 + skillEnhancementsJson.length()
-                + virtualItemsJson.length();
+                + virtualItemsJson.length()
+                + soulLinksJson.length()
+                + mysteriousDollJson.length()
+                + shrineMaidenDanceJson.length();
         if (totalLength > NetworkLimits.MAX_TOTAL_CATALOG_CHARS) {
             throw new IllegalArgumentException(
                     "Combined server catalogs exceed protocol limit of "
@@ -57,11 +89,19 @@ public record SyncServerCatalogPacket(
         buffer.writeUtf(packet.aegisesJson, NetworkLimits.MAX_CATALOG_JSON_CHARS);
         buffer.writeUtf(packet.skillEnhancementsJson, NetworkLimits.MAX_CATALOG_JSON_CHARS);
         buffer.writeUtf(packet.virtualItemsJson, NetworkLimits.MAX_CATALOG_JSON_CHARS);
+        buffer.writeUtf(packet.soulLinksJson, NetworkLimits.MAX_CATALOG_JSON_CHARS);
+        buffer.writeUtf(packet.mysteriousDollJson, NetworkLimits.MAX_CATALOG_JSON_CHARS);
+        buffer.writeUtf(packet.shrineMaidenDanceJson, NetworkLimits.MAX_CATALOG_JSON_CHARS);
+        buffer.writeUtf(packet.questsJson, NetworkLimits.MAX_CATALOG_JSON_CHARS);
     }
 
     public static SyncServerCatalogPacket decode(FriendlyByteBuf buffer) {
         return new SyncServerCatalogPacket(
                 buffer.readUtf(NetworkLimits.MAX_CATALOG_HASH_CHARS),
+                buffer.readUtf(NetworkLimits.MAX_CATALOG_JSON_CHARS),
+                buffer.readUtf(NetworkLimits.MAX_CATALOG_JSON_CHARS),
+                buffer.readUtf(NetworkLimits.MAX_CATALOG_JSON_CHARS),
+                buffer.readUtf(NetworkLimits.MAX_CATALOG_JSON_CHARS),
                 buffer.readUtf(NetworkLimits.MAX_CATALOG_JSON_CHARS),
                 buffer.readUtf(NetworkLimits.MAX_CATALOG_JSON_CHARS),
                 buffer.readUtf(NetworkLimits.MAX_CATALOG_JSON_CHARS),

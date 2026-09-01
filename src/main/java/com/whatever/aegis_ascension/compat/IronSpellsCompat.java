@@ -5,6 +5,7 @@ import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.util.AegisModifiers;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.damagesource.DamageSource;
@@ -27,11 +28,11 @@ public final class IronSpellsCompat {
     private static final ResourceLocation MANA_REGEN_ATTRIBUTE =
             PlatformServices.resources().create(MOD_ID, "mana_regen");
     private static final UUID MAGIC_CONVERSION_MAX_MANA_MODIFIER_ID =
-            UUID.fromString("7d2d44d8-e7ce-4cbe-9194-fc366eff3546");
+            AegisModifiers.adopt("7d2d44d8-e7ce-4cbe-9194-fc366eff3546");
     private static final UUID FRIEREN_MAX_MANA_MODIFIER_ID =
-            UUID.fromString("f9086697-6a6f-4a7b-8a1e-5c91961d03e1");
+            AegisModifiers.adopt("f9086697-6a6f-4a7b-8a1e-5c91961d03e1");
     private static final UUID NOELLE_MANA_REGEN_MODIFIER_ID =
-            UUID.fromString("24abf786-68ab-481b-b2c9-49f7ce747b2c");
+            AegisModifiers.adopt("24abf786-68ab-481b-b2c9-49f7ce747b2c");
 
     private static boolean handlersRegistered;
 

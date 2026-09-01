@@ -1,6 +1,7 @@
 package com.whatever.aegis_ascension.client;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
+import com.whatever.aegis_ascension.client.screen.ACGInventoryScreen;
 import com.whatever.aegis_ascension.client.screen.ACGPerkSelectionScreen;
 import com.whatever.aegis_ascension.aegis.AegisConstants;
 import com.whatever.aegis_ascension.network.ModNetworking;
@@ -8,13 +9,17 @@ import com.whatever.aegis_ascension.network.DevourItemPacket;
 import com.whatever.aegis_ascension.network.StoreHeldItemPacket;
 import com.whatever.aegis_ascension.network.StoreInventorySlotPacket;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.Slot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ClientPlayerNetworkEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.event.ScreenEvent;
+import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -58,6 +63,44 @@ public final class ClientEvents {
     )
     public static final class ForgeBusEvents {
         private ForgeBusEvents() {
+        }
+
+        /**
+         * Vanilla draws the HUD - the title overlay included - before the open Screen, so a
+         * title that arrives while an Aegis Ascension UI is up is painted behind it. These
+         * two handlers move it rather than duplicate it: the buried copy is cancelled, and
+         * the same vanilla overlay is redrawn once the screen has finished. Reusing
+         * vanilla's overlay keeps its own fade timing, scaling, and styling instead of
+         * reimplementing them, and leaves other mods' screens untouched.
+         */
+        @SubscribeEvent
+        public static void hideTitleBehindModScreens(RenderGuiOverlayEvent.Pre event) {
+            if (event.getOverlay() == VanillaGuiOverlay.TITLE_TEXT.type()
+                    && coversTheScreen(Minecraft.getInstance().screen)) {
+                event.setCanceled(true);
+            }
+        }
+
+        @SubscribeEvent
+        public static void drawTitleAboveModScreens(ScreenEvent.Render.Post event) {
+            Minecraft minecraft = Minecraft.getInstance();
+            if (!coversTheScreen(event.getScreen())
+                    || !(minecraft.gui instanceof ForgeGui forgeGui)) {
+                return;
+            }
+            VanillaGuiOverlay.TITLE_TEXT.type().overlay().render(
+                    forgeGui,
+                    event.getGuiGraphics(),
+                    event.getPartialTick(),
+                    minecraft.getWindow().getGuiScaledWidth(),
+                    minecraft.getWindow().getGuiScaledHeight()
+            );
+        }
+
+        /** The mod's full-window screens, the ones that would bury a title. */
+        private static boolean coversTheScreen(Screen screen) {
+            return screen instanceof ACGPerkSelectionScreen
+                    || screen instanceof ACGInventoryScreen;
         }
 
         /**

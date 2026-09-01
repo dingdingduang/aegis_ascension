@@ -9,6 +9,7 @@ import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.util.AegisModifiers;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -38,11 +39,11 @@ public final class SummonCompat {
             "com.hollingsworth.arsnouveau.api.entity.ISummon";
 
     private static final UUID SUMMON_ATTACK_SPEED_MODIFIER_ID =
-            UUID.fromString("0ec28c9a-0c4d-4717-958d-036f286bdab5");
+            AegisModifiers.adopt("0ec28c9a-0c4d-4717-958d-036f286bdab5");
     private static final UUID SUMMON_ENTITY_REACH_MODIFIER_ID =
-            UUID.fromString("f2803352-b0a3-4218-bdee-392c35dba6b4");
+            AegisModifiers.adopt("f2803352-b0a3-4218-bdee-392c35dba6b4");
     private static final UUID SUMMON_FOLLOW_RANGE_MODIFIER_ID =
-            UUID.fromString("ffcbdb99-f4bd-4301-a3c5-2ace2b1b034c");
+            AegisModifiers.adopt("ffcbdb99-f4bd-4301-a3c5-2ace2b1b034c");
 
     private static final Map<Class<?>, SummonAccessor> ACCESSORS =
             new ConcurrentHashMap<>();

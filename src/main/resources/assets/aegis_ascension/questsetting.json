@@ -1,79 +1,74 @@
 {
+  "maxRandomQuests": 5,
+  "questTiers": {
+    "R": {
+      "weight": 55,
+      "targetMultiplier": 1.0,
+      "experienceMultiplier": 1.0,
+      "goldMultiplier": 1.0,
+      "rewardCountMultiplier": 1.0,
+      "minimumRank": 0,
+      "stakeMultiplier": 1.0
+    },
+    "SR": {
+      "weight": 30,
+      "targetMultiplier": 1.8,
+      "experienceMultiplier": 2.5,
+      "goldMultiplier": 2.5,
+      "rewardCountMultiplier": 1.6,
+      "minimumRank": 8,
+      "stakeMultiplier": 2.0
+    },
+    "SSR": {
+      "weight": 15,
+      "targetMultiplier": 3.0,
+      "experienceMultiplier": 5.0,
+      "goldMultiplier": 5.0,
+      "rewardCountMultiplier": 2.2,
+      "minimumRank": 20,
+      "stakeMultiplier": 4.0
+    }
+  },
   "dailyMin": 1,
   "dailyMax": 5,
-  "dailyRefreshIntervalHours": 24,
+  "dailyRefreshIntervalHours": 4,
   "dailyAutoAccept": true,
   "challengeMin": 1,
   "challengeMax": 5,
-  "challengeRefreshIntervalHours": 24,
+  "challengeRefreshIntervalHours": 12,
   "challengeSecurityDepositExperience": 250,
+  "challengeDiscoveryChoiceChance": 0.5,
+  "chainDiscoveryChoiceChance": 1.0,
+  "challengeDiscoveryChoiceCount": 3,
+  "challengeDiscoveryChoiceTier": "",
+  "challengeDiscoveryChoiceMinimumTier": "R",
+  "reputationIcon": "minecraft:emerald",
+  "reputationVisibleWithin": 2,
   "questCompleteSound": "aegis_ascension:quest_ui/quest_complete_sound",
   "goldRewardMin": 10,
   "goldRewardMax": 50,
+  "discoveryRewardChance": 0.5,
   "chunkMin": 1,
   "chunkMax": 5,
   "chunkAutoAccept": true,
   "sideMin": 1,
   "sideMax": 5,
-  "sideRefreshIntervalHours": 24,
+  "sideRefreshIntervalHours": 8,
   "commonAutoAccept": true,
-  "dailyTemplates": [
-    {"id":"daily_kill","objective":"KILL","target":10,"icon":"minecraft:textures/item/golden_sword.png","title":"quest.aegis_ascension.daily.kill.title","description":"quest.aegis_ascension.daily.kill.description","experience":100,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]},
-    {"id":"daily_plant","objective":"PLANT","target":10,"icon":"minecraft:textures/item/wheat_seeds.png","title":"quest.aegis_ascension.daily.plant.title","description":"quest.aegis_ascension.daily.plant.description","experience":100,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]},
-    {"id":"daily_walk","objective":"WALK","target":50,"icon":"minecraft:textures/mob_effect/speed.png","title":"quest.aegis_ascension.daily.walk.title","description":"quest.aegis_ascension.daily.walk.description","experience":100,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]},
-    {"id":"daily_chest","objective":"OPEN_CHEST","target":3,"icon":"minecraft:textures/entity/chest/normal.png","title":"quest.aegis_ascension.daily.chest.title","description":"quest.aegis_ascension.daily.chest.description","experience":125,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]},
-    {"id":"daily_biome","objective":"EXPLORE_BIOME","target":1,"icon":"minecraft:textures/block/oak_sapling.png","title":"quest.aegis_ascension.daily.biome.title","description":"quest.aegis_ascension.daily.biome.description","experience":125,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]}
-  ],
-  "challengeTemplates": [
-    {"id":"challenge_kill","objective":"KILL","target":100,"icon":"minecraft:textures/item/diamond_sword.png","title":"quest.aegis_ascension.challenge.kill.title","description":"quest.aegis_ascension.challenge.kill.description","experience":5000,"rewards":[{"kind":"item","id":"minecraft:dragon_egg","count":1,"tier":"SSR","unique":true},{"kind":"random_unique","count":1,"tier":"SSR","unique":true}]},
-    {"id":"challenge_walk","objective":"WALK","target":1000,"icon":"minecraft:textures/mob_effect/speed.png","title":"quest.aegis_ascension.challenge.walk.title","description":"quest.aegis_ascension.challenge.walk.description","experience":5000,"rewards":[{"kind":"item","id":"minecraft:netherite_sword","count":1,"tier":"SSR","unique":true},{"kind":"random_unique","count":1,"tier":"SSR","unique":true}]},
-    {"id":"challenge_chest","objective":"OPEN_CHEST","target":10,"icon":"minecraft:textures/entity/chest/normal.png","title":"quest.aegis_ascension.challenge.chest.title","description":"quest.aegis_ascension.challenge.chest.description","experience":5000,"rewards":[{"kind":"item","id":"minecraft:netherite_chestplate","count":1,"tier":"SSR","unique":true},{"kind":"random_unique","count":1,"tier":"SSR","unique":true}]},
-    {"id":"challenge_plant","objective":"PLANT","target":100,"icon":"minecraft:textures/item/wheat_seeds.png","title":"quest.aegis_ascension.challenge.plant.title","description":"quest.aegis_ascension.challenge.plant.description","experience":5000,"rewards":[{"kind":"item","id":"minecraft:netherite_hoe","count":1,"tier":"SSR","unique":true},{"kind":"random_unique","count":1,"tier":"SSR","unique":true}]},
-    {"id":"challenge_specific_hunt","objective":"KILL","targetIds":["minecraft:warden","minecraft:wither_skeleton","minecraft:elder_guardian"],"targetMin":3,"targetMax":8,"icon":"minecraft:textures/item/diamond_sword.png","title":"quest.aegis_ascension.challenge.specific_hunt.title","description":"quest.aegis_ascension.challenge.specific_hunt.description","experience":6000,"rewards":[{"kind":"item","id":"minecraft:netherite_helmet","count":1,"tier":"SSR","unique":true},{"kind":"random_unique","count":1,"tier":"SSR","unique":true}]}
-  ],
-  "commonTemplates": [
-    {"id":"common_kill_10","objective":"KILL","target":10,"icon":"minecraft:textures/item/golden_sword.png","title":"quest.aegis_ascension.common.kill_10.title","description":"quest.aegis_ascension.common.kill_10.description","experience":50,"rewards":[{"kind":"random_common","count":2,"tier":"R"}]},
-    {"id":"common_kill_50","prerequisiteId":"common_kill_10","objective":"KILL","target":50,"icon":"minecraft:textures/item/golden_sword.png","title":"quest.aegis_ascension.common.kill_50.title","description":"quest.aegis_ascension.common.kill_50.description","experience":250,"rewards":[{"kind":"random_common","count":4,"tier":"SR"}]},
-    {"id":"common_kill_100","prerequisiteId":"common_kill_50","objective":"KILL","target":100,"icon":"minecraft:textures/item/golden_sword.png","title":"quest.aegis_ascension.common.kill_100.title","description":"quest.aegis_ascension.common.kill_100.description","experience":500,"rewards":[{"kind":"random_unique","count":1,"tier":"SSR","unique":true}]},
-    {"id":"common_plant_10","objective":"PLANT","target":10,"icon":"minecraft:textures/item/wheat_seeds.png","title":"quest.aegis_ascension.common.plant_10.title","description":"quest.aegis_ascension.common.plant_10.description","experience":50,"rewards":[{"kind":"random_common","count":2,"tier":"R"}]},
-    {"id":"common_plant_50","prerequisiteId":"common_plant_10","objective":"PLANT","target":50,"icon":"minecraft:textures/item/wheat_seeds.png","title":"quest.aegis_ascension.common.plant_50.title","description":"quest.aegis_ascension.common.plant_50.description","experience":250,"rewards":[{"kind":"random_common","count":4,"tier":"SR"}]},
-    {"id":"common_plant_100","prerequisiteId":"common_plant_50","objective":"PLANT","target":100,"icon":"minecraft:textures/item/wheat_seeds.png","title":"quest.aegis_ascension.common.plant_100.title","description":"quest.aegis_ascension.common.plant_100.description","experience":500,"rewards":[{"kind":"random_unique","count":1,"tier":"SSR","unique":true}]},
-    {"id":"common_walk_10","objective":"WALK","target":10,"icon":"minecraft:textures/mob_effect/speed.png","title":"quest.aegis_ascension.common.walk_10.title","description":"quest.aegis_ascension.common.walk_10.description","experience":25,"rewards":[{"kind":"random_common","count":1,"tier":"R"}]},
-    {"id":"common_walk_100","prerequisiteId":"common_walk_10","objective":"WALK","target":100,"icon":"minecraft:textures/mob_effect/speed.png","title":"quest.aegis_ascension.common.walk_100.title","description":"quest.aegis_ascension.common.walk_100.description","experience":100,"rewards":[{"kind":"random_common","count":2,"tier":"R"}]},
-    {"id":"common_walk_1000","prerequisiteId":"common_walk_100","objective":"WALK","target":1000,"icon":"minecraft:textures/mob_effect/speed.png","title":"quest.aegis_ascension.common.walk_1000.title","description":"quest.aegis_ascension.common.walk_1000.description","experience":500,"rewards":[{"kind":"random_common","count":4,"tier":"SR"}]},
-    {"id":"common_walk_5000","prerequisiteId":"common_walk_1000","objective":"WALK","target":5000,"icon":"minecraft:textures/mob_effect/speed.png","title":"quest.aegis_ascension.common.walk_5000.title","description":"quest.aegis_ascension.common.walk_5000.description","experience":1500,"rewards":[{"kind":"random_unique","count":1,"tier":"SSR","unique":true}]},
-    {"id":"common_walk_10000","prerequisiteId":"common_walk_5000","objective":"WALK","target":10000,"icon":"minecraft:textures/mob_effect/speed.png","title":"quest.aegis_ascension.common.walk_10000.title","description":"quest.aegis_ascension.common.walk_10000.description","experience":3000,"rewards":[{"kind":"random_unique","count":1,"tier":"SSR","unique":true}]},
-    {"id":"common_hunt_endless","prerequisiteId":"common_kill_100","objective":"KILL","target":100,"icon":"minecraft:textures/item/golden_sword.png","title":"quest.aegis_ascension.common.hunt_endless.title","description":"quest.aegis_ascension.common.hunt_endless.description","experience":125,"repeatable":true,"targetIncreaseEvery":5,"targetIncreaseAmount":50,"maximumTarget":1000,"rewardIncreaseEvery":10,"rewardMultiplierIncrease":0.5,"maximumRewardMultiplier":3.0,"minimumRewardIntervalMinutes":5,"rewards":[{"kind":"random_common","count":2,"tier":"R"}]},
-    {"id":"common_cultivation_endless","prerequisiteId":"common_plant_100","objective":"PLANT","target":100,"icon":"minecraft:textures/item/wheat_seeds.png","title":"quest.aegis_ascension.common.cultivation_endless.title","description":"quest.aegis_ascension.common.cultivation_endless.description","experience":125,"repeatable":true,"targetIncreaseEvery":5,"targetIncreaseAmount":50,"maximumTarget":1000,"rewardIncreaseEvery":10,"rewardMultiplierIncrease":0.5,"maximumRewardMultiplier":3.0,"minimumRewardIntervalMinutes":5,"rewards":[{"kind":"random_common","count":2,"tier":"R"}]},
-    {"id":"common_journey_endless","prerequisiteId":"common_walk_10000","objective":"WALK","target":1000,"icon":"minecraft:textures/mob_effect/speed.png","title":"quest.aegis_ascension.common.journey_endless.title","description":"quest.aegis_ascension.common.journey_endless.description","experience":150,"repeatable":true,"targetIncreaseEvery":5,"targetIncreaseAmount":500,"maximumTarget":10000,"rewardIncreaseEvery":10,"rewardMultiplierIncrease":0.5,"maximumRewardMultiplier":3.0,"minimumRewardIntervalMinutes":5,"rewards":[{"kind":"random_common","count":2,"tier":"R"}]}
-  ],
-  "chunkTemplates": [
-    {"id":"chunk_biome","objective":"EXPLORE_BIOME","target":1,"icon":"minecraft:textures/block/oak_sapling.png","title":"quest.aegis_ascension.chunk.biome.title","description":"quest.aegis_ascension.chunk.biome.description","experience":250,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]},
-    {"id":"chunk_chest","objective":"OPEN_CHEST","target":3,"icon":"minecraft:textures/entity/chest/normal.png","title":"quest.aegis_ascension.chunk.chest.title","description":"quest.aegis_ascension.chunk.chest.description","experience":250,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]},
-    {"id":"chunk_walk","objective":"WALK","target":256,"icon":"minecraft:textures/mob_effect/speed.png","title":"quest.aegis_ascension.chunk.walk.title","description":"quest.aegis_ascension.chunk.walk.description","experience":250,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]},
-    {"id":"chunk_kill","objective":"KILL","target":10,"icon":"minecraft:textures/item/golden_sword.png","title":"quest.aegis_ascension.chunk.kill.title","description":"quest.aegis_ascension.chunk.kill.description","experience":250,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]},
-    {"id":"chunk_plant","objective":"PLANT","target":12,"icon":"minecraft:textures/item/wheat_seeds.png","title":"quest.aegis_ascension.chunk.plant.title","description":"quest.aegis_ascension.chunk.plant.description","experience":250,"rewards":[{"kind":"random_common","count":4,"tier":"R"}]}
-  ],
-  "sideTemplates": [
-    {"id":"side_farmer_trade","weight":12,"profession":"farmer","objective":"TRADE_ITEM","targetIds":["minecraft:wheat","minecraft:carrot","minecraft:potato","minecraft:beetroot"],"targetMin":16,"targetMax":32,"icon":"minecraft:textures/item/wheat.png","title":"quest.aegis_ascension.side.farmer_trade.title","description":"quest.aegis_ascension.side.farmer_trade.description","story":"quest.aegis_ascension.side.farmer_trade.story","experience":300,"rewards":[{"kind":"item","id":"minecraft:emerald","count":6,"tier":"R"},{"kind":"random_common","count":4,"tier":"R"}]},
-    {"id":"side_fletcher_hunt","weight":7,"minimumRank":5,"profession":"fletcher","objective":"KILL","targetIds":["minecraft:skeleton","minecraft:zombie","minecraft:spider"],"targetMin":1,"targetMax":3,"icon":"minecraft:textures/item/golden_sword.png","title":"quest.aegis_ascension.side.fletcher_hunt.title","description":"quest.aegis_ascension.side.fletcher_hunt.description","story":"quest.aegis_ascension.side.fletcher_hunt.story","experience":350,"rewards":[{"kind":"item","id":"minecraft:bow","count":1,"tier":"R"},{"kind":"item","id":"minecraft:arrow","count":24,"tier":"R"}]},
-    {"id":"side_armorer_materials","weight":6,"minimumRank":5,"profession":"armorer","objective":"GIVE_MATERIAL","targetIds":["minecraft:iron_ingot","minecraft:copper_ingot","minecraft:coal"],"targetMin":8,"targetMax":20,"icon":"minecraft:textures/item/iron_chestplate.png","title":"quest.aegis_ascension.side.armorer_materials.title","description":"quest.aegis_ascension.side.armorer_materials.description","story":"quest.aegis_ascension.side.armorer_materials.story","experience":500,"rewards":[{"kind":"item","id":"minecraft:iron_chestplate","count":1,"tier":"SR"}]},
-    {"id":"side_librarian_trade","weight":10,"profession":"librarian","objective":"TRADE_ITEM","targetIds":["minecraft:paper","minecraft:book"],"targetMin":8,"targetMax":24,"icon":"minecraft:textures/item/book.png","title":"quest.aegis_ascension.side.librarian_trade.title","description":"quest.aegis_ascension.side.librarian_trade.description","story":"quest.aegis_ascension.side.librarian_trade.story","experience":400,"rewards":[{"kind":"item","id":"minecraft:bookshelf","count":4,"tier":"R"},{"kind":"random_common","count":3,"tier":"R"}]},
-    {"id":"side_weaponsmith_materials","weight":5,"minimumRank":10,"profession":"weaponsmith","objective":"GIVE_MATERIAL","targetIds":["minecraft:iron_ingot","minecraft:gold_ingot"],"targetMin":12,"targetMax":24,"icon":"minecraft:textures/item/diamond_sword.png","title":"quest.aegis_ascension.side.weaponsmith_materials.title","description":"quest.aegis_ascension.side.weaponsmith_materials.description","story":"quest.aegis_ascension.side.weaponsmith_materials.story","experience":650,"rewards":[{"kind":"item","id":"minecraft:diamond_sword","count":1,"tier":"SR"}]},
-    {"id":"side_fisherman_catch","weight":10,"profession":"fisherman","objective":"TRADE_ITEM","targetIds":["minecraft:cod","minecraft:salmon","minecraft:pufferfish","minecraft:tropical_fish"],"targetMin":8,"targetMax":20,"icon":"minecraft:textures/item/cod.png","title":"quest.aegis_ascension.side.fisherman_catch.title","description":"quest.aegis_ascension.side.fisherman_catch.description","story":"quest.aegis_ascension.side.fisherman_catch.story","experience":350,"rewards":[{"kind":"item","id":"minecraft:emerald","count":6,"tier":"R"},{"kind":"random_common","count":2,"tier":"R"}]},
-    {"id":"side_shepherd_wool","weight":10,"profession":"shepherd","objective":"TRADE_ITEM","targetIds":["minecraft:white_wool","minecraft:black_wool","minecraft:brown_wool","minecraft:gray_wool"],"targetMin":12,"targetMax":28,"icon":"minecraft:textures/block/white_wool.png","title":"quest.aegis_ascension.side.shepherd_wool.title","description":"quest.aegis_ascension.side.shepherd_wool.description","story":"quest.aegis_ascension.side.shepherd_wool.story","experience":350,"rewards":[{"kind":"item","id":"minecraft:emerald","count":7,"tier":"R"},{"kind":"random_common","count":2,"tier":"R"}]},
-    {"id":"side_cartographer_supplies","weight":9,"profession":"cartographer","objective":"TRADE_ITEM","targetIds":["minecraft:paper","minecraft:compass","minecraft:glass_pane"],"targetMin":4,"targetMax":12,"icon":"minecraft:textures/item/map.png","title":"quest.aegis_ascension.side.cartographer_supplies.title","description":"quest.aegis_ascension.side.cartographer_supplies.description","story":"quest.aegis_ascension.side.cartographer_supplies.story","experience":400,"rewards":[{"kind":"item","id":"minecraft:emerald","count":8,"tier":"R"},{"kind":"random_common","count":3,"tier":"R"}]},
-    {"id":"side_cleric_hunt","weight":6,"minimumRank":8,"profession":"cleric","objective":"KILL","targetIds":["minecraft:zombie","minecraft:drowned","minecraft:husk","minecraft:witch","minecraft:phantom"],"targetMin":1,"targetMax":3,"icon":"minecraft:textures/item/golden_sword.png","title":"quest.aegis_ascension.side.cleric_hunt.title","description":"quest.aegis_ascension.side.cleric_hunt.description","story":"quest.aegis_ascension.side.cleric_hunt.story","experience":450,"rewards":[{"kind":"item","id":"minecraft:emerald","count":8,"tier":"R"},{"kind":"random_common","count":3,"tier":"R"}]},
-    {"id":"side_leatherworker_materials","weight":9,"profession":"leatherworker","objective":"GIVE_MATERIAL","targetIds":["minecraft:leather","minecraft:rabbit_hide"],"targetMin":8,"targetMax":18,"icon":"minecraft:textures/item/leather.png","title":"quest.aegis_ascension.side.leatherworker_materials.title","description":"quest.aegis_ascension.side.leatherworker_materials.description","story":"quest.aegis_ascension.side.leatherworker_materials.story","experience":450,"rewards":[{"kind":"item","id":"minecraft:leather_horse_armor","count":1,"tier":"R"},{"kind":"item","id":"minecraft:emerald","count":6,"tier":"R"}]},
-    {"id":"side_toolsmith_materials","weight":7,"minimumRank":5,"profession":"toolsmith","objective":"GIVE_MATERIAL","targetIds":["minecraft:iron_ingot","minecraft:copper_ingot","minecraft:coal"],"targetMin":10,"targetMax":24,"icon":"minecraft:textures/item/iron_pickaxe.png","title":"quest.aegis_ascension.side.toolsmith_materials.title","description":"quest.aegis_ascension.side.toolsmith_materials.description","story":"quest.aegis_ascension.side.toolsmith_materials.story","experience":550,"rewards":[{"kind":"item","id":"minecraft:emerald","count":10,"tier":"SR"},{"kind":"random_common","count":4,"tier":"SR"}]},
-    {"id":"side_butcher_hunt","weight":5,"minimumRank":12,"profession":"butcher","objective":"KILL","targetIds":["minecraft:hoglin","minecraft:zoglin","minecraft:ravager"],"targetMin":1,"targetMax":3,"icon":"minecraft:textures/item/iron_axe.png","title":"quest.aegis_ascension.side.butcher_hunt.title","description":"quest.aegis_ascension.side.butcher_hunt.description","story":"quest.aegis_ascension.side.butcher_hunt.story","experience":650,"rewards":[{"kind":"item","id":"minecraft:golden_apple","count":1,"tier":"SR"},{"kind":"item","id":"minecraft:cooked_beef","count":16,"tier":"R"}]},
-    {"id":"side_mason_rebuild","weight":10,"profession":"mason","objective":"GIVE_MATERIAL","targetIds":["minecraft:stone_bricks","minecraft:bricks","minecraft:terracotta"],"targetMin":16,"targetMax":32,"icon":"minecraft:textures/block/bricks.png","title":"quest.aegis_ascension.side.mason_rebuild.title","description":"quest.aegis_ascension.side.mason_rebuild.description","story":"quest.aegis_ascension.side.mason_rebuild.story","experience":400,"rewards":[{"kind":"item","id":"minecraft:emerald","count":8,"tier":"R"},{"kind":"random_common","count":3,"tier":"R"}]},
-    {"id":"side_cleric_nether_hunt","weight":2,"minimumRank":25,"dimensions":["minecraft:the_nether"],"profession":"cleric","objective":"KILL","targetIds":["minecraft:wither_skeleton","minecraft:blaze","minecraft:magma_cube"],"targetMin":1,"targetMax":3,"icon":"minecraft:textures/item/diamond_sword.png","title":"quest.aegis_ascension.side.cleric_nether_hunt.title","description":"quest.aegis_ascension.side.cleric_nether_hunt.description","story":"quest.aegis_ascension.side.cleric_nether_hunt.story","experience":900,"rewards":[{"kind":"item","id":"minecraft:emerald","count":12,"tier":"SR"},{"kind":"random_common","count":6,"tier":"SR"}]},
-    {"id":"side_fisherman_swamp_bait","weight":3,"minimumRank":5,"biomes":["minecraft:swamp","minecraft:mangrove_swamp"],"profession":"fisherman","objective":"TRADE_ITEM","targetIds":["minecraft:slime_ball","minecraft:string"],"targetMin":8,"targetMax":16,"icon":"minecraft:textures/item/slime_ball.png","title":"quest.aegis_ascension.side.fisherman_swamp_bait.title","description":"quest.aegis_ascension.side.fisherman_swamp_bait.description","story":"quest.aegis_ascension.side.fisherman_swamp_bait.story","experience":500,"rewards":[{"kind":"item","id":"minecraft:emerald","count":8,"tier":"R"},{"kind":"random_common","count":3,"tier":"R"}]}
-  ],
   "rewardPools": {
-    "commonItems":["minecraft:bread","minecraft:iron_ingot","minecraft:gold_ingot","minecraft:arrow","minecraft:torch"],
-    "uniqueItems":["minecraft:dragon_egg","minecraft:netherite_sword","minecraft:netherite_chestplate","minecraft:diamond"],
-    "curioItems":[]
+    "commonItems": [
+      "minecraft:bread",
+      "minecraft:iron_ingot",
+      "minecraft:gold_ingot",
+      "minecraft:arrow",
+      "minecraft:torch"
+    ],
+    "uniqueItems": [
+      "minecraft:dragon_egg",
+      "minecraft:netherite_sword",
+      "minecraft:netherite_chestplate",
+      "minecraft:diamond"
+    ],
+    "curioItems": []
   }
 }

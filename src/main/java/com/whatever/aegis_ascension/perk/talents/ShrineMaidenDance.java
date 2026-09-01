@@ -8,6 +8,7 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getLiteralStr
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
+import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.perk.soullink.MadokaWithHomura;
 import com.whatever.aegis_ascension.platform.PlatformServices;
@@ -17,6 +18,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.SerializedName;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.EntityType;
@@ -48,6 +50,7 @@ public final class ShrineMaidenDance {
             "damage_reduction_penalty";
     private static final String SKILL_ENHANCEMENT_CHARGES =
             "skill_enhancement_charges";
+    private static final String RANDOM_AEGIS = "random_aegis";
     private static final Set<String> NEGATED_BY_LAW_OF_CYCLE = Set.of(
             HOSTILE_ZOMBIE,
             DIVINE_PUNISHMENT,
@@ -56,18 +59,42 @@ public final class ShrineMaidenDance {
     );
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final Catalog CATALOG = loadCatalog();
+    private static final int MAX_CATALOG_ENTRIES = 256;
+    private static final Catalog LOCAL_CATALOG = loadCatalog();
+    private static volatile Catalog activeCatalog = LOCAL_CATALOG;
 
     private ShrineMaidenDance() {
     }
 
     /** Forces creation and validation of the server-editable JSON during startup. */
     public static void initialize() {
-        CATALOG.outcomes.size();
+        activeCatalog.outcomes.size();
+    }
+
+    public static int outcomeCount() {
+        return activeCatalog.outcomes.size();
+    }
+
+    public static String exportCatalogJson() {
+        return GSON.toJson(LOCAL_CATALOG);
+    }
+
+    public static void installSyncedCatalog(String json) {
+        Catalog catalog = Objects.requireNonNull(
+                GSON.fromJson(Objects.requireNonNull(json, "json"), Catalog.class),
+                "Synchronized Shrine Maiden Dance catalog was empty"
+        );
+        validate(catalog);
+        activeCatalog = catalog;
+    }
+
+    public static void resetSyncedCatalog() {
+        activeCatalog = LOCAL_CATALOG;
     }
 
     public static void roll(ServerPlayer player, PlayerPerkData data) {
-        List<Outcome> available = CATALOG.outcomes.stream()
+        Catalog catalog = activeCatalog;
+        List<Outcome> available = catalog.outcomes.stream()
                 .filter(Outcome::enabled)
                 .filter(outcome -> outcome.weight() > 0.0D)
                 .toList();
@@ -87,28 +114,68 @@ public final class ShrineMaidenDance {
 
         if (data.owns(PERK_LAW_OF_THE_CYCLE)
                 && NEGATED_BY_LAW_OF_CYCLE.contains(selected.id())) {
+            Component negatedOutcome;
             if (MadokaWithHomura.isActive(data)) {
-                convertNegatedOutcome(selected.id(), player, data);
+                negatedOutcome = convertNegatedOutcome(
+                        selected.id(), player, data, catalog.settings);
                 data.applyChosenPerks(player);
             } else {
                 player.sendSystemMessage(getTranslatableString(
                         "message.aegis_ascension.shrine_maiden.negated"
                 ));
+                negatedOutcome = label("negated");
             }
+            announce(player, negatedOutcome, catalog.settings);
             return;
         }
 
-        grant(selected.id(), player, data);
+        Component outcome = grant(selected.id(), player, data, catalog.settings);
         data.applyChosenPerks(player);
+        announce(player, outcome, catalog.settings);
     }
 
-    private static void convertNegatedOutcome(String outcomeId, ServerPlayer player,
-                                              PlayerPerkData data) {
+    /**
+     * Puts the result on the winner's screen and in front of the whole server. The title
+     * fades on its own; the broadcast is what survives in chat for everyone else.
+     */
+    private static void announce(ServerPlayer player, Component outcome,
+                                 Settings settings) {
+        GeneralServerMethods.sendTitle(
+                player,
+                getTranslatableString("message.aegis_ascension.shrine_maiden.title"),
+                outcome,
+                settings.titleFadeInTicks,
+                settings.titleStayTicks,
+                settings.titleFadeOutTicks
+        );
+        MinecraftServer server = player.getServer();
+        if (server == null) {
+            return;
+        }
+        Component broadcast = getTranslatableString(
+                "message.aegis_ascension.shrine_maiden.broadcast",
+                player.getGameProfile().getName(),
+                outcome
+        );
+        for (ServerPlayer online : server.getPlayerList().getPlayers()) {
+            online.sendSystemMessage(broadcast);
+        }
+    }
+
+    /** The short form of an outcome, for the subtitle and the broadcast. */
+    private static Component label(String outcomeId) {
+        return getTranslatableString(
+                "message.aegis_ascension.shrine_maiden.label." + outcomeId
+        );
+    }
+
+    private static Component convertNegatedOutcome(String outcomeId, ServerPlayer player,
+                                                   PlayerPerkData data, Settings settings) {
         switch (outcomeId) {
             case ALL_SKILL_PENALTY -> {
                 double amount = MadokaWithHomura.convertPercentagePenalty(
                         data,
-                        CATALOG.settings.allSkillEnhancementAttributePenalty
+                        settings.allSkillEnhancementAttributePenalty
                 );
                 data.addAttributedCustomStat(PERK_SHRINE_MAIDEN_DANCE,
                         ALL_SKILL_ENHANCEMENT_ATTRIBUTE, amount);
@@ -116,11 +183,12 @@ public final class ShrineMaidenDance {
                         "message.aegis_ascension.madoka_homura.converted_percentage",
                         amount
                 ));
+                return label("converted");
             }
             case DAMAGE_REDUCTION_PENALTY -> {
                 double amount = MadokaWithHomura.convertDamageReductionPenalty(
                         data,
-                        CATALOG.settings.damageReductionPenalty
+                        settings.damageReductionPenalty
                 );
                 data.addAttributedCustomStat(PERK_SHRINE_MAIDEN_DANCE,
                         DAMAGE_REDUCTION, amount);
@@ -128,9 +196,12 @@ public final class ShrineMaidenDance {
                         "message.aegis_ascension.madoka_homura.converted_damage_reduction",
                         amount
                 ));
+                return label("converted");
             }
-            case HOSTILE_ZOMBIE, DIVINE_PUNISHMENT ->
-                    MadokaWithHomura.grantNonnumericReward(player, data);
+            case HOSTILE_ZOMBIE, DIVINE_PUNISHMENT -> {
+                MadokaWithHomura.grantNonnumericReward(player, data);
+                return label("converted");
+            }
             default -> throw new IllegalStateException(
                     "Unsupported converted Shrine Maiden outcome: " + outcomeId
             );
@@ -138,26 +209,27 @@ public final class ShrineMaidenDance {
     }
 
     public static Component description() {
+        Catalog catalog = activeCatalog;
         MutableComponent description = getTranslatableString(
                 "perk.aegis_ascension.perk_shrine_maiden_dance.description"
         );
-        for (Outcome outcome : CATALOG.outcomes.stream()
+        for (Outcome outcome : catalog.outcomes.stream()
                 .filter(Outcome::enabled)
                 .toList()) {
-            description.append("\n").append(describe(outcome));
+            description.append("\n").append(describe(outcome, catalog.settings));
         }
         return description.append("\n").append(getTranslatableString(
                 "perk.aegis_ascension.perk_shrine_maiden_dance.description.footer"
         ));
     }
 
-    private static void grant(String outcomeId, ServerPlayer player,
-                              PlayerPerkData data) {
-        Settings settings = CATALOG.settings;
+    private static Component grant(String outcomeId, ServerPlayer player,
+                                   PlayerPerkData data, Settings settings) {
         switch (outcomeId) {
             case HOSTILE_ZOMBIE -> {
                 spawnHostileZombie(player, settings);
                 notify(player, "zombie");
+                return label(HOSTILE_ZOMBIE);
             }
             case BREAKTHROUGH_EFFECT -> {
                 data.addCustomStat(
@@ -165,6 +237,7 @@ public final class ShrineMaidenDance {
                         settings.breakthroughEffectBonus
                 );
                 notify(player, "breakthrough");
+                return label(BREAKTHROUGH_EFFECT);
             }
             case DIVINE_PUNISHMENT -> {
                 double maxHealth = Math.max(1.0D, player.getMaxHealth());
@@ -179,6 +252,7 @@ public final class ShrineMaidenDance {
                 }
                 strikeLightning(player);
                 notify(player, "lightning");
+                return label(DIVINE_PUNISHMENT);
             }
             case ALL_SKILL_PENALTY -> {
                 data.addAttributedCustomStat(
@@ -187,10 +261,12 @@ public final class ShrineMaidenDance {
                         settings.allSkillEnhancementAttributePenalty
                 );
                 notify(player, "all_skill_penalty");
+                return label(ALL_SKILL_PENALTY);
             }
             case RANDOM_ITEMS -> {
                 grantRandomItems(player, Math.max(0, settings.randomItemRolls));
                 notify(player, "items");
+                return label(RANDOM_ITEMS);
             }
             case DAMAGE_REDUCTION_PENALTY -> {
                 data.addAttributedCustomStat(
@@ -199,6 +275,7 @@ public final class ShrineMaidenDance {
                         settings.damageReductionPenalty
                 );
                 notify(player, "damage_reduction");
+                return label(DAMAGE_REDUCTION_PENALTY);
             }
             case SKILL_ENHANCEMENT_CHARGES -> {
                 int minimum = Math.max(0, settings.skillEnhancementChargesMin);
@@ -211,6 +288,30 @@ public final class ShrineMaidenDance {
                         "message.aegis_ascension.shrine_maiden.skill_charges",
                         charges
                 ));
+                return getTranslatableString(
+                        "message.aegis_ascension.shrine_maiden.label."
+                                + SKILL_ENHANCEMENT_CHARGES,
+                        charges
+                );
+            }
+            case RANDOM_AEGIS -> {
+                // A player who already owns every Aegis has nothing to win here, so the
+                // roll is spent rather than silently rerolled into a different outcome.
+                Aegis granted = data.grantRandomUnownedAegis(player).orElse(null);
+                if (granted == null) {
+                    player.sendSystemMessage(getTranslatableString(
+                            "message.aegis_ascension.shrine_maiden.random_aegis_none"
+                    ));
+                    return label("random_aegis_none");
+                }
+                player.sendSystemMessage(getTranslatableString(
+                        "message.aegis_ascension.shrine_maiden.random_aegis",
+                        granted.title()
+                ));
+                return getTranslatableString(
+                        "message.aegis_ascension.shrine_maiden.label." + RANDOM_AEGIS,
+                        granted.title()
+                );
             }
             default -> throw new IllegalStateException(
                     "Unsupported Shrine Maiden Dance outcome: " + outcomeId
@@ -282,8 +383,7 @@ public final class ShrineMaidenDance {
         ));
     }
 
-    private static Component describe(Outcome outcome) {
-        Settings settings = CATALOG.settings;
+    private static Component describe(Outcome outcome, Settings settings) {
         String key = "perk.aegis_ascension.perk_shrine_maiden_dance.outcome."
                 + outcome.id();
         String weight = formatPercent(outcome.weight());
@@ -315,6 +415,7 @@ public final class ShrineMaidenDance {
                     key, weight, settings.skillEnhancementChargesMin,
                     settings.skillEnhancementChargesMax
             );
+            case RANDOM_AEGIS -> getTranslatableString(key, weight);
             default -> getLiteralString(outcome.id());
         };
     }
@@ -354,10 +455,15 @@ public final class ShrineMaidenDance {
         if (catalog.outcomes.isEmpty()) {
             throw new IllegalStateException("Shrine Maiden Dance outcome pool is empty");
         }
+        if (catalog.outcomes.size() > MAX_CATALOG_ENTRIES) {
+            throw new IllegalStateException(
+                    "Too many Shrine Maiden Dance outcomes: " + catalog.outcomes.size()
+            );
+        }
         Set<String> supported = Set.of(
                 HOSTILE_ZOMBIE, BREAKTHROUGH_EFFECT, DIVINE_PUNISHMENT,
                 ALL_SKILL_PENALTY, RANDOM_ITEMS, DAMAGE_REDUCTION_PENALTY,
-                SKILL_ENHANCEMENT_CHARGES
+                SKILL_ENHANCEMENT_CHARGES, RANDOM_AEGIS
         );
         Set<String> ids = new LinkedHashSet<>();
         for (Outcome outcome : catalog.outcomes) {
@@ -372,11 +478,79 @@ public final class ShrineMaidenDance {
                         "Duplicate Shrine Maiden Dance outcome: " + outcome.id()
                 );
             }
-            if (!Double.isFinite(outcome.weight())) {
+            if (!Double.isFinite(outcome.weight()) || outcome.weight() < 0.0D) {
                 throw new IllegalStateException(
-                        "Non-finite Shrine Maiden Dance weight: " + outcome.id()
+                        "Invalid Shrine Maiden Dance weight: " + outcome.id()
                 );
             }
+        }
+        validateSettings(catalog.settings);
+    }
+
+    private static void validateSettings(Settings settings) {
+        requireFinitePositive(settings.zombieMaxHealth, "zombie_max_health");
+        requireFiniteNonNegative(
+                settings.zombieMinimumAttackDamage,
+                "zombie_minimum_attack_damage"
+        );
+        requireFiniteNonNegative(settings.zombieAttackSpeed, "zombie_attack_speed");
+        requireFinite(settings.breakthroughEffectBonus, "breakthrough_effect_bonus");
+        requireUnitInterval(settings.healthHalvingThreshold, "health_halving_threshold");
+        requireFiniteNonNegative(
+                settings.healthMultiplierAboveThreshold,
+                "health_multiplier_above_threshold"
+        );
+        requireFinitePositive(settings.fallbackHealth, "fallback_health");
+        requireFinite(
+                settings.allSkillEnhancementAttributePenalty,
+                "all_skill_enhancement_attribute_penalty"
+        );
+        requireFinite(settings.damageReductionPenalty, "damage_reduction_penalty");
+        if (settings.randomItemRolls < 0 || settings.randomItemRolls > 10_000) {
+            throw new IllegalStateException("Invalid random_item_rolls");
+        }
+        if (settings.skillEnhancementChargesMin < 0
+                || settings.skillEnhancementChargesMax < settings.skillEnhancementChargesMin
+                || settings.skillEnhancementChargesMax > 1_000_000) {
+            throw new IllegalStateException("Invalid skill enhancement charge range");
+        }
+        requireTickCount(settings.titleFadeInTicks, "title_fade_in_ticks");
+        requireTickCount(settings.titleStayTicks, "title_stay_ticks");
+        requireTickCount(settings.titleFadeOutTicks, "title_fade_out_ticks");
+    }
+
+    private static void requireTickCount(int value, String field) {
+        if (value < 0 || value > 12_000) {
+            throw new IllegalStateException(
+                    "Out-of-range Shrine Maiden Dance setting: " + field
+            );
+        }
+    }
+
+    private static void requireFinite(double value, String field) {
+        if (!Double.isFinite(value)) {
+            throw new IllegalStateException("Non-finite Shrine Maiden Dance setting: " + field);
+        }
+    }
+
+    private static void requireFiniteNonNegative(double value, String field) {
+        requireFinite(value, field);
+        if (value < 0.0D) {
+            throw new IllegalStateException("Negative Shrine Maiden Dance setting: " + field);
+        }
+    }
+
+    private static void requireFinitePositive(double value, String field) {
+        requireFinite(value, field);
+        if (value <= 0.0D) {
+            throw new IllegalStateException("Non-positive Shrine Maiden Dance setting: " + field);
+        }
+    }
+
+    private static void requireUnitInterval(double value, String field) {
+        requireFinite(value, field);
+        if (value < 0.0D || value > 1.0D) {
+            throw new IllegalStateException("Out-of-range Shrine Maiden Dance setting: " + field);
         }
     }
 
@@ -413,5 +587,11 @@ public final class ShrineMaidenDance {
         private int skillEnhancementChargesMin = 1;
         @SerializedName("skill_enhancement_charges_max")
         private int skillEnhancementChargesMax = 10;
+        @SerializedName("title_fade_in_ticks")
+        private int titleFadeInTicks = 10;
+        @SerializedName("title_stay_ticks")
+        private int titleStayTicks = 70;
+        @SerializedName("title_fade_out_ticks")
+        private int titleFadeOutTicks = 20;
     }
 }

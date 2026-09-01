@@ -39,7 +39,8 @@ record DamageCalculationContext(
         boolean directMeleeAttack = !spellDamage
                 && source.getEntity() == attacker
                 && source.getDirectEntity() == attacker
-                && source.is(DamageTypes.PLAYER_ATTACK);
+                && (source.is(DamageTypes.PLAYER_ATTACK)
+                || MagicBladeMechanic.isMagicBladeDamage(source));
         return new DamageCalculationContext(
                 attacker,
                 target,
@@ -54,6 +55,7 @@ record DamageCalculationContext(
     static boolean isMagicDamage(DamageSource source) {
         return source.is(FORGE_MAGIC_DAMAGE)
                 || source.is(NEOFORGE_MAGIC_DAMAGE)
+                || MagicBladeMechanic.isMagicBladeDamage(source)
                 || source.is(DamageTypes.MAGIC)
                 || source.is(DamageTypes.INDIRECT_MAGIC);
     }

@@ -36,7 +36,8 @@ public record UnlockConstellationPacket(String perkId) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null || !PERK_DIVINE_SAKURA_POWER.equals(packet.perkId)) {
+            if (player == null || !ServerCatalogSync.isReady(player)
+                    || !PERK_DIVINE_SAKURA_POWER.equals(packet.perkId)) {
                 return;
             }
             if (!ToggleRequestLimiter.tryAcquire(player)) {

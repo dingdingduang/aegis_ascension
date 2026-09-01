@@ -257,11 +257,14 @@ public final class TalentProgressionEffects {
                     allSkillEnhancementGain * multiplier
             );
         }
+        // addIfOwned reads the perk's breakthrough_* stat and writes the attribute it
+        // feeds; passing them the other way round reads a stat Zephyr's Care does not
+        // declare and banks the result under a key nothing consumes.
         addIfOwned(
                 data,
                 PERK_ZEPHYRS_CARE,
-                BREAKTHROUGH_ALL_SKILL_ENHANCEMENT_ATTRIBUTE,
                 ALL_SKILL_ENHANCEMENT_ATTRIBUTE,
+                BREAKTHROUGH_ALL_SKILL_ENHANCEMENT_ATTRIBUTE,
                 multiplier
         );
 

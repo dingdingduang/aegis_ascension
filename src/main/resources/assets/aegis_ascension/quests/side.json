@@ -1,0 +1,2131 @@
+[
+  {
+    "id": "side_farmer_trade",
+    "weight": 12,
+    "profession": "farmer",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:wheat",
+      "minecraft:carrot",
+      "minecraft:potato",
+      "minecraft:beetroot"
+    ],
+    "targetMin": 16,
+    "targetMax": 32,
+    "icon": "minecraft:textures/item/wheat.png",
+    "title": "quest.aegis_ascension.side.farmer_trade.title",
+    "description": "quest.aegis_ascension.side.farmer_trade.description",
+    "story": "quest.aegis_ascension.side.farmer_trade.story",
+    "experience": 300,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "R",
+        "countMin": 6,
+        "countMax": 10
+      },
+      {
+        "kind": "random_common",
+        "tier": "R",
+        "countMin": 4,
+        "countMax": 7
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_fletcher_hunt",
+    "weight": 7,
+    "minimumRank": 5,
+    "profession": "fletcher",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:skeleton",
+      "minecraft:zombie",
+      "minecraft:spider"
+    ],
+    "targetMin": 1,
+    "targetMax": 3,
+    "icon": "minecraft:textures/item/golden_sword.png",
+    "title": "quest.aegis_ascension.side.fletcher_hunt.title",
+    "description": "quest.aegis_ascension.side.fletcher_hunt.description",
+    "story": "quest.aegis_ascension.side.fletcher_hunt.story",
+    "experience": 350,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:bow",
+        "tier": "R",
+        "countMin": 1,
+        "countMax": 1
+      },
+      {
+        "kind": "item",
+        "id": "minecraft:arrow",
+        "tier": "R",
+        "countMin": 24,
+        "countMax": 42
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_armorer_materials",
+    "weight": 6,
+    "minimumRank": 5,
+    "profession": "armorer",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:iron_ingot",
+      "minecraft:copper_ingot",
+      "minecraft:coal"
+    ],
+    "targetMin": 8,
+    "targetMax": 20,
+    "icon": "minecraft:textures/item/iron_chestplate.png",
+    "title": "quest.aegis_ascension.side.armorer_materials.title",
+    "description": "quest.aegis_ascension.side.armorer_materials.description",
+    "story": "quest.aegis_ascension.side.armorer_materials.story",
+    "experience": 500,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:iron_chestplate",
+        "tier": "SR",
+        "countMin": 1,
+        "countMax": 1
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_librarian_trade",
+    "weight": 10,
+    "profession": "librarian",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:paper",
+      "minecraft:book"
+    ],
+    "targetMin": 8,
+    "targetMax": 24,
+    "icon": "minecraft:textures/item/book.png",
+    "title": "quest.aegis_ascension.side.librarian_trade.title",
+    "description": "quest.aegis_ascension.side.librarian_trade.description",
+    "story": "quest.aegis_ascension.side.librarian_trade.story",
+    "experience": 400,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:bookshelf",
+        "tier": "R",
+        "countMin": 4,
+        "countMax": 7
+      },
+      {
+        "kind": "random_common",
+        "tier": "R",
+        "countMin": 3,
+        "countMax": 5
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_weaponsmith_materials",
+    "weight": 5,
+    "minimumRank": 10,
+    "profession": "weaponsmith",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:iron_ingot",
+      "minecraft:gold_ingot"
+    ],
+    "targetMin": 12,
+    "targetMax": 24,
+    "icon": "minecraft:textures/item/diamond_sword.png",
+    "title": "quest.aegis_ascension.side.weaponsmith_materials.title",
+    "description": "quest.aegis_ascension.side.weaponsmith_materials.description",
+    "story": "quest.aegis_ascension.side.weaponsmith_materials.story",
+    "experience": 650,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:diamond_sword",
+        "tier": "SR",
+        "countMin": 1,
+        "countMax": 1
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_fisherman_catch",
+    "weight": 10,
+    "profession": "fisherman",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:cod",
+      "minecraft:salmon",
+      "minecraft:pufferfish",
+      "minecraft:tropical_fish"
+    ],
+    "targetMin": 8,
+    "targetMax": 20,
+    "icon": "minecraft:textures/item/cod.png",
+    "title": "quest.aegis_ascension.side.fisherman_catch.title",
+    "description": "quest.aegis_ascension.side.fisherman_catch.description",
+    "story": "quest.aegis_ascension.side.fisherman_catch.story",
+    "experience": 350,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "R",
+        "countMin": 6,
+        "countMax": 10
+      },
+      {
+        "kind": "random_common",
+        "tier": "R",
+        "countMin": 2,
+        "countMax": 4
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_shepherd_wool",
+    "weight": 10,
+    "profession": "shepherd",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:white_wool",
+      "minecraft:black_wool",
+      "minecraft:brown_wool",
+      "minecraft:gray_wool"
+    ],
+    "targetMin": 12,
+    "targetMax": 28,
+    "icon": "minecraft:textures/block/white_wool.png",
+    "title": "quest.aegis_ascension.side.shepherd_wool.title",
+    "description": "quest.aegis_ascension.side.shepherd_wool.description",
+    "story": "quest.aegis_ascension.side.shepherd_wool.story",
+    "experience": 350,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "R",
+        "countMin": 7,
+        "countMax": 12
+      },
+      {
+        "kind": "random_common",
+        "tier": "R",
+        "countMin": 2,
+        "countMax": 4
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_cartographer_supplies",
+    "weight": 9,
+    "profession": "cartographer",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:paper",
+      "minecraft:compass",
+      "minecraft:glass_pane"
+    ],
+    "targetMin": 4,
+    "targetMax": 12,
+    "icon": "minecraft:textures/item/map.png",
+    "title": "quest.aegis_ascension.side.cartographer_supplies.title",
+    "description": "quest.aegis_ascension.side.cartographer_supplies.description",
+    "story": "quest.aegis_ascension.side.cartographer_supplies.story",
+    "experience": 400,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "R",
+        "countMin": 8,
+        "countMax": 14
+      },
+      {
+        "kind": "random_common",
+        "tier": "R",
+        "countMin": 3,
+        "countMax": 5
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_cleric_hunt",
+    "weight": 6,
+    "minimumRank": 8,
+    "profession": "cleric",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:zombie",
+      "minecraft:drowned",
+      "minecraft:husk",
+      "minecraft:witch",
+      "minecraft:phantom"
+    ],
+    "targetMin": 1,
+    "targetMax": 3,
+    "icon": "minecraft:textures/item/golden_sword.png",
+    "title": "quest.aegis_ascension.side.cleric_hunt.title",
+    "description": "quest.aegis_ascension.side.cleric_hunt.description",
+    "story": "quest.aegis_ascension.side.cleric_hunt.story",
+    "experience": 450,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "R",
+        "countMin": 8,
+        "countMax": 14
+      },
+      {
+        "kind": "random_common",
+        "tier": "R",
+        "countMin": 3,
+        "countMax": 5
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_leatherworker_materials",
+    "weight": 9,
+    "profession": "leatherworker",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:leather",
+      "minecraft:rabbit_hide"
+    ],
+    "targetMin": 8,
+    "targetMax": 18,
+    "icon": "minecraft:textures/item/leather.png",
+    "title": "quest.aegis_ascension.side.leatherworker_materials.title",
+    "description": "quest.aegis_ascension.side.leatherworker_materials.description",
+    "story": "quest.aegis_ascension.side.leatherworker_materials.story",
+    "experience": 450,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:leather_horse_armor",
+        "tier": "R",
+        "countMin": 1,
+        "countMax": 1
+      },
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "R",
+        "countMin": 6,
+        "countMax": 10
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_toolsmith_materials",
+    "weight": 7,
+    "minimumRank": 5,
+    "profession": "toolsmith",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:iron_ingot",
+      "minecraft:copper_ingot",
+      "minecraft:coal"
+    ],
+    "targetMin": 10,
+    "targetMax": 24,
+    "icon": "minecraft:textures/item/iron_pickaxe.png",
+    "title": "quest.aegis_ascension.side.toolsmith_materials.title",
+    "description": "quest.aegis_ascension.side.toolsmith_materials.description",
+    "story": "quest.aegis_ascension.side.toolsmith_materials.story",
+    "experience": 550,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "SR",
+        "countMin": 10,
+        "countMax": 18
+      },
+      {
+        "kind": "random_common",
+        "tier": "SR",
+        "countMin": 4,
+        "countMax": 7
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_butcher_hunt",
+    "weight": 5,
+    "minimumRank": 12,
+    "profession": "butcher",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:hoglin",
+      "minecraft:zoglin",
+      "minecraft:ravager"
+    ],
+    "targetMin": 1,
+    "targetMax": 3,
+    "icon": "minecraft:textures/item/iron_axe.png",
+    "title": "quest.aegis_ascension.side.butcher_hunt.title",
+    "description": "quest.aegis_ascension.side.butcher_hunt.description",
+    "story": "quest.aegis_ascension.side.butcher_hunt.story",
+    "experience": 650,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:golden_apple",
+        "tier": "SR",
+        "countMin": 1,
+        "countMax": 1
+      },
+      {
+        "kind": "item",
+        "id": "minecraft:cooked_beef",
+        "tier": "R",
+        "countMin": 16,
+        "countMax": 28
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_mason_rebuild",
+    "weight": 10,
+    "profession": "mason",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:stone_bricks",
+      "minecraft:bricks",
+      "minecraft:terracotta"
+    ],
+    "targetMin": 16,
+    "targetMax": 32,
+    "icon": "minecraft:textures/block/bricks.png",
+    "title": "quest.aegis_ascension.side.mason_rebuild.title",
+    "description": "quest.aegis_ascension.side.mason_rebuild.description",
+    "story": "quest.aegis_ascension.side.mason_rebuild.story",
+    "experience": 400,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "R",
+        "countMin": 8,
+        "countMax": 14
+      },
+      {
+        "kind": "random_common",
+        "tier": "R",
+        "countMin": 3,
+        "countMax": 5
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_cleric_nether_hunt",
+    "weight": 2,
+    "minimumRank": 25,
+    "dimensions": [
+      "minecraft:the_nether"
+    ],
+    "profession": "cleric",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:wither_skeleton",
+      "minecraft:blaze",
+      "minecraft:magma_cube"
+    ],
+    "targetMin": 1,
+    "targetMax": 3,
+    "icon": "minecraft:textures/item/diamond_sword.png",
+    "title": "quest.aegis_ascension.side.cleric_nether_hunt.title",
+    "description": "quest.aegis_ascension.side.cleric_nether_hunt.description",
+    "story": "quest.aegis_ascension.side.cleric_nether_hunt.story",
+    "experience": 900,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "SR",
+        "countMin": 12,
+        "countMax": 21
+      },
+      {
+        "kind": "random_common",
+        "tier": "SR",
+        "countMin": 6,
+        "countMax": 10
+      }
+    ],
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_fisherman_swamp_bait",
+    "weight": 3,
+    "minimumRank": 5,
+    "biomes": [
+      "minecraft:swamp",
+      "minecraft:mangrove_swamp"
+    ],
+    "profession": "fisherman",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:slime_ball",
+      "minecraft:string"
+    ],
+    "targetMin": 8,
+    "targetMax": 16,
+    "icon": "minecraft:textures/item/slime_ball.png",
+    "title": "quest.aegis_ascension.side.fisherman_swamp_bait.title",
+    "description": "quest.aegis_ascension.side.fisherman_swamp_bait.description",
+    "story": "quest.aegis_ascension.side.fisherman_swamp_bait.story",
+    "experience": 500,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "tier": "R",
+        "countMin": 8,
+        "countMax": 14
+      },
+      {
+        "kind": "random_common",
+        "tier": "R",
+        "countMin": 3,
+        "countMax": 5
+      }
+    ],
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "goldRewardMin": 60,
+    "goldRewardMax": 180
+  },
+  {
+    "id": "side_mason_quarry",
+    "weight": 8,
+    "profession": "mason",
+    "objective": "BREAK_BLOCK",
+    "targetIds": [
+      "minecraft:stone",
+      "minecraft:deepslate",
+      "minecraft:tuff",
+      "minecraft:andesite"
+    ],
+    "target": 64,
+    "targetMin": 64,
+    "targetMax": 140,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/stone_pickaxe.png",
+    "title": "quest.aegis_ascension.side.mason_quarry.title",
+    "description": "quest.aegis_ascension.side.mason_quarry.description",
+    "story": "quest.aegis_ascension.side.mason_quarry.story",
+    "experience": 420,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "countMin": 8,
+        "countMax": 14,
+        "tier": "R"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ],
+    "alsoRequires": [
+      {
+        "objective": "CRAFT_ITEM",
+        "targetIds": [
+          "minecraft:stone_bricks",
+          "minecraft:smooth_stone",
+          "minecraft:stone_slab"
+        ],
+        "target": 8,
+        "targetMin": 8,
+        "targetMax": 20
+      }
+    ]
+  },
+  {
+    "id": "side_toolsmith_forge",
+    "weight": 7,
+    "profession": "toolsmith",
+    "objective": "CRAFT_ITEM",
+    "targetIds": [
+      "minecraft:iron_pickaxe",
+      "minecraft:iron_axe",
+      "minecraft:iron_shovel",
+      "minecraft:iron_hoe"
+    ],
+    "target": 2,
+    "targetMin": 2,
+    "targetMax": 5,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/iron_pickaxe.png",
+    "title": "quest.aegis_ascension.side.toolsmith_forge.title",
+    "description": "quest.aegis_ascension.side.toolsmith_forge.description",
+    "story": "quest.aegis_ascension.side.toolsmith_forge.story",
+    "experience": 480,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      },
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      }
+    ],
+    "alsoRequires": [
+      {
+        "objective": "BREAK_BLOCK",
+        "targetIds": [
+          "minecraft:oak_log",
+          "minecraft:birch_log",
+          "minecraft:spruce_log"
+        ],
+        "target": 12,
+        "targetMin": 12,
+        "targetMax": 28
+      }
+    ]
+  },
+  {
+    "id": "side_fletcher_marksman",
+    "weight": 6,
+    "profession": "fletcher",
+    "objective": "HIT_ARROW",
+    "target": 12,
+    "targetMin": 12,
+    "targetMax": 28,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/spectral_arrow.png",
+    "title": "quest.aegis_ascension.side.fletcher_marksman.title",
+    "description": "quest.aegis_ascension.side.fletcher_marksman.description",
+    "story": "quest.aegis_ascension.side.fletcher_marksman.story",
+    "experience": 520,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:arrow",
+        "countMin": 32,
+        "countMax": 64,
+        "tier": "R"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_fletcher_timber",
+    "weight": 8,
+    "profession": "fletcher",
+    "objective": "BREAK_BLOCK",
+    "targetIds": [
+      "minecraft:oak_log",
+      "minecraft:birch_log",
+      "minecraft:spruce_log",
+      "minecraft:jungle_log"
+    ],
+    "target": 32,
+    "targetMin": 32,
+    "targetMax": 72,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/wooden_axe.png",
+    "title": "quest.aegis_ascension.side.fletcher_timber.title",
+    "description": "quest.aegis_ascension.side.fletcher_timber.description",
+    "story": "quest.aegis_ascension.side.fletcher_timber.story",
+    "experience": 380,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "countMin": 6,
+        "countMax": 12,
+        "tier": "R"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 4,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_farmer_provisions",
+    "weight": 9,
+    "profession": "farmer",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:bread",
+      "minecraft:wheat",
+      "minecraft:pumpkin",
+      "minecraft:melon_slice"
+    ],
+    "target": 16,
+    "targetMin": 16,
+    "targetMax": 40,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "icon": "minecraft:textures/item/bread.png",
+    "title": "quest.aegis_ascension.side.farmer_provisions.title",
+    "description": "quest.aegis_ascension.side.farmer_provisions.description",
+    "story": "quest.aegis_ascension.side.farmer_provisions.story",
+    "experience": 330,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_cleric_reagents",
+    "weight": 4,
+    "minimumRank": 12,
+    "profession": "cleric",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:nether_wart",
+      "minecraft:blaze_rod",
+      "minecraft:spider_eye",
+      "minecraft:ghast_tear"
+    ],
+    "target": 6,
+    "targetMin": 6,
+    "targetMax": 16,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/brewing_stand.png",
+    "title": "quest.aegis_ascension.side.cleric_reagents.title",
+    "description": "quest.aegis_ascension.side.cleric_reagents.description",
+    "story": "quest.aegis_ascension.side.cleric_reagents.story",
+    "experience": 800,
+    "goldRewardMin": 120,
+    "goldRewardMax": 320,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      }
+    ],
+    "securityDeposit": 250,
+    "failOnDeath": true,
+    "minimumReputation": 3
+  },
+  {
+    "id": "side_armorer_forge",
+    "weight": 5,
+    "minimumRank": 8,
+    "profession": "armorer",
+    "objective": "CRAFT_ITEM",
+    "targetIds": [
+      "minecraft:iron_helmet",
+      "minecraft:iron_chestplate",
+      "minecraft:iron_leggings",
+      "minecraft:iron_boots",
+      "minecraft:shield"
+    ],
+    "target": 2,
+    "targetMin": 2,
+    "targetMax": 4,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/iron_chestplate.png",
+    "title": "quest.aegis_ascension.side.armorer_forge.title",
+    "description": "quest.aegis_ascension.side.armorer_forge.description",
+    "story": "quest.aegis_ascension.side.armorer_forge.story",
+    "experience": 700,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ],
+    "alsoRequires": [
+      {
+        "objective": "BREAK_BLOCK",
+        "targetIds": [
+          "minecraft:iron_ore",
+          "minecraft:deepslate_iron_ore",
+          "minecraft:copper_ore"
+        ],
+        "target": 10,
+        "targetMin": 10,
+        "targetMax": 24
+      },
+      {
+        "objective": "GIVE_MATERIAL",
+        "targetIds": [
+          "minecraft:coal",
+          "minecraft:charcoal"
+        ],
+        "target": 12,
+        "targetMin": 12,
+        "targetMax": 28
+      }
+    ],
+    "rewardChoices": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SR"
+      },
+      {
+        "kind": "item",
+        "id": "minecraft:iron_ingot",
+        "countMin": 12,
+        "countMax": 20,
+        "tier": "R"
+      },
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      }
+    ],
+    "minimumReputation": 3
+  },
+  {
+    "id": "side_librarian_lapis",
+    "weight": 7,
+    "profession": "librarian",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:lapis_lazuli",
+      "minecraft:book",
+      "minecraft:paper",
+      "minecraft:ink_sac"
+    ],
+    "target": 12,
+    "targetMin": 12,
+    "targetMax": 32,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/enchanted_book.png",
+    "title": "quest.aegis_ascension.side.librarian_lapis.title",
+    "description": "quest.aegis_ascension.side.librarian_lapis.description",
+    "story": "quest.aegis_ascension.side.librarian_lapis.story",
+    "experience": 460,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 7,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_butcher_cull",
+    "weight": 8,
+    "profession": "butcher",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:cow",
+      "minecraft:pig",
+      "minecraft:chicken",
+      "minecraft:sheep",
+      "minecraft:rabbit"
+    ],
+    "target": 8,
+    "targetMin": 8,
+    "targetMax": 20,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/cooked_beef.png",
+    "title": "quest.aegis_ascension.side.butcher_cull.title",
+    "description": "quest.aegis_ascension.side.butcher_cull.description",
+    "story": "quest.aegis_ascension.side.butcher_cull.story",
+    "experience": 360,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:emerald",
+        "countMin": 6,
+        "countMax": 12,
+        "tier": "R"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 4,
+        "tier": "R"
+      }
+    ],
+    "failOnArmorWorn": true,
+    "alsoRequires": [
+      {
+        "objective": "SHOOT_ARROW",
+        "target": 20,
+        "targetMin": 20,
+        "targetMax": 45
+      }
+    ]
+  },
+  {
+    "id": "side_weaponsmith_ore",
+    "weight": 4,
+    "minimumRank": 10,
+    "profession": "weaponsmith",
+    "objective": "BREAK_BLOCK",
+    "targetIds": [
+      "minecraft:iron_ore",
+      "minecraft:gold_ore",
+      "minecraft:deepslate_iron_ore",
+      "minecraft:deepslate_gold_ore",
+      "minecraft:ancient_debris"
+    ],
+    "target": 6,
+    "targetMin": 6,
+    "targetMax": 18,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/raw_gold.png",
+    "title": "quest.aegis_ascension.side.weaponsmith_ore.title",
+    "description": "quest.aegis_ascension.side.weaponsmith_ore.description",
+    "story": "quest.aegis_ascension.side.weaponsmith_ore.story",
+    "experience": 750,
+    "goldRewardMin": 120,
+    "goldRewardMax": 300,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ],
+    "minimumReputation": 3
+  },
+  {
+    "id": "side_chain_ledger_1",
+    "weight": 9,
+    "profession": "fisherman",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:cod",
+      "minecraft:salmon"
+    ],
+    "target": 16,
+    "targetMin": 16,
+    "targetMax": 28,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/cod.png",
+    "title": "quest.aegis_ascension.side.chain_ledger_1.title",
+    "description": "quest.aegis_ascension.side.chain_ledger_1.description",
+    "story": "quest.aegis_ascension.side.chain_ledger_1.story",
+    "experience": 380,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_ledger_2",
+    "weight": 1,
+    "profession": "librarian",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:paper",
+      "minecraft:book",
+      "minecraft:ink_sac"
+    ],
+    "target": 10,
+    "targetMin": 10,
+    "targetMax": 20,
+    "tiers": [
+      "SR"
+    ],
+    "prerequisiteId": "side_chain_ledger_1",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/writable_book.png",
+    "title": "quest.aegis_ascension.side.chain_ledger_2.title",
+    "description": "quest.aegis_ascension.side.chain_ledger_2.description",
+    "story": "quest.aegis_ascension.side.chain_ledger_2.story",
+    "experience": 620,
+    "goldRewardMin": 120,
+    "goldRewardMax": 260,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_ledger_3",
+    "weight": 1,
+    "profession": "mason",
+    "objective": "BREAK_BLOCK",
+    "targetIds": [
+      "minecraft:deepslate",
+      "minecraft:tuff",
+      "minecraft:cobbled_deepslate"
+    ],
+    "target": 64,
+    "targetMin": 64,
+    "targetMax": 120,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "prerequisiteId": "side_chain_ledger_2",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/stone_pickaxe.png",
+    "title": "quest.aegis_ascension.side.chain_ledger_3.title",
+    "description": "quest.aegis_ascension.side.chain_ledger_3.description",
+    "story": "quest.aegis_ascension.side.chain_ledger_3.story",
+    "experience": 1100,
+    "goldRewardMin": 250,
+    "goldRewardMax": 600,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_forge_1",
+    "weight": 8,
+    "profession": "armorer",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:iron_ingot",
+      "minecraft:coal",
+      "minecraft:copper_ingot"
+    ],
+    "target": 14,
+    "targetMin": 14,
+    "targetMax": 28,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/iron_ingot.png",
+    "title": "quest.aegis_ascension.side.chain_forge_1.title",
+    "description": "quest.aegis_ascension.side.chain_forge_1.description",
+    "story": "quest.aegis_ascension.side.chain_forge_1.story",
+    "experience": 520,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_forge_2",
+    "weight": 1,
+    "minimumRank": 10,
+    "profession": "weaponsmith",
+    "objective": "BREAK_BLOCK",
+    "targetIds": [
+      "minecraft:ancient_debris",
+      "minecraft:deepslate_gold_ore",
+      "minecraft:gold_ore"
+    ],
+    "target": 4,
+    "targetMin": 4,
+    "targetMax": 12,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "prerequisiteId": "side_chain_forge_1",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/netherite_scrap.png",
+    "title": "quest.aegis_ascension.side.chain_forge_2.title",
+    "description": "quest.aegis_ascension.side.chain_forge_2.description",
+    "story": "quest.aegis_ascension.side.chain_forge_2.story",
+    "experience": 1400,
+    "goldRewardMin": 300,
+    "goldRewardMax": 700,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_aim_1",
+    "weight": 9,
+    "profession": "fletcher",
+    "objective": "SHOOT_ARROW",
+    "target": 30,
+    "targetMin": 30,
+    "targetMax": 60,
+    "tiers": [
+      "R"
+    ],
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/arrow.png",
+    "title": "quest.aegis_ascension.side.chain_aim_1.title",
+    "description": "quest.aegis_ascension.side.chain_aim_1.description",
+    "story": "quest.aegis_ascension.side.chain_aim_1.story",
+    "experience": 340,
+    "goldRewardMin": 60,
+    "goldRewardMax": 180,
+    "rewards": [
+      {
+        "kind": "item",
+        "id": "minecraft:arrow",
+        "countMin": 32,
+        "countMax": 64,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_aim_2",
+    "weight": 1,
+    "profession": "fletcher",
+    "objective": "HIT_ARROW",
+    "target": 15,
+    "targetMin": 15,
+    "targetMax": 30,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "prerequisiteId": "side_chain_aim_1",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/spectral_arrow.png",
+    "title": "quest.aegis_ascension.side.chain_aim_2.title",
+    "description": "quest.aegis_ascension.side.chain_aim_2.description",
+    "story": "quest.aegis_ascension.side.chain_aim_2.story",
+    "experience": 900,
+    "goldRewardMin": 200,
+    "goldRewardMax": 480,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ],
+    "failOnDamageTaken": true
+  },
+  {
+    "id": "side_fisherman_tide",
+    "weight": 6,
+    "profession": "fisherman",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:cod",
+      "minecraft:salmon",
+      "minecraft:tropical_fish"
+    ],
+    "target": 20,
+    "targetMin": 20,
+    "targetMax": 44,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "lifetimeMinutes": 180,
+    "icon": "minecraft:textures/item/tropical_fish.png",
+    "title": "quest.aegis_ascension.side.fisherman_tide.title",
+    "description": "quest.aegis_ascension.side.fisherman_tide.description",
+    "story": "quest.aegis_ascension.side.fisherman_tide.story",
+    "experience": 620,
+    "goldRewardMin": 140,
+    "goldRewardMax": 320,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 4,
+        "countMax": 8,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_butcher_market",
+    "weight": 5,
+    "profession": "butcher",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:cow",
+      "minecraft:pig",
+      "minecraft:sheep",
+      "minecraft:chicken"
+    ],
+    "target": 12,
+    "targetMin": 12,
+    "targetMax": 26,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "lifetimeMinutes": 360,
+    "icon": "minecraft:textures/item/cooked_porkchop.png",
+    "title": "quest.aegis_ascension.side.butcher_market.title",
+    "description": "quest.aegis_ascension.side.butcher_market.description",
+    "story": "quest.aegis_ascension.side.butcher_market.story",
+    "experience": 700,
+    "goldRewardMin": 160,
+    "goldRewardMax": 380,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_cartographer_survey",
+    "weight": 8,
+    "profession": "cartographer",
+    "objective": "REACH_LOCATION",
+    "targetIds": [
+      "minecraft:village_plains",
+      "minecraft:village_desert",
+      "minecraft:village_savanna",
+      "minecraft:village_snowy",
+      "minecraft:village_taiga"
+    ],
+    "target": 1,
+    "targetMin": 1,
+    "targetMax": 1,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "icon": "minecraft:textures/item/filled_map.png",
+    "title": "quest.aegis_ascension.side.cartographer_survey.title",
+    "description": "quest.aegis_ascension.side.cartographer_survey.description",
+    "story": "quest.aegis_ascension.side.cartographer_survey.story",
+    "experience": 520,
+    "goldRewardMin": 100,
+    "goldRewardMax": 240,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_cartographer_ruins",
+    "weight": 6,
+    "minimumRank": 6,
+    "profession": "cartographer",
+    "objective": "REACH_LOCATION",
+    "targetIds": [
+      "minecraft:desert_pyramid",
+      "minecraft:jungle_pyramid",
+      "minecraft:swamp_hut",
+      "minecraft:pillager_outpost",
+      "minecraft:shipwreck",
+      "minecraft:igloo"
+    ],
+    "target": 1,
+    "targetMin": 1,
+    "targetMax": 1,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/map.png",
+    "title": "quest.aegis_ascension.side.cartographer_ruins.title",
+    "description": "quest.aegis_ascension.side.cartographer_ruins.description",
+    "story": "quest.aegis_ascension.side.cartographer_ruins.story",
+    "experience": 780,
+    "goldRewardMin": 160,
+    "goldRewardMax": 400,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_cleric_deepdark",
+    "weight": 2,
+    "minimumRank": 18,
+    "profession": "cleric",
+    "objective": "REACH_LOCATION",
+    "targetIds": [
+      "minecraft:ancient_city"
+    ],
+    "target": 1,
+    "targetMin": 1,
+    "targetMax": 1,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "icon": "minecraft:textures/item/echo_shard.png",
+    "title": "quest.aegis_ascension.side.cleric_deepdark.title",
+    "description": "quest.aegis_ascension.side.cleric_deepdark.description",
+    "story": "quest.aegis_ascension.side.cleric_deepdark.story",
+    "experience": 1600,
+    "goldRewardMin": 400,
+    "goldRewardMax": 900,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ],
+    "minimumReputation": 4
+  },
+  {
+    "id": "side_weaponsmith_bastion",
+    "weight": 2,
+    "minimumRank": 15,
+    "profession": "weaponsmith",
+    "objective": "REACH_LOCATION",
+    "targetIds": [
+      "minecraft:fortress",
+      "minecraft:bastion_remnant"
+    ],
+    "target": 1,
+    "targetMin": 1,
+    "targetMax": 1,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "dimensions": [
+      "minecraft:the_nether"
+    ],
+    "icon": "minecraft:textures/item/netherite_scrap.png",
+    "title": "quest.aegis_ascension.side.weaponsmith_bastion.title",
+    "description": "quest.aegis_ascension.side.weaponsmith_bastion.description",
+    "story": "quest.aegis_ascension.side.weaponsmith_bastion.story",
+    "experience": 1500,
+    "goldRewardMin": 380,
+    "goldRewardMax": 850,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      }
+    ],
+    "securityDeposit": 400,
+    "failOnDeath": true,
+    "minimumReputation": 5
+  },
+  {
+    "id": "side_chain_ledger_4",
+    "weight": 1,
+    "profession": "cartographer",
+    "objective": "REACH_LOCATION",
+    "targetIds": [
+      "minecraft:stronghold",
+      "minecraft:mineshaft"
+    ],
+    "target": 1,
+    "targetMin": 1,
+    "targetMax": 1,
+    "tiers": [
+      "SSR"
+    ],
+    "prerequisiteId": "side_chain_ledger_3",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/compass.png",
+    "title": "quest.aegis_ascension.side.chain_ledger_4.title",
+    "description": "quest.aegis_ascension.side.chain_ledger_4.description",
+    "story": "quest.aegis_ascension.side.chain_ledger_4.story",
+    "experience": 1800,
+    "goldRewardMin": 500,
+    "goldRewardMax": 1100,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 4,
+        "countMax": 8,
+        "tier": "R"
+      }
+    ],
+    "rewardChoices": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "item",
+        "id": "minecraft:diamond",
+        "countMin": 6,
+        "countMax": 10,
+        "tier": "SSR"
+      },
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SSR"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_winter_1",
+    "weight": 1,
+    "profession": "farmer",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:wheat",
+      "minecraft:potato",
+      "minecraft:carrot"
+    ],
+    "target": 24,
+    "targetMin": 24,
+    "targetMax": 48,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/wheat.png",
+    "title": "quest.aegis_ascension.side.chain_winter_1.title",
+    "description": "quest.aegis_ascension.side.chain_winter_1.description",
+    "story": "quest.aegis_ascension.side.chain_winter_1.story",
+    "experience": 420,
+    "goldRewardMin": 80,
+    "goldRewardMax": 220,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_winter_2",
+    "weight": 1,
+    "minimumRank": 4,
+    "profession": "shepherd",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:white_wool",
+      "minecraft:brown_wool",
+      "minecraft:black_wool"
+    ],
+    "target": 20,
+    "targetMin": 20,
+    "targetMax": 40,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "prerequisiteId": "side_chain_winter_1",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/white_wool.png",
+    "title": "quest.aegis_ascension.side.chain_winter_2.title",
+    "description": "quest.aegis_ascension.side.chain_winter_2.description",
+    "story": "quest.aegis_ascension.side.chain_winter_2.story",
+    "experience": 620,
+    "goldRewardMin": 80,
+    "goldRewardMax": 220,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 7,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_winter_3",
+    "weight": 1,
+    "minimumRank": 8,
+    "profession": "toolsmith",
+    "objective": "CRAFT_ITEM",
+    "targetIds": [
+      "minecraft:iron_axe",
+      "minecraft:iron_shovel",
+      "minecraft:shears"
+    ],
+    "target": 3,
+    "targetMin": 3,
+    "targetMax": 7,
+    "tiers": [
+      "SR"
+    ],
+    "prerequisiteId": "side_chain_winter_2",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/iron_axe.png",
+    "title": "quest.aegis_ascension.side.chain_winter_3.title",
+    "description": "quest.aegis_ascension.side.chain_winter_3.description",
+    "story": "quest.aegis_ascension.side.chain_winter_3.story",
+    "experience": 900,
+    "goldRewardMin": 180,
+    "goldRewardMax": 420,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_winter_4",
+    "weight": 1,
+    "minimumRank": 12,
+    "profession": "cleric",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:stray",
+      "minecraft:skeleton",
+      "minecraft:husk"
+    ],
+    "target": 20,
+    "targetMin": 20,
+    "targetMax": 44,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "prerequisiteId": "side_chain_winter_3",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/golden_apple.png",
+    "title": "quest.aegis_ascension.side.chain_winter_4.title",
+    "description": "quest.aegis_ascension.side.chain_winter_4.description",
+    "story": "quest.aegis_ascension.side.chain_winter_4.story",
+    "experience": 1500,
+    "goldRewardMin": 320,
+    "goldRewardMax": 760,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_mine_1",
+    "weight": 1,
+    "profession": "mason",
+    "objective": "BREAK_BLOCK",
+    "targetIds": [
+      "minecraft:stone",
+      "minecraft:deepslate",
+      "minecraft:tuff"
+    ],
+    "target": 64,
+    "targetMin": 64,
+    "targetMax": 140,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/stone_pickaxe.png",
+    "title": "quest.aegis_ascension.side.chain_mine_1.title",
+    "description": "quest.aegis_ascension.side.chain_mine_1.description",
+    "story": "quest.aegis_ascension.side.chain_mine_1.story",
+    "experience": 450,
+    "goldRewardMin": 80,
+    "goldRewardMax": 220,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_mine_2",
+    "weight": 1,
+    "minimumRank": 8,
+    "profession": "cartographer",
+    "objective": "REACH_LOCATION",
+    "targetIds": [
+      "minecraft:mineshaft",
+      "minecraft:stronghold"
+    ],
+    "target": 1,
+    "targetMin": 1,
+    "targetMax": 1,
+    "tiers": [
+      "SR"
+    ],
+    "prerequisiteId": "side_chain_mine_1",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/compass.png",
+    "title": "quest.aegis_ascension.side.chain_mine_2.title",
+    "description": "quest.aegis_ascension.side.chain_mine_2.description",
+    "story": "quest.aegis_ascension.side.chain_mine_2.story",
+    "experience": 1000,
+    "goldRewardMin": 200,
+    "goldRewardMax": 480,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_mine_3",
+    "weight": 1,
+    "minimumRank": 12,
+    "profession": "weaponsmith",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:cave_spider",
+      "minecraft:zombie",
+      "minecraft:skeleton"
+    ],
+    "target": 24,
+    "targetMin": 24,
+    "targetMax": 52,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "prerequisiteId": "side_chain_mine_2",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/iron_sword.png",
+    "title": "quest.aegis_ascension.side.chain_mine_3.title",
+    "description": "quest.aegis_ascension.side.chain_mine_3.description",
+    "story": "quest.aegis_ascension.side.chain_mine_3.story",
+    "experience": 1600,
+    "goldRewardMin": 340,
+    "goldRewardMax": 800,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 7,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_ash_1",
+    "weight": 1,
+    "minimumRank": 6,
+    "profession": "librarian",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:paper",
+      "minecraft:book",
+      "minecraft:ink_sac"
+    ],
+    "target": 16,
+    "targetMin": 16,
+    "targetMax": 36,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/writable_book.png",
+    "title": "quest.aegis_ascension.side.chain_ash_1.title",
+    "description": "quest.aegis_ascension.side.chain_ash_1.description",
+    "story": "quest.aegis_ascension.side.chain_ash_1.story",
+    "experience": 500,
+    "goldRewardMin": 80,
+    "goldRewardMax": 220,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_ash_2",
+    "weight": 1,
+    "minimumRank": 12,
+    "profession": "cleric",
+    "objective": "GIVE_MATERIAL",
+    "targetIds": [
+      "minecraft:blaze_rod",
+      "minecraft:nether_wart",
+      "minecraft:ghast_tear"
+    ],
+    "target": 8,
+    "targetMin": 8,
+    "targetMax": 20,
+    "tiers": [
+      "SR"
+    ],
+    "prerequisiteId": "side_chain_ash_1",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/blaze_rod.png",
+    "title": "quest.aegis_ascension.side.chain_ash_2.title",
+    "description": "quest.aegis_ascension.side.chain_ash_2.description",
+    "story": "quest.aegis_ascension.side.chain_ash_2.story",
+    "experience": 1200,
+    "goldRewardMin": 260,
+    "goldRewardMax": 600,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_ash_3",
+    "weight": 1,
+    "minimumRank": 15,
+    "profession": "weaponsmith",
+    "objective": "REACH_LOCATION",
+    "targetIds": [
+      "minecraft:fortress",
+      "minecraft:bastion_remnant"
+    ],
+    "target": 1,
+    "targetMin": 1,
+    "targetMax": 1,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "prerequisiteId": "side_chain_ash_2",
+    "oncePerPlayer": true,
+    "dimensions": [
+      "minecraft:the_nether"
+    ],
+    "icon": "minecraft:textures/item/netherite_scrap.png",
+    "title": "quest.aegis_ascension.side.chain_ash_3.title",
+    "description": "quest.aegis_ascension.side.chain_ash_3.description",
+    "story": "quest.aegis_ascension.side.chain_ash_3.story",
+    "experience": 1900,
+    "goldRewardMin": 420,
+    "goldRewardMax": 980,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_pens_1",
+    "weight": 1,
+    "profession": "butcher",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:wolf",
+      "minecraft:fox"
+    ],
+    "target": 6,
+    "targetMin": 6,
+    "targetMax": 14,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/bone.png",
+    "title": "quest.aegis_ascension.side.chain_pens_1.title",
+    "description": "quest.aegis_ascension.side.chain_pens_1.description",
+    "story": "quest.aegis_ascension.side.chain_pens_1.story",
+    "experience": 440,
+    "goldRewardMin": 80,
+    "goldRewardMax": 220,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_pens_2",
+    "weight": 1,
+    "minimumRank": 5,
+    "profession": "leatherworker",
+    "objective": "TRADE_ITEM",
+    "targetIds": [
+      "minecraft:leather",
+      "minecraft:rabbit_hide"
+    ],
+    "target": 18,
+    "targetMin": 18,
+    "targetMax": 40,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "prerequisiteId": "side_chain_pens_1",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/leather.png",
+    "title": "quest.aegis_ascension.side.chain_pens_2.title",
+    "description": "quest.aegis_ascension.side.chain_pens_2.description",
+    "story": "quest.aegis_ascension.side.chain_pens_2.story",
+    "experience": 700,
+    "goldRewardMin": 80,
+    "goldRewardMax": 220,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "side_chain_pens_3",
+    "weight": 1,
+    "minimumRank": 12,
+    "profession": "butcher",
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:pillager",
+      "minecraft:vindicator",
+      "minecraft:ravager"
+    ],
+    "target": 10,
+    "targetMin": 10,
+    "targetMax": 24,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "prerequisiteId": "side_chain_pens_2",
+    "oncePerPlayer": true,
+    "icon": "minecraft:textures/item/crossbow.png",
+    "title": "quest.aegis_ascension.side.chain_pens_3.title",
+    "description": "quest.aegis_ascension.side.chain_pens_3.description",
+    "story": "quest.aegis_ascension.side.chain_pens_3.story",
+    "experience": 1550,
+    "goldRewardMin": 330,
+    "goldRewardMax": 780,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  }
+]

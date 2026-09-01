@@ -1,5 +1,6 @@
 package com.whatever.aegis_ascension.mechanic;
 
+import com.whatever.aegis_ascension.util.DisplayStatScope;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.perk.soullink.SoulLinkEffects;
@@ -106,8 +107,9 @@ public final class TalentEffects {
     }
 
     public static Map<String, Double> buildDisplayStats(Player player,
-                                                        PlayerPerkData data) {
-        return TalentStatService.buildDisplayStats(player, data);
+                                                        PlayerPerkData data,
+                                                        DisplayStatScope scope) {
+        return TalentStatService.buildDisplayStats(player, data, scope);
     }
 
     public static double cooldownReduction(PlayerPerkData data) {

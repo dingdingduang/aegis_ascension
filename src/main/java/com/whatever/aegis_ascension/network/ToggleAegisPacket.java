@@ -25,7 +25,7 @@ public record ToggleAegisPacket(String aegisId, boolean enabled) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null) {
+            if (player == null || !ServerCatalogSync.isReady(player)) {
                 return;
             }
             if (!ToggleRequestLimiter.tryAcquire(player)) {

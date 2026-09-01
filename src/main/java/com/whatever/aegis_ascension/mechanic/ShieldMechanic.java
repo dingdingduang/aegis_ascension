@@ -164,6 +164,18 @@ public final class ShieldMechanic {
     }
 
     /**
+     * Grants a shield using a source-specific Primary Attribute multiplier when one is
+     * configured. A null multiplier keeps the server-wide setting as the fallback for
+     * generic or older shield sources.
+     */
+    public static void addShieldWithPrimaryStatMultiplier(ServerPlayer player, float amount,
+                                                           Double primaryStatMultiplier) {
+        addShield(player, amount,
+                SHIELD_MODEL, SHIELD_MODEL_SCALE, SHIELD_MODEL_OFFSET_Y,
+                SHIELD_MODEL_COUNT, null, primaryStatMultiplier);
+    }
+
+    /**
      * Grants a shield while excluding one source perk from the additive Shield Gain
      * calculation. This is used when that perk's stats already define the raw grant.
      */
@@ -172,6 +184,18 @@ public final class ShieldMechanic {
         addShield(player, amount,
                 SHIELD_MODEL, SHIELD_MODEL_SCALE, SHIELD_MODEL_OFFSET_Y,
                 SHIELD_MODEL_COUNT, excludedPerkId);
+    }
+
+    /**
+     * Koharu-style grant overload with both source exclusion and a source-specific
+     * Primary Attribute multiplier.
+     */
+    public static void addShieldExcludingPerkGainWithPrimaryStatMultiplier(
+            ServerPlayer player, float amount, String excludedPerkId,
+            Double primaryStatMultiplier) {
+        addShield(player, amount,
+                SHIELD_MODEL, SHIELD_MODEL_SCALE, SHIELD_MODEL_OFFSET_Y,
+                SHIELD_MODEL_COUNT, excludedPerkId, primaryStatMultiplier);
     }
 
     /**
@@ -195,10 +219,18 @@ public final class ShieldMechanic {
     private static void addShield(ServerPlayer player, float amount,
                                   ResourceLocation model, float modelScale, float modelOffsetY,
                                   int modelCount, String excludedPerkId) {
+        addShield(player, amount, model, modelScale, modelOffsetY, modelCount,
+                excludedPerkId, null);
+    }
+
+    private static void addShield(ServerPlayer player, float amount,
+                                  ResourceLocation model, float modelScale, float modelOffsetY,
+                                  int modelCount, String excludedPerkId,
+                                  Double primaryStatMultiplier) {
         if (player == null || player.isRemoved() || !player.isAlive() || amount <= 0.0F) {
             return;
         }
-        float granted = applyShieldGain(player, amount, excludedPerkId);
+        float granted = applyShieldGain(player, amount, excludedPerkId, primaryStatMultiplier);
         if (granted <= 0.0F) {
             return;
         }
@@ -215,19 +247,23 @@ public final class ShieldMechanic {
     /**
      * Applies the player's shield scaling to a raw grant, once, for every source.
      *
-     * <p>The server-wide Primary Attribute multiplier is applied first.
+     * <p>The source-specific Primary Attribute multiplier is applied first when the
+     * source defines one; otherwise the server-wide fallback setting is used.
      * {@code shield_gain} (and its per-level term) is then an additive bonus to shields
      * gained; {@code shield_gain_multiplier} (Alya) is an independent multiplier on the
      * final value. Callers pass a raw base and never apply these themselves, so a
      * source's own contribution cannot be counted twice.</p>
      */
     private static float applyShieldGain(ServerPlayer player, float amount,
-                                         String excludedPerkId) {
+                                         String excludedPerkId,
+                                         Double primaryStatMultiplierOverride) {
         var data = PerkData.of(player);
         double shieldGain = excludedPerkId == null
                 ? TalentEffects.shieldGain(player, data)
                 : TalentEffects.shieldGainExcludingPerk(player, data, excludedPerkId);
-        double primaryStatMultiplier = data.hasChosenPrimarySkillEnhancement()
+        double primaryStatMultiplier = primaryStatMultiplierOverride != null
+                ? primaryStatMultiplierOverride
+                : data.hasChosenPrimarySkillEnhancement()
                 ? ServerSettings.get().primaryStatMultiplier(
                         data.getPrimarySkillEnhancement().id()
                 )

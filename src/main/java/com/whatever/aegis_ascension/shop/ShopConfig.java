@@ -56,6 +56,13 @@ public final class ShopConfig {
     /** Raw experience points (not levels) charged per manual reroll. */
     public int manualRefreshExperienceCost = 200;
     /** Slots always filled, drawn from {@link #guaranteedItems}. */
+    /**
+     * How far a listed price may drift from its configured amount, as a fraction. At
+     * 0.15 an item costing 100 is stocked somewhere between 85 and 115. The roll happens
+     * once when the stock is generated, so a price is fixed for as long as that offer
+     * stands and waiting for a refresh is a real choice. Zero disables the variation.
+     */
+    public double priceVariance = 0.15D;
     public int minimumSlots = 3;
     /** Hard ceiling on total slots, including the guaranteed ones. */
     public int maximumSlots = 16;
@@ -148,6 +155,8 @@ public final class ShopConfig {
     /** Settings for the registry-backed Discovery Shop. */
     public static final class DiscoveryShop {
         public boolean enabled = true;
+        /** As the common shop's, applied to this shop's own rarity prices. */
+        public double priceVariance = 0.15D;
         public int autoRefreshIntervalMinutes = 60;
         public int maxManualRefreshes = 3;
         public int manualRefreshExperienceCost = 500;

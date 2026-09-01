@@ -21,7 +21,8 @@ public record ExchangePerkChargePacket() {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null) {
+            if (player == null || !ServerCatalogSync.isReady(player)
+                    || !ToggleRequestLimiter.tryAcquire(player)) {
                 return;
             }
             PerkData.get(player).ifPresent(data -> {

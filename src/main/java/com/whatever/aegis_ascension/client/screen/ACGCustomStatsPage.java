@@ -31,13 +31,19 @@ final class ACGCustomStatsPage implements ACGPage {
             List<ACGCardWidget.DetailLine> details = List.of();
             if (definition != null) {
                 Breakdown breakdown = CustomStats.breakdown(definition);
+                // A card of this height fits three lines, so each side's flat and
+                // percentage share one. The pair reads "additive / multiplicative".
                 details = List.of(
                         new ACGCardWidget.DetailLine(getTranslatableString(
-                                "screen.aegis_ascension.collection.stat.flat_value",
-                                breakdown.flatText()), 0xFFB8D7FF),
+                                "screen.aegis_ascension.collection.stat.mod_values",
+                                breakdown.flatText(),
+                                breakdown.percentageText()), 0xFF72E39A),
                         new ACGCardWidget.DetailLine(getTranslatableString(
-                                "screen.aegis_ascension.collection.stat.percentage_value",
-                                breakdown.percentageText()), ACGTheme.GOLD),
+                                "screen.aegis_ascension.collection.stat.other_values",
+                                breakdown.otherFlatText(),
+                                breakdown.otherPercentageText()),
+                                breakdown.hasOtherSources()
+                                        ? ACGTheme.GOLD : ACGTheme.TEXT_MUTED),
                         new ACGCardWidget.DetailLine(getTranslatableString(
                                 "screen.aegis_ascension.collection.stat.final_value",
                                 breakdown.finalText(definition)), card.statusColor())

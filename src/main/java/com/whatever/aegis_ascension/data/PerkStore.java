@@ -71,8 +71,9 @@ public final class PerkStore {
      * @param keepInventory when true, spares ordinary banked storage, current shop stock,
      *                      and ordinary virtual-item use counts by resetting in place
      *                      through {@link PlayerPerkData#resetAll()} - the same thing
-     *                      {@code /perk reset} does. Devour Cores are progression and are
-     *                      removed in either mode. When false, everything goes.
+     *                      {@code /perk reset} does. Trinity Tea Party Swiss Rolls and
+     *                      Devour Cores are progression and are removed in either mode.
+     *                      When false, everything goes.
      */
     public static void reset(UUID id, boolean keepInventory) {
         if (keepInventory) {

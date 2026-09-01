@@ -29,22 +29,36 @@ import java.util.Set;
 /** A unique, data-driven Aegis loaded from config/aegis_ascension/aegises.json. */
 public final class Aegis {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final int MAX_CATALOG_ENTRIES = 128;
+    private static final int MAX_WIRE_ID_LENGTH = 128;
+    /** Aegises contributed by dependent mods, by owning mod id, in registration order. */
+    private static final Map<String, List<AegisJson>> REGISTERED_AEGISES =
+            new LinkedHashMap<>();
     private static final Catalog LOCAL_CATALOG = loadCatalog();
-    private static final CatalogSnapshot LOCAL_SNAPSHOT = buildSnapshot(LOCAL_CATALOG);
-    private static volatile CatalogSnapshot activeSnapshot = LOCAL_SNAPSHOT;
+    private static volatile Catalog effectiveCatalog = buildEffectiveCatalog();
+    private static volatile CatalogSnapshot localSnapshot = buildSnapshot(effectiveCatalog);
+    private static volatile CatalogSnapshot activeSnapshot = localSnapshot;
 
     private static CatalogSnapshot buildSnapshot(Catalog catalog) {
+        return buildSnapshot(catalog, false);
+    }
+
+    private static CatalogSnapshot buildSnapshot(Catalog catalog, boolean trustServerAvailability) {
+        Objects.requireNonNull(catalog.aegises, "Missing aegises");
+        if (catalog.aegises.size() > MAX_CATALOG_ENTRIES) {
+            throw new IllegalStateException("Too many Aegises: " + catalog.aegises.size());
+        }
         List<Aegis> values = new ArrayList<>();
         Map<String, Aegis> byId = new LinkedHashMap<>();
         for (AegisJson definition : catalog.aegises) {
-            Map<String, Double> stats = definition.stats == null
-                    ? new LinkedHashMap<>()
-                    : new LinkedHashMap<>(definition.stats);
+            Objects.requireNonNull(definition, "Null Aegis entry");
+            String id = requireWireId(definition.id, "Aegis id");
+            Map<String, Double> stats = validateStats(definition.stats, id + " stats");
             Aegis aegis = new Aegis(
-                    Objects.requireNonNull(definition.id, "Missing Aegis id"),
-                    Objects.requireNonNull(definition.name, "Missing Aegis name"),
-                    Objects.requireNonNull(definition.description, "Missing Aegis description"),
-                    requireLocation(definition.icon),
+                    id,
+                    requireText(definition.name, id + " name"),
+                    requireText(definition.description, id + " description"),
+                    requireLocation(requireText(definition.icon, id + " icon")),
                     stats,
                     definition.primaryStatMultipliers == null
                             ? Map.of()
@@ -54,7 +68,8 @@ public final class Aegis {
                             : definition.extraCastExcludedSpells,
                     definition.enabled,
                     definition.initialSelectionAllowed,
-                    definition.requiresMod == null ? "" : definition.requiresMod,
+                    requiredMods(definition),
+                    !trustServerAvailability || Boolean.TRUE.equals(definition.serverAvailable),
                     definition.manualToggle != null
                             ? definition.manualToggle
                             : defaultManualToggle(definition.id)
@@ -82,14 +97,16 @@ public final class Aegis {
     private final Set<ResourceLocation> extraCastExcludedSpells;
     private final boolean enabled;
     private final boolean initialSelectionAllowed;
-    private final String requiresMod;
+    private final List<String> requiredMods;
+    private final boolean authorityAvailable;
     private final boolean manuallyToggleable;
 
     private Aegis(String id, String nameKey, String descriptionKey,
                   ResourceLocation iconTexture, Map<String, Double> stats,
                   Map<String, Double> primaryStatMultipliers,
                   List<String> extraCastExcludedSpells,
-                  boolean enabled, boolean initialSelectionAllowed, String requiresMod,
+                  boolean enabled, boolean initialSelectionAllowed, List<String> requiredMods,
+                  boolean authorityAvailable,
                   boolean manuallyToggleable) {
         this.id = id;
         this.nameKey = nameKey;
@@ -102,15 +119,17 @@ public final class Aegis {
         this.stats = Collections.unmodifiableMap(effectiveStats);
         Map<String, Double> effectivePrimaryStatMultipliers = new LinkedHashMap<>();
         primaryStatMultipliers.forEach((primaryStatId, multiplier) -> {
-            if (primaryStatId == null || primaryStatId.isBlank()
-                    || multiplier == null || !Double.isFinite(multiplier)
+            if (multiplier == null || !Double.isFinite(multiplier)
                     || multiplier < 0.0D) {
                 throw new IllegalStateException(
                         "Invalid primary-stat multiplier for Aegis " + id
                                 + ": " + primaryStatId + "=" + multiplier
                 );
             }
-            effectivePrimaryStatMultipliers.put(primaryStatId, multiplier);
+            effectivePrimaryStatMultipliers.put(
+                    requireWireId(primaryStatId, "Aegis " + id + " primary-stat id"),
+                    multiplier
+            );
         });
         this.primaryStatMultipliers = Collections.unmodifiableMap(
                 effectivePrimaryStatMultipliers
@@ -132,7 +151,8 @@ public final class Aegis {
         );
         this.enabled = enabled;
         this.initialSelectionAllowed = initialSelectionAllowed;
-        this.requiresMod = requiresMod;
+        this.requiredMods = List.copyOf(requiredMods);
+        this.authorityAvailable = authorityAvailable;
         this.manuallyToggleable = manuallyToggleable;
     }
 
@@ -198,7 +218,12 @@ public final class Aegis {
     public boolean canOffer(boolean initialSelection) {
         return enabled
                 && (!initialSelection || initialSelectionAllowed)
-                && (requiresMod.isBlank() || PlatformServices.mods().isLoaded(requiresMod));
+                && authorityAvailable
+                && requiredMods.stream().allMatch(modId -> PlatformServices.mods().isLoaded(modId));
+    }
+
+    public List<String> requiredMods() {
+        return requiredMods;
     }
 
     public static List<Aegis> values() {
@@ -209,24 +234,97 @@ public final class Aegis {
         return Optional.ofNullable(activeSnapshot.byId().get(id));
     }
 
+    /**
+     * Registers the Aegises a dependent mod ships at
+     * {@code assets/<modId>/aegises.json} inside its own jar.
+     *
+     * <p>Every id must be namespaced to the registering mod. The owning mod is added to
+     * each entry's required mods, registrations are accepted only before a server starts,
+     * and the complete candidate catalog is validated before any live state is replaced.</p>
+     *
+     * @return the number of Aegises registered for this mod
+     */
+    public static synchronized int registerAddonAegises(String modId) {
+        String namespace = requireModId(modId);
+        requireRegistrationWindow(namespace);
+        if (!PlatformServices.mods().isLoaded(namespace)) {
+            throw new IllegalStateException(
+                    "Cannot register Aegises for a mod that is not loaded: " + namespace
+            );
+        }
+        String resourcePath = "assets/" + namespace + "/aegises.json";
+        Path file = PlatformServices.mods()
+                .findModResource(namespace, resourcePath)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Mod " + namespace + " ships no " + resourcePath
+                ));
+        List<AegisJson> aegises = readAddonAegises(namespace, file);
+
+        Map<String, List<AegisJson>> candidate = new LinkedHashMap<>(REGISTERED_AEGISES);
+        candidate.put(namespace, aegises);
+        Catalog effective = buildEffectiveCatalog(candidate);
+        CatalogSnapshot rebuilt;
+        try {
+            rebuilt = buildSnapshot(effective);
+        } catch (RuntimeException exception) {
+            throw new IllegalStateException(
+                    "Aegises from mod " + namespace + " were rejected: "
+                            + exception.getMessage(),
+                    exception
+            );
+        }
+
+        REGISTERED_AEGISES.clear();
+        REGISTERED_AEGISES.putAll(candidate);
+        boolean localActive = activeSnapshot == localSnapshot;
+        effectiveCatalog = effective;
+        localSnapshot = rebuilt;
+        if (localActive) {
+            activeSnapshot = rebuilt;
+        }
+        return aegises.size();
+    }
+
+    /** Mod ids that have registered Aegises, in registration order. */
+    public static List<String> registeredAddonMods() {
+        synchronized (Aegis.class) {
+            return List.copyOf(REGISTERED_AEGISES.keySet());
+        }
+    }
+
     /** Serializes the server's effective, validated catalog for the login snapshot. */
     public static String exportCatalogJson() {
-        return GSON.toJson(LOCAL_CATALOG);
+        Catalog exported = GSON.fromJson(GSON.toJson(effectiveCatalog), Catalog.class);
+        for (AegisJson definition : exported.aegises) {
+            if (definition != null) {
+                definition.serverAvailable = requiredMods(definition).stream()
+                        .allMatch(modId -> PlatformServices.mods().isLoaded(modId));
+            }
+        }
+        return GSON.toJson(exported);
     }
 
     /** Installs a server-authoritative catalog in client memory without touching local files. */
     public static void installSyncedCatalog(String json) {
         Catalog catalog = Objects.requireNonNull(
-                GSON.fromJson(json, Catalog.class),
+                GSON.fromJson(Objects.requireNonNull(json, "json"), Catalog.class),
                 "Synchronized Aegis catalog was empty"
         );
         Objects.requireNonNull(catalog.aegises, "Missing aegises");
-        activeSnapshot = buildSnapshot(catalog);
+        // Server availability is authoritative. Do not close or hide a valid offer merely
+        // because this remote client does not have the server's optional integration mod.
+        for (AegisJson definition : catalog.aegises) {
+            if (definition != null) {
+                definition.requiresMod = "";
+                definition.requiredMods = List.of();
+            }
+        }
+        activeSnapshot = buildSnapshot(catalog, true);
     }
 
     /** Restores this installation's own catalog after leaving a remote server. */
     public static void resetSyncedCatalog() {
-        activeSnapshot = LOCAL_SNAPSHOT;
+        activeSnapshot = localSnapshot;
     }
 
     private static boolean defaultManualToggle(String id) {
@@ -274,6 +372,93 @@ public final class Aegis {
         }
     }
 
+    private static void requireRegistrationWindow(String modId) {
+        if (PlatformServices.server().currentServer() != null) {
+            throw new IllegalStateException(
+                    "Mod " + modId + " registered Aegises after the server started."
+                            + " Register during mod setup: rebuilding the catalog now would"
+                            + " invalidate loaded Aegis object identities."
+            );
+        }
+    }
+
+    private static List<AegisJson> readAddonAegises(String namespace, Path file) {
+        AddonCatalog catalog;
+        try (var reader = Files.newBufferedReader(file, StandardCharsets.UTF_8)) {
+            catalog = GSON.fromJson(reader, AddonCatalog.class);
+        } catch (Exception exception) {
+            throw new IllegalStateException(
+                    "Could not read Aegises for mod " + namespace + " from " + file,
+                    exception
+            );
+        }
+        if (catalog == null || catalog.aegises == null || catalog.aegises.isEmpty()) {
+            throw new IllegalStateException(
+                    "Mod " + namespace + " declared no Aegises in " + file
+            );
+        }
+        List<AegisJson> aegises = new ArrayList<>(catalog.aegises.size());
+        for (AegisJson definition : catalog.aegises) {
+            aegises.add(prepareAddonAegis(namespace, definition));
+        }
+        return List.copyOf(aegises);
+    }
+
+    private static AegisJson prepareAddonAegis(String namespace, AegisJson definition) {
+        if (definition == null) {
+            throw new IllegalStateException(
+                    "Mod " + namespace + " declared a null Aegis entry"
+            );
+        }
+        requireAddonId(namespace, definition.id, "Aegis");
+        requireAddonField(namespace, definition.id, "name", definition.name);
+        requireAddonField(namespace, definition.id, "description", definition.description);
+        requireAddonField(namespace, definition.id, "icon", definition.icon);
+
+        List<String> requiredMods = new ArrayList<>(requiredMods(definition));
+        requiredMods.add(namespace);
+        definition.requiresMod = "";
+        definition.requiredMods = List.copyOf(new LinkedHashSet<>(requiredMods));
+        return definition;
+    }
+
+    private static void requireAddonId(String namespace, String value, String kind) {
+        ResourceLocation location = value == null
+                ? null
+                : PlatformServices.resources().tryParse(value);
+        if (location == null || !namespace.equals(location.getNamespace())
+                || value.length() > MAX_WIRE_ID_LENGTH) {
+            throw new IllegalStateException(
+                    kind + " id " + value + " from mod " + namespace
+                            + " must be a valid namespaced id under " + namespace + ":"
+            );
+        }
+    }
+
+    private static void requireAddonField(String namespace, String entryId,
+                                          String field, String value) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException(
+                    "Aegis " + entryId + " from mod " + namespace
+                            + " is missing required field \"" + field + "\""
+            );
+        }
+    }
+
+    private static Catalog buildEffectiveCatalog() {
+        return buildEffectiveCatalog(REGISTERED_AEGISES);
+    }
+
+    private static Catalog buildEffectiveCatalog(
+            Map<String, List<AegisJson>> registered
+    ) {
+        Catalog effective = new Catalog();
+        List<AegisJson> aegises = new ArrayList<>(LOCAL_CATALOG.aegises);
+        registered.values().forEach(aegises::addAll);
+        effective.aegises = List.copyOf(aegises);
+        return effective;
+    }
+
     private static ResourceLocation requireLocation(String value) {
         ResourceLocation location = PlatformServices.resources().tryParse(value);
         if (location == null) {
@@ -282,8 +467,69 @@ public final class Aegis {
         return location;
     }
 
+    private static String requireText(String value, String field) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("Missing " + field);
+        }
+        return value;
+    }
+
+    private static String requireWireId(String value, String field) {
+        String id = requireText(value, field);
+        if (id.length() > MAX_WIRE_ID_LENGTH) {
+            throw new IllegalStateException(field + " exceeds " + MAX_WIRE_ID_LENGTH + " characters");
+        }
+        return id;
+    }
+
+    private static Map<String, Double> validateStats(Map<String, Double> stats, String field) {
+        if (stats == null) {
+            return Map.of();
+        }
+        Map<String, Double> validated = new LinkedHashMap<>();
+        stats.forEach((key, value) -> {
+            String statId = requireWireId(key, field + " key");
+            if (value == null || !Double.isFinite(value)) {
+                throw new IllegalStateException("Invalid " + field + " entry: " + key + "=" + value);
+            }
+            validated.put(statId, value);
+        });
+        return validated;
+    }
+
+    private static String requireModId(String value) {
+        if (value == null || value.isBlank()) {
+            return "";
+        }
+        String modId = value.trim();
+        if (!modId.matches("[a-z][a-z0-9_]*")) {
+            throw new IllegalStateException("Invalid required mod id: " + value);
+        }
+        return modId;
+    }
+
+    private static List<String> requiredMods(AegisJson definition) {
+        LinkedHashSet<String> modIds = new LinkedHashSet<>();
+        if (definition.requiresMod != null && !definition.requiresMod.isBlank()) {
+            modIds.add(requireModId(definition.requiresMod));
+        }
+        if (definition.requiredMods != null) {
+            for (String modId : definition.requiredMods) {
+                if (modId != null && !modId.isBlank()) {
+                    modIds.add(requireModId(modId));
+                }
+            }
+        }
+        return List.copyOf(modIds);
+    }
+
     private static final class Catalog {
         private List<AegisJson> aegises = List.of();
+    }
+
+    /** The narrow shape a dependent mod may ship: Aegises only. */
+    private static final class AddonCatalog {
+        private List<AegisJson> aegises;
     }
 
     private static final class AegisJson {
@@ -301,6 +547,10 @@ public final class Aegis {
         private boolean initialSelectionAllowed = true;
         @SerializedName("requires_mod")
         private String requiresMod = "";
+        @SerializedName("required_mods")
+        private List<String> requiredMods = List.of();
+        @SerializedName("server_available")
+        private Boolean serverAvailable;
         @SerializedName("manual_toggle")
         private Boolean manualToggle;
     }

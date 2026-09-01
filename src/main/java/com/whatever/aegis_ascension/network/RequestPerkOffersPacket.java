@@ -20,7 +20,8 @@ public record RequestPerkOffersPacket() {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer sender = context.getSender();
-            if (sender == null) {
+            if (sender == null || !ServerCatalogSync.isReady(sender)
+                    || !ProgressionRequestLimiter.tryAcquirePerkOffers(sender)) {
                 return;
             }
 

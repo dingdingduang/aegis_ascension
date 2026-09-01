@@ -87,6 +87,21 @@ public final class QuestState {
     public void addSide(QuestProgress value) { if (value != null) side.add(value); }
     public void clearDaily() { daily.clear(); }
     public void clearCommon() { common.clear(); }
+    /** Withdraws matching quests from every list; used by the admin grant command. */
+    public boolean removeIf(java.util.function.Predicate<QuestProgress> filter) {
+        if (filter == null) return false;
+        boolean removed = daily.removeIf(filter);
+        removed |= common.removeIf(filter);
+        removed |= challenges.removeIf(filter);
+        removed |= chunks.removeIf(filter);
+        removed |= side.removeIf(filter);
+        return removed;
+    }
+
+    /** Withdraws Common quests matching the filter; used to hide stages that are locked. */
+    public boolean removeCommonIf(java.util.function.Predicate<QuestProgress> filter) {
+        return filter != null && common.removeIf(filter);
+    }
     public void clearChallenges() { challenges.clear(); }
     public void clearChunks() { chunks.clear(); }
     public void clearSide() { side.clear(); }

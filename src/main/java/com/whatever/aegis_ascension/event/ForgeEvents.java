@@ -9,10 +9,14 @@ import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import com.whatever.aegis_ascension.mechanic.ServerTickHandler;
 import com.whatever.aegis_ascension.mechanic.ServerGameplayHandler;
 import com.whatever.aegis_ascension.mechanic.ShieldMechanic;
+import com.whatever.aegis_ascension.mechanic.MagicBladeMechanic;
 import com.whatever.aegis_ascension.network.ServerCatalogSync;
 import com.whatever.aegis_ascension.quest.QuestManager;
+import com.whatever.aegis_ascension.network.ModNetworking;
+import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.perk.talents.KoharuShield;
 import com.whatever.aegis_ascension.perk.talents.HomuraExperienceProtection;
+import com.whatever.aegis_ascension.perk.talents.HomuraResetNegation;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -26,6 +30,7 @@ import net.minecraftforge.event.server.ServerStoppedEvent;
 import net.minecraftforge.event.entity.player.PlayerXpEvent;
 import net.minecraftforge.event.entity.player.TradeWithVillagerEvent;
 import net.minecraftforge.event.entity.living.LivingDamageEvent;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
@@ -33,6 +38,9 @@ import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.level.BlockEvent;
+import net.minecraftforge.event.entity.ProjectileImpactEvent;
+import net.minecraft.world.entity.projectile.AbstractArrow;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraft.world.level.block.CropBlock;
 import net.minecraft.world.level.block.entity.RandomizableContainerBlockEntity;
@@ -43,6 +51,12 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = AegisAscensionMod.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class ForgeEvents {
+    /**
+     * Separates an arrow the player just loosed from one restored motionless from disk.
+     * Even a minimally drawn bow launches well above this, while a stuck arrow sits at zero.
+     */
+    private static final double MINIMUM_LOOSED_ARROW_SPEED_SQUARED = 0.05D;
+
     private ForgeEvents() {
     }
 
@@ -91,6 +105,7 @@ public final class ForgeEvents {
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
         HomuraExperienceProtection.clear();
+        HomuraResetNegation.clear();
         QuestManager.clearTransientState();
         ServerCatalogSync.clearAll();
         PlayerDataLifecycle.onServerStopped();
@@ -221,6 +236,14 @@ public final class ForgeEvents {
 //                Float.isFinite(player.getAbsorptionAmount())
 //        );
 //    }
+
+    /** Converts enabled Magic Blade player attacks before vanilla mitigation begins. */
+    @SubscribeEvent(priority = EventPriority.HIGHEST)
+    public static void onLivingAttack(LivingAttackEvent event) {
+        if (MagicBladeMechanic.convertAttack(event.getEntity(), event.getSource())) {
+            event.setCanceled(true);
+        }
+    }
 
     /** Captures base damage before Apothic Attributes' HIGH-priority crit handler. */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -356,6 +379,70 @@ public final class ForgeEvents {
         boolean unopenedGeneratedLoot = blockEntity.saveWithoutMetadata().contains(
                 RandomizableContainerBlockEntity.LOOT_TABLE_TAG, Tag.TAG_STRING);
         QuestManager.onChestOpened(player, event.getPos(), unopenedGeneratedLoot);
+    }
+
+    @SubscribeEvent
+    public static void onQuestCraft(PlayerEvent.ItemCraftedEvent event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) return;
+        QuestManager.onCraft(player, event.getCrafting());
+    }
+
+    @SubscribeEvent
+    public static void onQuestBlockBroken(BlockEvent.BreakEvent event) {
+        if (event.isCanceled() || !(event.getPlayer() instanceof ServerPlayer player)) return;
+        QuestManager.onBlockBroken(player, event.getState());
+    }
+
+    /**
+     * Fires for every arrow that enters the level rather than for the bow release, so
+     * crossbow bolts and multishot volleys count alongside ordinary bow shots.
+     *
+     * <p>This event also fires for arrows restored from disk, and an arrow stuck in a
+     * block keeps both its owner and its saved entity, so a chunk reload would otherwise
+     * re-count every spent shot. Only a moving arrow is a shot the player just took.</p>
+     */
+    @SubscribeEvent
+    public static void onQuestArrowShot(EntityJoinLevelEvent event) {
+        if (event.isCanceled() || event.getLevel().isClientSide()
+                || !(event.getEntity() instanceof AbstractArrow arrow)
+                || !(arrow.getOwner() instanceof ServerPlayer player)
+                || arrow.getDeltaMovement().lengthSqr() <= MINIMUM_LOOSED_ARROW_SPEED_SQUARED) {
+            return;
+        }
+        QuestManager.onArrowShot(player, arrow);
+    }
+
+    @SubscribeEvent
+    public static void onQuestArrowHit(ProjectileImpactEvent event) {
+        if (event.isCanceled() || !(event.getProjectile() instanceof AbstractArrow arrow)
+                || !(arrow.getOwner() instanceof ServerPlayer player)
+                || !(event.getRayTraceResult() instanceof EntityHitResult hit)
+                || !(hit.getEntity() instanceof LivingEntity victim)
+                || victim == player) {
+            return;
+        }
+        QuestManager.onArrowHit(player, victim);
+    }
+
+    /** Fails constrained quests only after revive handlers have declined to cancel. */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onQuestOwnerDied(LivingDeathEvent event) {
+        if (event.isCanceled() || !(event.getEntity() instanceof ServerPlayer player)) return;
+        PerkData.get(player).ifPresent(data -> {
+            if (QuestManager.onPlayerDied(data)) ModNetworking.syncQuestsTo(player);
+        });
+    }
+
+    /** Cancelled damage never lands, so it must not break a no-damage constraint. */
+    @SubscribeEvent(priority = EventPriority.LOWEST)
+    public static void onQuestOwnerDamaged(LivingHurtEvent event) {
+        if (event.isCanceled() || event.getAmount() <= 0.0F
+                || !(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        PerkData.get(player).ifPresent(data -> {
+            if (QuestManager.onPlayerDamaged(data)) ModNetworking.syncQuestsTo(player);
+        });
     }
 
     /** Captures only genuine deaths after revive/cancel handlers have finished. */

@@ -40,7 +40,12 @@ public final class MysteriousDoll {
     public static final String RANDOM_TALENT = "random_talent";
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
-    private static final List<Outcome> OUTCOMES = loadOutcomes();
+    private static final int MAX_CATALOG_ENTRIES = 256;
+    private static final int MAX_WIRE_ID_LENGTH = 128;
+    private static final Catalog LOCAL_CATALOG = loadCatalog();
+    private static final List<Outcome> LOCAL_OUTCOMES = buildOutcomes(LOCAL_CATALOG);
+    private static volatile List<Outcome> activeOutcomes = LOCAL_OUTCOMES;
+    private static volatile boolean usingSyncedCatalog;
 
     private MysteriousDoll() {
     }
@@ -48,7 +53,7 @@ public final class MysteriousDoll {
     /** Rolls and immediately grants exactly one non-banned, available outcome. */
     public static void roll(ServerPlayer player, PlayerPerkData data) {
         List<Item> itemPool = randomItemPool(player);
-        List<Outcome> available = OUTCOMES.stream()
+        List<Outcome> available = activeOutcomes.stream()
                 .filter(Outcome::enabled)
                 .filter(outcome -> outcome.weight() > 0.0D)
                 .filter(outcome -> !PlatformServices.config().isMysteriousDollOutcomeBanned(
@@ -82,11 +87,10 @@ public final class MysteriousDoll {
         MutableComponent description = getTranslatableString(
                 "perk.aegis_ascension.perk_mysterious_doll.description"
         );
-        for (Outcome outcome : OUTCOMES.stream()
+        for (Outcome outcome : activeOutcomes.stream()
                 .filter(Outcome::enabled)
-                .filter(candidate -> !PlatformServices.config().isMysteriousDollOutcomeBanned(
-                        candidate.id()
-                ))
+                .filter(candidate -> usingSyncedCatalog
+                        || !PlatformServices.config().isMysteriousDollOutcomeBanned(candidate.id()))
                 .toList()) {
             description.append("\n").append(describe(outcome));
         }
@@ -96,7 +100,33 @@ public final class MysteriousDoll {
     }
 
     public static List<Outcome> outcomes() {
-        return OUTCOMES;
+        return activeOutcomes;
+    }
+
+    /** Serializes the server-effective outcome pool, including common-config bans. */
+    public static String exportCatalogJson() {
+        Catalog effective = GSON.fromJson(GSON.toJson(LOCAL_CATALOG), Catalog.class);
+        for (OutcomeJson definition : effective.outcomes) {
+            if (definition != null
+                    && PlatformServices.config().isMysteriousDollOutcomeBanned(definition.id)) {
+                definition.enabled = false;
+            }
+        }
+        return GSON.toJson(effective);
+    }
+
+    public static void installSyncedCatalog(String json) {
+        Catalog catalog = Objects.requireNonNull(
+                GSON.fromJson(Objects.requireNonNull(json, "json"), Catalog.class),
+                "Synchronized Mysterious Doll catalog was empty"
+        );
+        activeOutcomes = buildOutcomes(catalog);
+        usingSyncedCatalog = true;
+    }
+
+    public static void resetSyncedCatalog() {
+        activeOutcomes = LOCAL_OUTCOMES;
+        usingSyncedCatalog = false;
     }
 
     private static boolean isAvailable(Outcome outcome, PlayerPerkData data,
@@ -258,7 +288,7 @@ public final class MysteriousDoll {
         return outcome.amount() > 0.0D ? "+" + formatted : formatted;
     }
 
-    private static List<Outcome> loadOutcomes() {
+    private static Catalog loadCatalog() {
         Path configPath = PlatformServices.paths()
                 .modConfigDirectory(AegisAscensionMod.MOD_ID)
                 .resolve("mysterious_doll.json");
@@ -280,27 +310,38 @@ public final class MysteriousDoll {
             try (var reader = Files.newBufferedReader(configPath, StandardCharsets.UTF_8)) {
                 catalog = GSON.fromJson(reader, Catalog.class);
             }
-            Objects.requireNonNull(catalog, "Mysterious Doll catalog was empty");
-            Objects.requireNonNull(catalog.outcomes, "Missing Mysterious Doll outcomes");
-            if (catalog.outcomes.isEmpty()) {
-                throw new IllegalStateException("Mysterious Doll outcome pool is empty");
-            }
-
-            List<Outcome> outcomes = new ArrayList<>();
-            Set<String> ids = new LinkedHashSet<>();
-            for (OutcomeJson definition : catalog.outcomes) {
-                Outcome outcome = validate(definition);
-                if (!ids.add(outcome.id())) {
-                    throw new IllegalStateException(
-                            "Duplicate Mysterious Doll outcome id: " + outcome.id()
-                    );
-                }
-                outcomes.add(outcome);
-            }
-            return List.copyOf(outcomes);
+            return Objects.requireNonNull(catalog, "Mysterious Doll catalog was empty");
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
+    }
+
+    private static List<Outcome> buildOutcomes(Catalog catalog) {
+        Objects.requireNonNull(catalog.outcomes, "Missing Mysterious Doll outcomes");
+        if (catalog.outcomes.isEmpty()) {
+            throw new IllegalStateException("Mysterious Doll outcome pool is empty");
+        }
+        if (catalog.outcomes.size() > MAX_CATALOG_ENTRIES) {
+            throw new IllegalStateException(
+                    "Too many Mysterious Doll outcomes: " + catalog.outcomes.size()
+            );
+        }
+
+        List<Outcome> outcomes = new ArrayList<>();
+        Set<String> ids = new LinkedHashSet<>();
+        for (OutcomeJson definition : catalog.outcomes) {
+            Outcome outcome = validate(Objects.requireNonNull(
+                    definition,
+                    "Null Mysterious Doll outcome"
+            ));
+            if (!ids.add(outcome.id())) {
+                throw new IllegalStateException(
+                        "Duplicate Mysterious Doll outcome id: " + outcome.id()
+                );
+            }
+            outcomes.add(outcome);
+        }
+        return List.copyOf(outcomes);
     }
 
     private static Outcome validate(OutcomeJson definition) {
@@ -319,6 +360,11 @@ public final class MysteriousDoll {
         if (id.isBlank()) {
             throw new IllegalStateException("Blank Mysterious Doll outcome id");
         }
+        if (id.length() > MAX_WIRE_ID_LENGTH) {
+            throw new IllegalStateException(
+                    "Mysterious Doll outcome id exceeds " + MAX_WIRE_ID_LENGTH + " characters"
+            );
+        }
         if (!List.of(CUSTOM_STAT, RANDOM_AEGIS, RANDOM_ITEM, RANDOM_TALENT)
                 .contains(type)) {
             throw new IllegalStateException(
@@ -328,6 +374,12 @@ public final class MysteriousDoll {
         if (type.equals(CUSTOM_STAT) && stat.isBlank()) {
             throw new IllegalStateException(
                     "Mysterious Doll custom_stat outcome is missing stat: " + id
+            );
+        }
+        if (type.equals(CUSTOM_STAT) && stat.length() > MAX_WIRE_ID_LENGTH) {
+            throw new IllegalStateException(
+                    "Mysterious Doll custom stat id exceeds " + MAX_WIRE_ID_LENGTH
+                            + " characters: " + id
             );
         }
         if (type.equals(RANDOM_TALENT)) {
@@ -345,7 +397,8 @@ public final class MysteriousDoll {
                     "Invalid Mysterious Doll format for " + id + ": " + format
             );
         }
-        if (!Double.isFinite(definition.weight) || !Double.isFinite(definition.amount)) {
+        if (!Double.isFinite(definition.weight) || definition.weight < 0.0D
+                || !Double.isFinite(definition.amount)) {
             throw new IllegalStateException(
                     "Non-finite Mysterious Doll value for outcome: " + id
             );

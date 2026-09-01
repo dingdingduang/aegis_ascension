@@ -6,6 +6,7 @@ import static com.whatever.aegis_ascension.perk.soullink.SoulLinkEffects.stat;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.util.AegisModifiers;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.LivingEntity;
@@ -20,9 +21,9 @@ public final class MakeUpWorkClub {
     private static final String STACKS_TAG = "aegis_ascension.make_up_armor_shred_stacks";
     private static final String EXPIRES_TAG = "aegis_ascension.make_up_armor_shred_expires";
     private static final UUID FLAT_ARMOR_MODIFIER_ID =
-            UUID.fromString("c87d0ba5-b58c-47bb-a11e-b46b0ce1f1cb");
+            AegisModifiers.adopt("c87d0ba5-b58c-47bb-a11e-b46b0ce1f1cb");
     private static final UUID ZERO_ARMOR_MODIFIER_ID =
-            UUID.fromString("0373ae1c-d9dd-4649-baa3-f1c59d20cb66");
+            AegisModifiers.adopt("0373ae1c-d9dd-4649-baa3-f1c59d20cb66");
 
     private MakeUpWorkClub() {
     }

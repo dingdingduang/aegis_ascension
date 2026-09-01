@@ -2,7 +2,6 @@ package com.whatever.aegis_ascension.platform;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.network.*;
-import com.whatever.aegis_ascension.util.GeneralClientMethods;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -31,10 +30,12 @@ public final class ForgeNetworkAccess implements NetworkAccess {
     // 38 -> 39: login-time server catalog snapshot and acknowledgement handshake.
     // 39 -> 40: completed-quest icon metadata in Quest Center synchronization.
     // 40 -> 41: synchronized data-driven quest completion SoundEvent id.
-    private static final String PROTOCOL_VERSION = "41";
+    // 41 -> 42: display-stats-only packet, and per-source stat records on request.
+    // 42 -> 43: complete login catalog snapshot (Soul Links and special-talent data).
+    private static final String PROTOCOL_VERSION = "43";
 
     private final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
-            GeneralClientMethods.fromNamespaceAndPath(AegisAscensionMod.MOD_ID, "main"),
+            ResourceLocation.fromNamespaceAndPath(AegisAscensionMod.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals
@@ -353,6 +354,10 @@ public final class ForgeNetworkAccess implements NetworkAccess {
                 AcknowledgeServerCatalogPacket::decode,
                 AcknowledgeServerCatalogPacket::handle,
                 Optional.of(NetworkDirection.PLAY_TO_SERVER));
+        channel.registerMessage(
+                id++, SyncDisplayStatsPacket.class, SyncDisplayStatsPacket::encode,
+                SyncDisplayStatsPacket::decode, SyncDisplayStatsPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT));
     }
 
     @Override

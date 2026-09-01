@@ -20,7 +20,8 @@ public record RequestAegisOffersPacket() {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer sender = context.getSender();
-            if (sender == null) {
+            if (sender == null || !ServerCatalogSync.isReady(sender)
+                    || !ProgressionRequestLimiter.tryAcquireAegisOffers(sender)) {
                 return;
             }
             PerkData.get(sender).ifPresent(data -> {

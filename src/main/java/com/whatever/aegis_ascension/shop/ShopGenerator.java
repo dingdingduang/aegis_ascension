@@ -70,7 +70,8 @@ public final class ShopGenerator {
                         && !uniqueVirtualsInRoll.add(entry.virtualId)) {
                     continue;
                 }
-                offers.add(virtualOffer(entry.virtualId, entry.count, entry.experienceCost));
+                offers.add(virtualOffer(entry.virtualId, entry.count,
+                        rollPrice(entry.experienceCost, config.priceVariance, random)));
                 continue;
             }
             Item item = ShopConfig.resolveItem(entry.item);
@@ -78,7 +79,8 @@ public final class ShopGenerator {
                 continue;
             }
             // Fixed entries are offered at their exact configured count, never randomized.
-            offers.add(new ShopOffer(new ItemStack(item, entry.count), entry.experienceCost,
+            offers.add(new ShopOffer(new ItemStack(item, entry.count),
+                    rollPrice(entry.experienceCost, config.priceVariance, random),
                     GeneralConstants.rarityColor(entry.tier)));
         }
 
@@ -134,7 +136,8 @@ public final class ShopGenerator {
                 int min = Math.max(1, picked.minCount);
                 int max = Math.max(min, picked.maxCount);
                 int count = min >= max ? min : min + random.nextInt(max - min + 1);
-                offers.add(virtualOffer(picked.virtualId, count, picked.experienceCost));
+                offers.add(virtualOffer(picked.virtualId, count,
+                        rollPrice(picked.experienceCost, config.priceVariance, random)));
                 VirtualItems.Definition definition = VirtualItems.byId(picked.virtualId);
                 if (definition.uniquePurchase) {
                     uniqueVirtualsInRoll.add(picked.virtualId);
@@ -147,7 +150,8 @@ public final class ShopGenerator {
                 continue;
             }
             offers.add(new ShopOffer(new ItemStack(item, rollCount(picked, item, random)),
-                    picked.experienceCost, GeneralConstants.rarityColor(picked.tier)));
+                    rollPrice(picked.experienceCost, config.priceVariance, random),
+                    GeneralConstants.rarityColor(picked.tier)));
         }
         return offers;
     }
@@ -298,7 +302,7 @@ public final class ShopGenerator {
             int count = min >= max ? min : min + random.nextInt(max - min + 1);
             offers.add(new ShopOffer(
                     new ItemStack(item, count),
-                    settings.experienceCost(),
+                    rollPrice(settings.experienceCost(), config.priceVariance, random),
                     GeneralConstants.rarityColor(settings.tier())
             ));
         }
@@ -410,6 +414,22 @@ public final class ShopGenerator {
      * and clamped to the item's own max stack size so an unstackable item (a tool, armor)
      * can never be offered as a stack of 3 even if the config asks for it.
      */
+    /**
+     * Varies a listed price around its configured amount so the same item is not always
+     * worth the same. Rolled once when the stock is generated and carried on the offer,
+     * so the price a player is shown is the price the server charges, and a cheap roll
+     * rewards checking the shop rather than being a client-side illusion.
+     */
+    private static int rollPrice(int basePrice, double variance, RandomSource random) {
+        if (basePrice <= 0 || !(variance > 0.0D) || !Double.isFinite(variance)) {
+            return Math.max(0, basePrice);
+        }
+        double spread = Math.min(0.95D, variance);
+        double factor = 1.0D + (random.nextDouble() * 2.0D - 1.0D) * spread;
+        long rolled = Math.round(basePrice * factor);
+        return (int) Math.max(1L, Math.min(Integer.MAX_VALUE, rolled));
+    }
+
     private static int rollCount(ShopConfig.RandomEntry entry, Item item, RandomSource random) {
         int max = Math.min(entry.maxCount, item.getMaxStackSize());
         int min = Math.max(1, Math.min(entry.minCount, max));

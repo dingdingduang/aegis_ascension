@@ -190,8 +190,12 @@ public final class TalentConstants {
             "attack_speed_flat_per_stack";
     public static final String ATTACK_SPEED_MULTIPLIER = "attack_speed_multiplier";
     public static final String ATTACK_SPEED = "attack_speed";
+    /** This mod's own additive and multiplicative share of a stat. */
     public static final String DISPLAY_FLAT_PREFIX = "__display_flat.";
     public static final String DISPLAY_PERCENT_PREFIX = "__display_percent.";
+    /** Everything else feeding a stat: the vanilla base value, equipment, other mods. */
+    public static final String DISPLAY_OTHER_FLAT_PREFIX = "__display_other_flat.";
+    public static final String DISPLAY_OTHER_PERCENT_PREFIX = "__display_other_percent.";
     public static final String ATTACKS_PER_STACK = "attacks_per_stack";
     public static final String BASE_TRIGGER_CHANCE = "base_trigger_chance";
     public static final String BLAZING_REVIVE_USED = "blazing_revive_used";
@@ -448,6 +452,7 @@ public final class TalentConstants {
     public static final String SHIELD_GAIN = "shield_gain";
     public static final String SHIELD_GAIN_MULTIPLIER = "shield_gain_multiplier";
     public static final String SHIELD_GAIN_PER_LEVEL = "shield_gain_per_level";
+    public static final String SHIELD_PRIMARY_MULTIPLIER = "shield_primary_multiplier";
     public static final String SHIELD_PER_DAMAGE_BONUS_STEP =
             "shield_per_damage_bonus_step";
     public static final String SHIELD_DAMAGE_BONUS_INTERVAL_SECONDS =

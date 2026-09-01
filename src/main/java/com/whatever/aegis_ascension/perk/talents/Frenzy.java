@@ -5,6 +5,7 @@ import static com.whatever.aegis_ascension.perk.TalentConstants.*;
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
+import com.whatever.aegis_ascension.util.AegisModifiers;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Mob;
@@ -16,7 +17,7 @@ import java.util.UUID;
 /** Applies Frenzy's one-time permanent Max Health modifier to nearby spawned mobs. */
 public final class Frenzy {
     private static final UUID MAX_HEALTH_MODIFIER_ID =
-            UUID.fromString("e9e8df40-5d23-4094-95c1-f182cd97039c");
+            AegisModifiers.adopt("e9e8df40-5d23-4094-95c1-f182cd97039c");
 
     private Frenzy() {
     }

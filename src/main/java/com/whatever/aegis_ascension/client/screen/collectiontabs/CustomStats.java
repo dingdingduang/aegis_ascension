@@ -28,9 +28,9 @@ import java.util.List;
  */
 public final class CustomStats {
     private static final List<Definition> DEFINITIONS = List.of(
-            skillStat(ATTACK_DAMAGE, "attack_damage", Format.NUMBER),
-            skillStat(ARMOR, "armor", Format.NUMBER),
-            skillStat(ATTACK_SPEED, "attack_speed", Format.NUMBER),
+            skillAttributeStat(ATTACK_DAMAGE, "attack_damage", Format.NUMBER),
+            skillAttributeStat(ARMOR, "armor", Format.NUMBER),
+            skillAttributeStat(ATTACK_SPEED, "attack_speed", Format.NUMBER),
             stat(ALL_SKILL_ENHANCEMENT_ATTRIBUTE, PERK_NOELLE, Format.PERCENT),
             stat(BREAKTHROUGH_EFFECT, PERK_PLANA, Format.PERCENT),
             stat(FINAL_DAMAGE, PERK_KOKONA, Format.PERCENT),
@@ -53,7 +53,7 @@ public final class CustomStats {
             stat(SUMMON_COUNT, PERK_PLATEAU_WITCH, Format.INTEGER),
             stat(CRITICAL_CHANCE, PERK_INK_DYED_SAKURA, Format.PERCENT),
             stat(CRITICAL_DAMAGE, PERK_HALF_HUMAN_HALF_PHANTOM_GARDENER, Format.PERCENT),
-            stat(LUCK, PERK_ALICE, Format.NUMBER),
+            attributeStat(LUCK, PERK_ALICE, Format.NUMBER),
             stat(LUCKY_STRIKE, PERK_LUCKY_ARROW, Format.PERCENT),
             stat(PRIMARY_ATTRIBUTE_FLAT, PERK_ARONA, Format.NUMBER),
             stat(ATTACK_RANGE, PERK_WIND_ARROW, Format.NUMBER),
@@ -98,6 +98,16 @@ public final class CustomStats {
                     .append(getTranslatableString(
                             "screen.aegis_ascension.collection.stat.percentage_value",
                             breakdown.percentageText()
+                    ))
+                    .append("\n")
+                    .append(getTranslatableString(
+                            "screen.aegis_ascension.collection.stat.other_flat_value",
+                            breakdown.otherFlatText()
+                    ))
+                    .append("\n")
+                    .append(getTranslatableString(
+                            "screen.aegis_ascension.collection.stat.other_percentage_value",
+                            breakdown.otherPercentageText()
                     ))
                     .append("\n")
                     .append(getTranslatableString(
@@ -146,31 +156,48 @@ public final class CustomStats {
             return new Breakdown(
                     ClientPerkState.getDisplayStat(flatKey),
                     ClientPerkState.getDisplayStat(percentageKey),
+                    ClientPerkState.getDisplayStat(
+                            DISPLAY_OTHER_FLAT_PREFIX + definition.key()),
+                    ClientPerkState.getDisplayStat(
+                            DISPLAY_OTHER_PERCENT_PREFIX + definition.key()),
                     finalValue
             );
         }
+        // Stats fed only by talents.json and aegises.json: nothing outside the mod can
+        // reach them, so the whole value is ours and both "other" halves are zero.
         if (definition.format().percentageBased()) {
-            return new Breakdown(0.0D, finalValue, finalValue);
+            return new Breakdown(0.0D, finalValue, 0.0D, 0.0D, finalValue);
         }
-        return new Breakdown(finalValue, 0.0D, finalValue);
+        return new Breakdown(finalValue, 0.0D, 0.0D, 0.0D, finalValue);
     }
 
+    /** A stat only this mod's talents and Aegises can contribute to. */
     private static Definition stat(String key, String iconPerkId, Format format) {
-        ResourceLocation icon = Perk.byId(iconPerkId)
+        return new Definition(key, perkIcon(iconPerkId), format, false);
+    }
+
+    /** A stat backed by a live Minecraft attribute, so equipment can reach it too. */
+    private static Definition attributeStat(String key, String iconPerkId, Format format) {
+        return new Definition(key, perkIcon(iconPerkId), format, true);
+    }
+
+    private static ResourceLocation perkIcon(String iconPerkId) {
+        return Perk.byId(iconPerkId)
                 .map(Perk::iconTexture)
                 .orElseThrow(() -> new IllegalStateException(
                         "Missing stat icon talent: " + iconPerkId
                 ));
-        return new Definition(key, icon, format);
     }
 
-    private static Definition skillStat(String key, String enhancementId, Format format) {
+    /** A Minecraft-attribute stat whose icon comes from a Skill Enhancement. */
+    private static Definition skillAttributeStat(String key, String enhancementId,
+                                                 Format format) {
         ResourceLocation icon = SkillEnhancement.byId(enhancementId)
                 .map(SkillEnhancement::iconTexture)
                 .orElseThrow(() -> new IllegalStateException(
                         "Missing stat icon enhancement: " + enhancementId
                 ));
-        return new Definition(key, icon, format);
+        return new Definition(key, icon, format, true);
     }
 
     private static Definition aegisStat(String key, String aegisId, Format format) {
@@ -179,7 +206,7 @@ public final class CustomStats {
                 .orElseThrow(() -> new IllegalStateException(
                         "Missing stat icon Aegis: " + aegisId
                 ));
-        return new Definition(key, icon, format);
+        return new Definition(key, icon, format, false);
     }
 
     private static Definition soulStat(String key, String soulLinkId, Format format) {
@@ -188,7 +215,7 @@ public final class CustomStats {
                 .orElseThrow(() -> new IllegalStateException(
                         "Missing stat icon Soul Link: " + soulLinkId
                 ));
-        return new Definition(key, icon, format);
+        return new Definition(key, icon, format, false);
     }
 
     public enum Format {
@@ -240,7 +267,13 @@ public final class CustomStats {
         }
     }
 
-    public record Definition(String key, ResourceLocation icon, Format format) {
+    /**
+     * @param attributeBacked whether a live Minecraft attribute backs this stat, so
+     *                        equipment, potions, or other mods can feed it alongside
+     *                        Aegis Ascension. Only these carry a non-zero "other" half.
+     */
+    public record Definition(String key, ResourceLocation icon, Format format,
+                             boolean attributeBacked) {
         public String translationKey() {
             return "screen.aegis_ascension.collection.stat." + key;
         }
@@ -250,7 +283,17 @@ public final class CustomStats {
         }
     }
 
-    public record Breakdown(double flat, double percentage, double finalValue) {
+    /**
+     * @param flat             this mod's additive contribution
+     * @param percentage       this mod's multiplicative contribution
+     * @param otherFlat        base value plus additive contributions from outside the mod
+     * @param otherPercentage  multiplicative contributions from outside the mod
+     * @param finalValue       the player's real current value, equal to
+     *                         {@code (flat + otherFlat) * (1 + percentage)
+     *                         * (1 + otherPercentage)}
+     */
+    public record Breakdown(double flat, double percentage, double otherFlat,
+                            double otherPercentage, double finalValue) {
         public String flatText() {
             return Format.NUMBER.format(flat);
         }
@@ -259,8 +302,21 @@ public final class CustomStats {
             return Format.PERCENT.format(percentage);
         }
 
+        public String otherFlatText() {
+            return Format.NUMBER.format(otherFlat);
+        }
+
+        public String otherPercentageText() {
+            return Format.PERCENT.format(otherPercentage);
+        }
+
         public String finalText(Definition definition) {
             return definition.format().format(finalValue);
+        }
+
+        /** Whether anything outside this mod currently feeds the stat. */
+        public boolean hasOtherSources() {
+            return Math.abs(otherFlat) > 1.0E-9D || Math.abs(otherPercentage) > 1.0E-9D;
         }
     }
 }

@@ -71,7 +71,7 @@ public final class AngelsAegis {
     }
 
     /**
-     * {@code Initial_Capacity = Primary_Stat * shield_primary_multiplier}.
+     * {@code Raw_Capacity = Primary_Stat * shield_primary_multiplier}.
      *
      * <p>The primary stat is the live value of the player's chosen primary skill
      * enhancement (for an "armor" primary, the player's armor), so the shield scales
@@ -81,6 +81,22 @@ public final class AngelsAegis {
         double primaryStat = GeneralIronSpellSupportMethods.primaryStat(player, data);
         double multiplier = aegisStat(AegisConstants.SHIELD_PRIMARY_MULTIPLIER);
         return (float) Math.max(0.0D, primaryStat * multiplier);
+    }
+
+    /**
+     * Returns Angel's per-Primary-Attribute shield limit, or null for an older/custom
+     * definition without a multiplier map so the shared server fallback remains active.
+     */
+    private static Double primaryStatMultiplier(PlayerPerkData data) {
+        if (!data.hasChosenPrimarySkillEnhancement()) {
+            return null;
+        }
+        return Aegis.byId(AegisConstants.ANGEL)
+                .filter(aegis -> !aegis.primaryStatMultipliers().isEmpty())
+                .map(aegis -> Math.max(0.0D, aegis.primaryStatMultiplier(
+                        data.getPrimarySkillEnhancement().id()
+                )))
+                .orElse(null);
     }
 
     // ------------------------------------------------------------------
@@ -129,7 +145,11 @@ public final class AngelsAegis {
             if (!data.isAegisEnabled(AegisConstants.ANGEL)) {
                 return;
             }
-            ShieldMechanic.addShield(player, shieldCapacity(player, data));
+            ShieldMechanic.addShieldWithPrimaryStatMultiplier(
+                    player,
+                    shieldCapacity(player, data),
+                    primaryStatMultiplier(data)
+            );
         });
     }
 

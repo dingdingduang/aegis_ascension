@@ -5,6 +5,8 @@ import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.perk.SkillEnhancement;
 import com.whatever.aegis_ascension.perk.SoulLink;
 import com.whatever.aegis_ascension.network.SyncDevourDataPacket;
+import com.whatever.aegis_ascension.util.DisplayStatScope;
+import com.whatever.aegis_ascension.util.StatAttribution;
 
 import java.util.List;
 import java.util.LinkedHashMap;
@@ -261,6 +263,46 @@ public final class ClientPerkState {
         return DISPLAY_STATS.getOrDefault(key, 0.0D);
     }
 
+    /**
+     * Applies synchronized display values according to how much the sender carried.
+     *
+     * <p>{@code ESSENTIAL} is a fragment sent with routine progression syncs, so it is
+     * merged over what is already held; replacing the map with it would blank the
+     * Collection screen every time the player bought something. {@code VALUES} and
+     * {@code FULL} are complete sets and replace the values outright.</p>
+     *
+     * <p>The per-source records are kept across a {@code VALUES} sync: only the Custom
+     * Stats tab asks for them, and a sync from another tab must not blank its source
+     * panel. A {@code FULL} sync is authoritative for them and replaces the set, so a
+     * record that decayed to zero on the server does disappear.</p>
+     */
+    public static void setDisplayStats(Map<String, Double> displayStats,
+                                       DisplayStatScope scope) {
+        if (!scope.isComplete()) {
+            DISPLAY_STATS.putAll(displayStats);
+            return;
+        }
+        Map<String, Double> carriedRecords = null;
+        if (!scope.includesAttribution()) {
+            carriedRecords = new LinkedHashMap<>();
+            for (Map.Entry<String, Double> entry : DISPLAY_STATS.entrySet()) {
+                if (isAttributionRecord(entry.getKey())) {
+                    carriedRecords.put(entry.getKey(), entry.getValue());
+                }
+            }
+        }
+        DISPLAY_STATS.clear();
+        DISPLAY_STATS.putAll(displayStats);
+        if (carriedRecords != null) {
+            DISPLAY_STATS.putAll(carriedRecords);
+        }
+    }
+
+    /** Whether a synced display key is a per-source stat record rather than a value. */
+    private static boolean isAttributionRecord(String key) {
+        return key.startsWith(StatAttribution.SYNCED_PREFIX);
+    }
+
     public static boolean hasDisplayStat(String key) {
         return DISPLAY_STATS.containsKey(key);
     }
@@ -354,6 +396,7 @@ public final class ClientPerkState {
                               Map<Perk, Integer> perkRanks,
                               Set<String> enabledManualTalents,
                               Map<String, Double> displayStats,
+            DisplayStatScope displayStatScope,
                               Map<SkillEnhancement, Integer> skillEnhancementRanks,
                               List<SkillEnhancement> syncedSkillEnhancementOffers,
                               SkillEnhancement syncedPrimarySkillEnhancement,
@@ -398,8 +441,7 @@ public final class ClientPerkState {
         PERK_RANKS.putAll(perkRanks);
         ENABLED_MANUAL_TALENTS.clear();
         ENABLED_MANUAL_TALENTS.addAll(enabledManualTalents);
-        DISPLAY_STATS.clear();
-        DISPLAY_STATS.putAll(displayStats);
+        setDisplayStats(displayStats, displayStatScope);
         SKILL_ENHANCEMENT_RANKS.clear();
         SKILL_ENHANCEMENT_RANKS.putAll(skillEnhancementRanks);
         skillEnhancementOffers = List.copyOf(syncedSkillEnhancementOffers);

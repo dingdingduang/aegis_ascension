@@ -63,8 +63,9 @@ public final class ServerSettings {
     }
 
     /**
-     * Multiplier applied to all shield grants for the selected Primary Attribute.
-     * An unlisted attribute uses the JSON {@code default} entry, then {@code 1.0}.
+     * Fallback multiplier for shield grants whose source does not define its own
+     * {@code primary_stat_multipliers} map. An unlisted attribute uses the JSON
+     * {@code default} entry, then {@code 1.0}.
      */
     public double primaryStatMultiplier(String primaryStatId) {
         Double specific = primaryStatMultipliers.get(primaryStatId);

@@ -2,10 +2,12 @@ package com.whatever.aegis_ascension.client;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.client.sound.ClientSoundServices;
+import com.whatever.aegis_ascension.quest.QuestConfig;
 import com.whatever.aegis_ascension.quest.QuestView;
 import com.whatever.aegis_ascension.network.SyncQuestDataPacket;
 import com.whatever.aegis_ascension.quest.QuestType;
 import com.whatever.aegis_ascension.util.GeneralClientMethods;
+import com.whatever.aegis_ascension.quest.QuestObjective;
 import com.whatever.aegis_ascension.util.GeneralTextMethods;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -63,7 +65,6 @@ public final class QuestTrackerOverlay {
     private static final ResourceLocation CHEST_TEXTURE =
             GeneralClientMethods.fromNamespaceAndPath("minecraft", "textures/entity/chest/normal.png");
 
-    private static boolean visible = true;
     private static int trackerPage;
     private static int completionReturnPage = -1;
     private static final List<CompletionEffect> completionEffects = new ArrayList<>();
@@ -77,12 +78,17 @@ public final class QuestTrackerOverlay {
         event.registerAboveAll("quest_tracker", QuestTrackerOverlay::render);
     }
 
+    /**
+     * Flips the overlay on or off and remembers it. Held in the local settings file
+     * rather than a static field so the choice survives a restart: a player who turns
+     * the tracker off does not want it back every time they launch the game.
+     */
     public static void toggleVisibility() {
-        visible = !visible;
+        MiscLocalSettings.get().setQuestTrackerOverlayShown(!visible());
     }
 
     public static boolean visible() {
-        return visible;
+        return MiscLocalSettings.get().isQuestTrackerOverlayShown();
     }
 
     /** Requests the next accepted-quest page; render-time clamping handles list changes. */
@@ -131,7 +137,8 @@ public final class QuestTrackerOverlay {
     public static void clear() {
         completionEffects.clear();
         rowMotions.clear();
-        visible = true;
+        // Visibility is deliberately not reset here. It is a saved preference now, and
+        // leaving a world should not turn the tracker back on for the next one.
         trackerPage = 0;
         completionReturnPage = -1;
     }
@@ -139,7 +146,7 @@ public final class QuestTrackerOverlay {
     private static void render(ForgeGui gui, GuiGraphics graphics, float partialTick,
                                int screenWidth, int screenHeight) {
         Minecraft minecraft = Minecraft.getInstance();
-        if (!visible || minecraft.options.hideGui || minecraft.player == null
+        if (!visible() || minecraft.options.hideGui || minecraft.player == null
                 || (minecraft.screen != null && !(minecraft.screen instanceof ChatScreen))) {
             return;
         }
@@ -298,9 +305,11 @@ public final class QuestTrackerOverlay {
 
     private static void drawQuestIcon(GuiGraphics graphics, QuestView quest,
                                       int x, int y, int size, float alpha) {
-        if (quest.type() == QuestType.SIDE && !quest.profession().isBlank()
+        if (quest.type() == QuestType.SIDE
+                && !ClientQuestCatalog.get(quest.id()).profession.isBlank()
                 && QuestIconRenderer.drawVillagerProfessionIcon(
-                graphics, quest.profession(), x, y, size, alpha)) {
+                graphics, ClientQuestCatalog.get(quest.id()).profession,
+                x, y, size, alpha)) {
             return;
         }
         ResourceLocation icon = icon(quest);
@@ -600,9 +609,10 @@ public final class QuestTrackerOverlay {
     }
 
     private static Component title(QuestView quest) {
-        Component title = quest.title() == null || quest.title().isBlank()
+        String titleKey = ClientQuestCatalog.get(quest.id()).title;
+        Component title = titleKey == null || titleKey.isBlank()
                 ? GeneralTextMethods.getLiteralString(quest.objective().name())
-                : GeneralTextMethods.getTranslatableString(quest.title());
+                : GeneralTextMethods.getTranslatableString(titleKey);
         return quest.repeatable()
                 ? title.copy().append(GeneralTextMethods.getTranslatableString(
                 "screen.aegis_ascension.acg.quest.repeat_cycle", quest.cycle()))
@@ -610,9 +620,10 @@ public final class QuestTrackerOverlay {
     }
 
     private static Component description(QuestView quest) {
-        return quest.description() == null || quest.description().isBlank()
+        String descriptionKey = ClientQuestCatalog.get(quest.id()).description;
+        return descriptionKey == null || descriptionKey.isBlank()
                 ? GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.no_description")
-                : GeneralTextMethods.getTranslatableString(quest.description());
+                : GeneralTextMethods.getTranslatableString(descriptionKey);
     }
 
     private static String progressText(QuestView quest) {
@@ -620,7 +631,8 @@ public final class QuestTrackerOverlay {
     }
 
     private static ResourceLocation icon(QuestView quest) {
-        ResourceLocation configured = ResourceLocation.tryParse(quest.icon());
+        ResourceLocation configured = ResourceLocation.tryParse(
+                ClientQuestCatalog.get(quest.id()).icon);
         if (configured != null && GeneralClientMethods.resourceExists(configured)) {
             return configured;
         }
@@ -641,12 +653,20 @@ public final class QuestTrackerOverlay {
 
     /** Default objective art used when a server template omits its optional icon field. */
     private static ResourceLocation objectiveIcon(QuestView quest) {
+        // Crafting has no vanilla item texture of its own, so it uses the mod's stand-in.
+        if (quest.objective() == QuestObjective.CRAFT_ITEM) {
+            return GeneralClientMethods.fromNamespaceAndPath(AegisAscensionMod.MOD_ID,
+                    "textures/gui/quest_ui/quest_unknown.png");
+        }
         String path = switch (quest.objective()) {
             case KILL -> quest.type() == QuestType.CHALLENGE
                     ? "textures/item/diamond_sword.png" : "textures/item/golden_sword.png";
             case PLANT -> "textures/item/wheat_seeds.png";
             case OPEN_CHEST -> "textures/entity/chest/normal.png";
             case WALK -> "textures/mob_effect/speed.png";
+            case BREAK_BLOCK -> "textures/item/iron_pickaxe.png";
+            case SHOOT_ARROW, HIT_ARROW -> "textures/item/arrow.png";
+            case REACH_LOCATION -> "textures/item/filled_map.png";
             default -> null;
         };
         return path == null ? null : GeneralClientMethods.fromNamespaceAndPath("minecraft", path);

@@ -4,6 +4,9 @@ import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.perk.SkillEnhancement;
+import com.whatever.aegis_ascension.perk.soullink.SoulLinkCatalog;
+import com.whatever.aegis_ascension.perk.talents.MysteriousDoll;
+import com.whatever.aegis_ascension.perk.talents.ShrineMaidenDance;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.server.level.ServerPlayer;
@@ -41,13 +44,14 @@ public final class ServerCatalogSync {
         UUID playerId = player.getUUID();
         String expected = EXPECTED_HASHES.get(playerId);
         if (expected == null || !expected.equals(hash)) {
-            AegisAscensionMod.getLogger().warn(
-                    "Rejected catalog acknowledgement from {}: expected {}, received {}",
-                    player.getGameProfile().getName(),
-                    expected,
-                    hash
-            );
-            begin(player);
+            if (ProgressionRequestLimiter.tryAcquireCatalogAcknowledgement(player)) {
+                AegisAscensionMod.getLogger().warn(
+                        "Rejected catalog acknowledgement from {}: expected {}, received {}",
+                        player.getGameProfile().getName(),
+                        expected,
+                        hash
+                );
+            }
             return;
         }
         EXPECTED_HASHES.remove(playerId);
@@ -79,11 +83,40 @@ public final class ServerCatalogSync {
                 NetworkLimits.MAX_VIRTUAL_ITEMS,
                 "virtual items"
         );
+        requireCatalogSize(
+                SoulLinkCatalog.values().size(),
+                NetworkLimits.MAX_SOUL_LINKS,
+                "Soul Links"
+        );
+        requireCatalogSize(
+                MysteriousDoll.outcomes().size(),
+                NetworkLimits.MAX_SPECIAL_TALENT_OUTCOMES,
+                "Mysterious Doll outcomes"
+        );
+        requireCatalogSize(
+                ShrineMaidenDance.outcomeCount(),
+                NetworkLimits.MAX_SPECIAL_TALENT_OUTCOMES,
+                "Shrine Maiden Dance outcomes"
+        );
         String talents = Perk.exportCatalogJson();
         String aegises = Aegis.exportCatalogJson();
         String enhancements = SkillEnhancement.exportCatalogJson();
         String virtualItems = VirtualItems.exportCatalogJson();
-        String hash = sha256(talents, aegises, enhancements, virtualItems);
+        String soulLinks = SoulLinkCatalog.exportCatalogJson();
+        String mysteriousDoll = MysteriousDoll.exportCatalogJson();
+        String shrineMaidenDance = ShrineMaidenDance.exportCatalogJson();
+        String quests = com.whatever.aegis_ascension.quest.QuestConfig.get()
+                .exportCatalogJson();
+        String hash = sha256(
+                talents,
+                aegises,
+                enhancements,
+                virtualItems,
+                soulLinks,
+                mysteriousDoll,
+                shrineMaidenDance,
+                quests
+        );
         return new Snapshot(
                 hash,
                 new SyncServerCatalogPacket(
@@ -91,7 +124,11 @@ public final class ServerCatalogSync {
                         talents,
                         aegises,
                         enhancements,
-                        virtualItems
+                        virtualItems,
+                        soulLinks,
+                        mysteriousDoll,
+                        shrineMaidenDance,
+                        quests
                 )
         );
     }

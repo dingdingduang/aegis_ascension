@@ -3,6 +3,7 @@ package com.whatever.aegis_ascension.network;
 import com.whatever.aegis_ascension.client.ClientPacketHandler;
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.perk.Perk;
+import com.whatever.aegis_ascension.util.DisplayStatScope;
 import com.whatever.aegis_ascension.perk.SkillEnhancement;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.api.distmarker.Dist;
@@ -43,6 +44,7 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
                                  Map<Perk, Integer> perkRanks,
                                  Set<String> enabledManualTalents,
                                  Map<String, Double> displayStats,
+                                 DisplayStatScope displayStatScope,
                                  Map<SkillEnhancement, Integer> skillEnhancementRanks,
                                  List<SkillEnhancement> skillEnhancementOffers,
                                  SkillEnhancement primarySkillEnhancement,
@@ -112,6 +114,7 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
         });
         buffer.writeVarInt(packet.enabledManualTalents.size());
         packet.enabledManualTalents.forEach(perkId -> buffer.writeUtf(perkId, 128));
+        buffer.writeVarInt(packet.displayStatScope.wireValue());
         buffer.writeVarInt(packet.displayStats.size());
         packet.displayStats.forEach((key, value) -> {
             buffer.writeUtf(key, 128);
@@ -198,6 +201,9 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
             Perk.byId(perkId).filter(Perk::manuallyToggleable)
                     .ifPresent(perk -> enabledTalents.add(perk.id()));
         }
+        // Read in the order encode writes: scope first, then the entry count.
+        DisplayStatScope displayStatScope =
+                DisplayStatScope.fromWireValue(buffer.readVarInt());
         int statCount = NetworkLimits.readBoundedCount(
                 buffer,
                 NetworkLimits.MAX_DISPLAY_STATS,
@@ -292,6 +298,7 @@ public record SyncPerkDataPacket(int selectionCharges, int pendingBreakthroughTr
                 ranks,
                 enabledTalents,
                 displayStats,
+                displayStatScope,
                 enhancementRanks,
                 enhancementOffers,
                 primarySkillEnhancement,

@@ -1,5 +1,6 @@
 package com.whatever.aegis_ascension.network;
 
+import com.whatever.aegis_ascension.util.DisplayStatScope;
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
@@ -91,8 +92,34 @@ public final class ModNetworking {
         syncQuestsTo(player);
     }
 
+    /**
+     * Pushes only the Custom Stats display values.
+     *
+     * <p>For the tab's periodic refresh, which reads nothing else. The full progression
+     * packet still carries these values whenever it is sent for another reason, so this
+     * never becomes the only route by which they arrive.</p>
+     */
+    public static void syncDisplayStatsTo(ServerPlayer player, DisplayStatScope scope) {
+        if (!ServerCatalogSync.isReady(player)) return;
+        PerkData.get(player).ifPresent(data -> NETWORK.sendToPlayer(
+                player,
+                new SyncDisplayStatsPacket(
+                        TalentEffects.buildDisplayStats(player, data, scope), scope)
+        ));
+    }
+
     /** Pushes perk/progression state without attaching the much larger quest catalogue. */
     public static void syncPerkDataTo(ServerPlayer player) {
+        syncPerkDataTo(player, DisplayStatScope.ESSENTIAL);
+    }
+
+    /**
+     * @param scope how much of the display map to attach. A shop purchase or a storage
+     *              action would otherwise carry kilobytes of stat values for a screen
+     *              that is almost always closed, so those syncs send only the few values
+     *              other screens read.
+     */
+    public static void syncPerkDataTo(ServerPlayer player, DisplayStatScope scope) {
         if (!ServerCatalogSync.isReady(player)) return;
         PerkData.get(player).ifPresent(data -> {
             AegisExperienceSystem.Snapshot progression =
@@ -130,7 +157,8 @@ public final class ModNetworking {
                                 PlatformServices.config().hiddenTalentIds(),
                                 data.getPerkRanks(),
                                 data.getEnabledManualTalents(),
-                                TalentEffects.buildDisplayStats(player, data),
+                                TalentEffects.buildDisplayStats(player, data, scope),
+                                scope,
                                 data.getSkillEnhancementRanks(),
                                 data.getPendingSkillEnhancementOffers(),
                                 data.getPrimarySkillEnhancement(),
@@ -161,7 +189,10 @@ public final class ModNetworking {
                         PlatformServices.config().useMinecraftDefaultLevel(),
                         data.getQuestState().autoAcceptEligibleQuests(),
                         com.whatever.aegis_ascension.quest.QuestConfig.get()
-                                .questCompleteSound)));
+                                .questCompleteSound,
+                        com.whatever.aegis_ascension.quest.QuestConfig.get()
+                                .reputationIcon,
+                        QuestManager.lifetimeTotals(data))));
     }
 
     /** Sends only counters for quests dirtied since the previous batched flush. */
@@ -169,7 +200,8 @@ public final class ModNetworking {
         if (!ServerCatalogSync.isReady(player)) return;
         if (questIds == null || questIds.isEmpty()) return;
         PerkData.get(player).ifPresent(data -> {
-            Map<String, Integer> progress = QuestManager.progressValues(data, questIds);
+            Map<String, java.util.List<Integer>> progress =
+                    QuestManager.progressValues(data, questIds);
             if (!progress.isEmpty()) {
                 NETWORK.sendToPlayer(player, new SyncQuestProgressPacket(progress));
             }

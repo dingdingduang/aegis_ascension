@@ -201,6 +201,42 @@
       "minCount": 1,
       "maxCount": 1,
       "experienceCost": 2500
+    },
+    {
+      "tier": "SR",
+      "item": "minecraft:ancient_debris",
+      "virtualId": "",
+      "weight": 3,
+      "minCount": 1,
+      "maxCount": 2,
+      "experienceCost": 2400
+    },
+    {
+      "tier": "SR",
+      "item": "minecraft:diamond_block",
+      "virtualId": "",
+      "weight": 4,
+      "minCount": 1,
+      "maxCount": 2,
+      "experienceCost": 1600
+    },
+    {
+      "tier": "SSR",
+      "item": "minecraft:netherite_ingot",
+      "virtualId": "",
+      "weight": 2,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 4200
+    },
+    {
+      "tier": "SSR",
+      "item": "minecraft:elytra",
+      "virtualId": "",
+      "weight": 1,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 6000
     }
   ],
   "rarityWeights": {
@@ -210,7 +246,7 @@
   },
   "discoveryShop": {
     "enabled": true,
-    "autoRefreshIntervalMinutes": 60,
+    "autoRefreshIntervalMinutes": 180,
     "maxManualRefreshes": 3,
     "manualRefreshExperienceCost": 500,
     "minimumSlots": 4,
@@ -219,17 +255,17 @@
     "sequentialSlotUnlock": false,
     "defaultMinCount": 1,
     "defaultMaxCount": 1,
-    "defaultExperienceCost": 500,
+    "defaultExperienceCost": 250,
     "defaultTier": "R",
     "rarityExperienceCosts": {
-      "R": 500,
-      "SR": 1500,
-      "SSR": 5000
+      "r": 250,
+      "sr": 1800,
+      "ssr": 8000
     },
     "rarityWeights": {
-      "R": 88,
-      "SR": 10,
-      "SSR": 2
+      "r": 55,
+      "sr": 33,
+      "ssr": 12
     },
     "autoClassifyEquipmentTier": true,
     "srAttackDamageThreshold": 6.0,
@@ -272,6 +308,8 @@
         "experienceCost": 7500,
         "tier": "SSR"
       }
-    ]
-  }
+    ],
+    "priceVariance": 0.15
+  },
+  "priceVariance": 0.15
 }

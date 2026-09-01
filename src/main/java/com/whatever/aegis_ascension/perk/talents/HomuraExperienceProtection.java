@@ -15,6 +15,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * to the replacement player entity. Restoration sets an exact snapshot rather
  * than adding XP, while the matching XP-drop event is suppressed, preventing
  * duplication with keepInventory or another XP-preservation mod.
+ *
+ * <p>This holds on servers that reset talents on death too. The snapshot is taken while
+ * the player still owns the blessing, and {@link HomuraResetNegation} then cancels the
+ * wipe that would have removed it, so retained experience and retained talents arrive
+ * together rather than one without the other.</p>
  */
 public final class HomuraExperienceProtection {
     private static final Map<UUID, ExperienceSnapshot> PENDING =

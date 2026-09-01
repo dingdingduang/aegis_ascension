@@ -4,6 +4,10 @@ import com.whatever.aegis_ascension.platform.AttributeAccess;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.game.ClientboundSetSubtitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitleTextPacket;
+import net.minecraft.network.protocol.game.ClientboundSetTitlesAnimationPacket;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -213,6 +217,23 @@ public final class GeneralServerMethods {
             return;
         }
         level.sendParticles(particle, x, y, z, count, spread, spread, spread, speed);
+    }
+
+    /**
+     * Shows a title and subtitle that fade by themselves. Vanilla renders and times the
+     * overlay client-side, so this needs no packet handler of ours; the tick counts are
+     * gameplay tuning and belong in the caller's config rather than here.
+     */
+    public static void sendTitle(ServerPlayer player, Component title, Component subtitle,
+                                 int fadeInTicks, int stayTicks, int fadeOutTicks) {
+        player.connection.send(new ClientboundSetTitlesAnimationPacket(
+                Math.max(0, fadeInTicks),
+                Math.max(0, stayTicks),
+                Math.max(0, fadeOutTicks)
+        ));
+        player.connection.send(new ClientboundSetSubtitleTextPacket(subtitle));
+        // The title packet is sent last: it is what starts the animation running.
+        player.connection.send(new ClientboundSetTitleTextPacket(title));
     }
 
     public static int getTotalExperience(Player player) {

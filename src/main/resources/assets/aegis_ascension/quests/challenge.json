@@ -1,0 +1,267 @@
+[
+  {
+    "id": "challenge_kill",
+    "weight": 12,
+    "objective": "KILL",
+    "target": 60,
+    "targetMin": 60,
+    "targetMax": 120,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "securityDeposit": 250,
+    "icon": "minecraft:textures/item/diamond_sword.png",
+    "title": "quest.aegis_ascension.challenge.kill.title",
+    "description": "quest.aegis_ascension.challenge.kill.description",
+    "experience": 1000,
+    "goldRewardMin": 120,
+    "goldRewardMax": 320,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      },
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      }
+    ]
+  },
+  {
+    "id": "challenge_walk",
+    "weight": 11,
+    "objective": "WALK",
+    "target": 800,
+    "targetMin": 800,
+    "targetMax": 1600,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "securityDeposit": 200,
+    "icon": "minecraft:textures/item/golden_boots.png",
+    "title": "quest.aegis_ascension.challenge.walk.title",
+    "description": "quest.aegis_ascension.challenge.walk.description",
+    "experience": 900,
+    "goldRewardMin": 120,
+    "goldRewardMax": 300,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "challenge_chest",
+    "weight": 10,
+    "objective": "OPEN_CHEST",
+    "target": 8,
+    "targetMin": 8,
+    "targetMax": 16,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "securityDeposit": 220,
+    "icon": "minecraft:textures/entity/chest/normal.png",
+    "title": "quest.aegis_ascension.challenge.chest.title",
+    "description": "quest.aegis_ascension.challenge.chest.description",
+    "experience": 1000,
+    "goldRewardMin": 140,
+    "goldRewardMax": 340,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 7,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "challenge_plant",
+    "weight": 10,
+    "objective": "PLANT",
+    "target": 60,
+    "targetMin": 60,
+    "targetMax": 140,
+    "tiers": [
+      "R",
+      "SR"
+    ],
+    "securityDeposit": 200,
+    "icon": "minecraft:textures/item/golden_hoe.png",
+    "title": "quest.aegis_ascension.challenge.plant.title",
+    "description": "quest.aegis_ascension.challenge.plant.description",
+    "experience": 900,
+    "goldRewardMin": 120,
+    "goldRewardMax": 300,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "challenge_specific_hunt",
+    "weight": 8,
+    "minimumRank": 6,
+    "objective": "KILL",
+    "targetIds": [
+      "minecraft:witch",
+      "minecraft:evoker",
+      "minecraft:pillager",
+      "minecraft:ravager",
+      "minecraft:vindicator"
+    ],
+    "target": 3,
+    "targetMin": 3,
+    "targetMax": 8,
+    "tiers": [
+      "R",
+      "SR",
+      "SSR"
+    ],
+    "securityDeposit": 300,
+    "icon": "minecraft:textures/item/bow.png",
+    "title": "quest.aegis_ascension.challenge.specific_hunt.title",
+    "description": "quest.aegis_ascension.challenge.specific_hunt.description",
+    "experience": 1400,
+    "goldRewardMin": 200,
+    "goldRewardMax": 480,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "challenge_flawless",
+    "weight": 6,
+    "minimumRank": 10,
+    "objective": "KILL",
+    "target": 20,
+    "targetMin": 20,
+    "targetMax": 45,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "securityDeposit": 400,
+    "failOnDamageTaken": true,
+    "icon": "minecraft:textures/item/totem_of_undying.png",
+    "title": "quest.aegis_ascension.challenge.flawless.title",
+    "description": "quest.aegis_ascension.challenge.flawless.description",
+    "experience": 1600,
+    "goldRewardMin": 260,
+    "goldRewardMax": 600,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 2,
+        "tier": "SR"
+      }
+    ]
+  },
+  {
+    "id": "challenge_bare_blade",
+    "weight": 6,
+    "minimumRank": 8,
+    "objective": "KILL",
+    "target": 25,
+    "targetMin": 25,
+    "targetMax": 60,
+    "tiers": [
+      "SR",
+      "SSR"
+    ],
+    "securityDeposit": 350,
+    "failOnArmorWorn": true,
+    "icon": "minecraft:textures/item/iron_sword.png",
+    "title": "quest.aegis_ascension.challenge.bare_blade.title",
+    "description": "quest.aegis_ascension.challenge.bare_blade.description",
+    "experience": 1500,
+    "goldRewardMin": 240,
+    "goldRewardMax": 560,
+    "rewards": [
+      {
+        "kind": "shop_item",
+        "countMin": 1,
+        "countMax": 3,
+        "tier": "SR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 7,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "challenge_descent",
+    "weight": 3,
+    "minimumRank": 18,
+    "objective": "REACH_LOCATION",
+    "targetIds": [
+      "minecraft:ancient_city",
+      "minecraft:stronghold"
+    ],
+    "target": 1,
+    "targetMin": 1,
+    "targetMax": 1,
+    "tiers": [
+      "SSR"
+    ],
+    "securityDeposit": 600,
+    "failOnDeath": true,
+    "icon": "minecraft:textures/item/echo_shard.png",
+    "title": "quest.aegis_ascension.challenge.descent.title",
+    "description": "quest.aegis_ascension.challenge.descent.description",
+    "experience": 1800,
+    "goldRewardMin": 400,
+    "goldRewardMax": 900,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "countMin": 1,
+        "countMax": 1,
+        "tier": "SSR"
+      },
+      {
+        "kind": "random_common",
+        "countMin": 4,
+        "countMax": 8,
+        "tier": "R"
+      }
+    ]
+  }
+]

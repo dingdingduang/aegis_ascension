@@ -7,5 +7,10 @@ public enum QuestObjective {
     OPEN_CHEST,
     EXPLORE_BIOME,
     TRADE_ITEM,
-    GIVE_MATERIAL
+    GIVE_MATERIAL,
+    CRAFT_ITEM,
+    BREAK_BLOCK,
+    SHOOT_ARROW,
+    HIT_ARROW,
+    REACH_LOCATION
 }

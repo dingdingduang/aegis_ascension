@@ -54,6 +54,11 @@
         "shield_interval_reduction_per_cooldown": 1.0,
         "min_shield_interval_seconds": 0.2
       },
+      "primary_stat_multipliers": {
+        "attack_damage": 0.5,
+        "armor": 0.4,
+        "default": 1
+      },
       "manual_toggle": true,
       "enabled": true,
       "initial_selection_allowed": true

@@ -31,7 +31,8 @@ public record RequestShopDataPacket(ShopType shopType) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer player = context.getSender();
-            if (player == null) {
+            if (player == null || !ServerCatalogSync.isReady(player)
+                    || !ProgressionRequestLimiter.tryAcquireShopData(player)) {
                 return;
             }
             PerkData.get(player).ifPresent(data ->

@@ -22,7 +22,8 @@ public record SelectSkillEnhancementPacket(String enhancementId) {
         NetworkEvent.Context context = contextSupplier.get();
         context.enqueueWork(() -> {
             ServerPlayer sender = context.getSender();
-            if (sender == null) {
+            if (sender == null || !ServerCatalogSync.isReady(sender)
+                    || !ToggleRequestLimiter.tryAcquire(sender)) {
                 return;
             }
 

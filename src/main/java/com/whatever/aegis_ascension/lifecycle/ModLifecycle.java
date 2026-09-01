@@ -5,6 +5,7 @@ import com.whatever.aegis_ascension.compat.IronSpellsCompat;
 import com.whatever.aegis_ascension.config.ServerSettings;
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.network.ModNetworking;
+import com.whatever.aegis_ascension.network.ServerCatalogSync;
 import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
 import com.whatever.aegis_ascension.perk.talents.ShrineMaidenDance;
 import com.whatever.aegis_ascension.platform.PlatformServices;
@@ -45,12 +46,14 @@ public final class ModLifecycle {
         if (server == null) {
             return;
         }
-        server.execute(() -> server.getPlayerList().getPlayers().forEach(player ->
+        server.execute(() -> server.getPlayerList().getPlayers().forEach(player -> {
                 PerkData.get(player).ifPresent(data -> {
                     AegisExperienceSystem.awardMilestones(player, data, false);
                     data.applyChosenPerks(player);
-                    ModNetworking.syncTo(player);
-                })
-        ));
+                });
+                // The effective Mysterious Doll catalog includes common-config bans, so
+                // re-handshake before sending progression state derived from the new config.
+                ServerCatalogSync.begin(player);
+        }));
     }
 }

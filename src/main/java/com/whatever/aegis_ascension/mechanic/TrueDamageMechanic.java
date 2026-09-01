@@ -80,7 +80,11 @@ final class TrueDamageMechanic {
     private static HurtPlan prepare(ServerPlayer owner, PlayerPerkData data,
                                     LivingEntity target, DamageSource source,
                                     HurtCapture capture) {
-        boolean sevenColoredMagician = data.owns(PERK_SEVEN_COLORED_MAGICIAN);
+        // Child of Magic converts every hit, which bypasses the whole outgoing
+        // pipeline, so it honours the manual toggle the same way Skill Damage
+        // Conversion does - a disabled talent must convert nothing.
+        boolean sevenColoredMagician = data.owns(PERK_SEVEN_COLORED_MAGICIAN)
+                && data.isTalentEnabled(PERK_SEVEN_COLORED_MAGICIAN);
         boolean supportedSpell = AegisSpellDamage.isSpellDamage(source);
         boolean skillConversion = data.owns(PERK_SKILL_DAMAGE_CONVERSION)
                 && data.isTalentEnabled(PERK_SKILL_DAMAGE_CONVERSION)
@@ -208,7 +212,8 @@ final class TrueDamageMechanic {
 
     private static double royalSacredFlameMultiplier(ServerPlayer owner,
                                                        PlayerPerkData data) {
-        if (!data.owns(PERK_SEVEN_COLORED_MAGICIAN)) {
+        if (!data.owns(PERK_SEVEN_COLORED_MAGICIAN)
+                || !data.isTalentEnabled(PERK_SEVEN_COLORED_MAGICIAN)) {
             return 1.0D;
         }
 

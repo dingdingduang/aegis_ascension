@@ -249,7 +249,7 @@ public final class ACGPerkSelectionScreen extends Screen {
                 && ClientPerkState.isLiveCustomStatsRefreshAllowed()
                 && ++statSyncTicks >= 20) {
             statSyncTicks = 0;
-            ModNetworking.sendToServer(new RequestPerkDataPacket(true));
+            ModNetworking.sendToServer(new RequestPerkDataPacket(true, true));
         }
         if (isAwaitingServer()) {
             // Normally cleared within a tick or two by refreshFromServer() once the
@@ -395,8 +395,12 @@ public final class ACGPerkSelectionScreen extends Screen {
             }
             case SKILL_ENHANCEMENT ->
                     ModNetworking.sendToServer(new RequestSkillEnhancementOffersPacket());
-            case OWNED_AEGIS, OWNED_PERKS, OWNED_SOUL_LINKS, DEVOURED, PLAYER_CUSTOM_STAT ->
-                    ModNetworking.sendToServer(new RequestPerkDataPacket(false));
+            // Only Custom Stats renders the per-source records, so the other tabs
+            // share this request but ask the server to leave them out.
+            case PLAYER_CUSTOM_STAT ->
+                    ModNetworking.sendToServer(new RequestPerkDataPacket(false, true));
+            case OWNED_AEGIS, OWNED_PERKS, OWNED_SOUL_LINKS, DEVOURED ->
+                    ModNetworking.sendToServer(new RequestPerkDataPacket(false, false));
             case CUSTOM_SHOP -> shopPage.requestSelectedShop();
             case QUEST_CENTER -> ModNetworking.sendToServer(new RequestQuestDataPacket());
             case STORAGE -> ModNetworking.sendToServer(new RequestStorageDataPacket());
@@ -613,6 +617,13 @@ public final class ACGPerkSelectionScreen extends Screen {
     }
 
     private void renderHoveredTooltip(GuiGraphics graphics, int mouseX, int mouseY) {
+        // Shop slots carry real item stacks, so they show the game's own tooltip rather
+        // than a card's text.
+        if (mode == UIMode.CUSTOM_SHOP
+                && shopPage.renderHoveredTooltip(font, graphics, mouseX, mouseY)) {
+            hoveredStatKey = null;
+            return;
+        }
         for (var child : children()) {
             if (!(child instanceof ACGCardWidget card) || !card.isHoveredNow()) {
                 continue;

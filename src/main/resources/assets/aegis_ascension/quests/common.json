@@ -1,0 +1,265 @@
+[
+  {
+    "id": "common_kill_10",
+    "objective": "KILL",
+    "target": 10,
+    "icon": "minecraft:textures/item/golden_sword.png",
+    "title": "quest.aegis_ascension.common.kill_10.title",
+    "description": "quest.aegis_ascension.common.kill_10.description",
+    "experience": 50,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 2,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "common_kill_50",
+    "prerequisiteId": "common_kill_10",
+    "objective": "KILL",
+    "target": 50,
+    "icon": "minecraft:textures/item/golden_sword.png",
+    "title": "quest.aegis_ascension.common.kill_50.title",
+    "description": "quest.aegis_ascension.common.kill_50.description",
+    "experience": 250,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 4,
+        "tier": "SR"
+      }
+    ]
+  },
+  {
+    "id": "common_kill_100",
+    "prerequisiteId": "common_kill_50",
+    "objective": "KILL",
+    "target": 100,
+    "icon": "minecraft:textures/item/golden_sword.png",
+    "title": "quest.aegis_ascension.common.kill_100.title",
+    "description": "quest.aegis_ascension.common.kill_100.description",
+    "experience": 500,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "count": 1,
+        "tier": "SSR",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "id": "common_plant_10",
+    "objective": "PLANT",
+    "target": 10,
+    "icon": "minecraft:textures/item/wheat_seeds.png",
+    "title": "quest.aegis_ascension.common.plant_10.title",
+    "description": "quest.aegis_ascension.common.plant_10.description",
+    "experience": 50,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 2,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "common_plant_50",
+    "prerequisiteId": "common_plant_10",
+    "objective": "PLANT",
+    "target": 50,
+    "icon": "minecraft:textures/item/wheat_seeds.png",
+    "title": "quest.aegis_ascension.common.plant_50.title",
+    "description": "quest.aegis_ascension.common.plant_50.description",
+    "experience": 250,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 4,
+        "tier": "SR"
+      }
+    ]
+  },
+  {
+    "id": "common_plant_100",
+    "prerequisiteId": "common_plant_50",
+    "objective": "PLANT",
+    "target": 100,
+    "icon": "minecraft:textures/item/wheat_seeds.png",
+    "title": "quest.aegis_ascension.common.plant_100.title",
+    "description": "quest.aegis_ascension.common.plant_100.description",
+    "experience": 500,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "count": 1,
+        "tier": "SSR",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "id": "common_walk_10",
+    "objective": "WALK",
+    "target": 10,
+    "icon": "minecraft:textures/mob_effect/speed.png",
+    "title": "quest.aegis_ascension.common.walk_10.title",
+    "description": "quest.aegis_ascension.common.walk_10.description",
+    "experience": 25,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 1,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "common_walk_100",
+    "prerequisiteId": "common_walk_10",
+    "objective": "WALK",
+    "target": 100,
+    "icon": "minecraft:textures/mob_effect/speed.png",
+    "title": "quest.aegis_ascension.common.walk_100.title",
+    "description": "quest.aegis_ascension.common.walk_100.description",
+    "experience": 100,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 2,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "common_walk_1000",
+    "prerequisiteId": "common_walk_100",
+    "objective": "WALK",
+    "target": 1000,
+    "icon": "minecraft:textures/mob_effect/speed.png",
+    "title": "quest.aegis_ascension.common.walk_1000.title",
+    "description": "quest.aegis_ascension.common.walk_1000.description",
+    "experience": 500,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 4,
+        "tier": "SR"
+      }
+    ]
+  },
+  {
+    "id": "common_walk_5000",
+    "prerequisiteId": "common_walk_1000",
+    "objective": "WALK",
+    "target": 5000,
+    "icon": "minecraft:textures/mob_effect/speed.png",
+    "title": "quest.aegis_ascension.common.walk_5000.title",
+    "description": "quest.aegis_ascension.common.walk_5000.description",
+    "experience": 1500,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "count": 1,
+        "tier": "SSR",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "id": "common_walk_10000",
+    "prerequisiteId": "common_walk_5000",
+    "objective": "WALK",
+    "target": 10000,
+    "icon": "minecraft:textures/mob_effect/speed.png",
+    "title": "quest.aegis_ascension.common.walk_10000.title",
+    "description": "quest.aegis_ascension.common.walk_10000.description",
+    "experience": 3000,
+    "rewards": [
+      {
+        "kind": "random_unique",
+        "count": 1,
+        "tier": "SSR",
+        "unique": true
+      }
+    ]
+  },
+  {
+    "id": "common_hunt_endless",
+    "prerequisiteId": "common_kill_100",
+    "objective": "KILL",
+    "target": 100,
+    "icon": "minecraft:textures/item/golden_sword.png",
+    "title": "quest.aegis_ascension.common.hunt_endless.title",
+    "description": "quest.aegis_ascension.common.hunt_endless.description",
+    "experience": 125,
+    "repeatable": true,
+    "targetIncreaseEvery": 5,
+    "targetIncreaseAmount": 50,
+    "maximumTarget": 1000,
+    "rewardIncreaseEvery": 10,
+    "rewardMultiplierIncrease": 0.5,
+    "maximumRewardMultiplier": 3.0,
+    "minimumRewardIntervalMinutes": 5,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 2,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "common_cultivation_endless",
+    "prerequisiteId": "common_plant_100",
+    "objective": "PLANT",
+    "target": 100,
+    "icon": "minecraft:textures/item/wheat_seeds.png",
+    "title": "quest.aegis_ascension.common.cultivation_endless.title",
+    "description": "quest.aegis_ascension.common.cultivation_endless.description",
+    "experience": 125,
+    "repeatable": true,
+    "targetIncreaseEvery": 5,
+    "targetIncreaseAmount": 50,
+    "maximumTarget": 1000,
+    "rewardIncreaseEvery": 10,
+    "rewardMultiplierIncrease": 0.5,
+    "maximumRewardMultiplier": 3.0,
+    "minimumRewardIntervalMinutes": 5,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 2,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "common_journey_endless",
+    "prerequisiteId": "common_walk_10000",
+    "objective": "WALK",
+    "target": 1000,
+    "icon": "minecraft:textures/mob_effect/speed.png",
+    "title": "quest.aegis_ascension.common.journey_endless.title",
+    "description": "quest.aegis_ascension.common.journey_endless.description",
+    "experience": 150,
+    "repeatable": true,
+    "targetIncreaseEvery": 5,
+    "targetIncreaseAmount": 500,
+    "maximumTarget": 10000,
+    "rewardIncreaseEvery": 10,
+    "rewardMultiplierIncrease": 0.5,
+    "maximumRewardMultiplier": 3.0,
+    "minimumRewardIntervalMinutes": 5,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "count": 2,
+        "tier": "R"
+      }
+    ]
+  }
+]

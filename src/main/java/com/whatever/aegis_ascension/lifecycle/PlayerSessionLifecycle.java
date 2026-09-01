@@ -9,6 +9,7 @@ import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
 import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.network.ServerCatalogSync;
 import com.whatever.aegis_ascension.perk.soullink.SoulLinkEffects;
+import com.whatever.aegis_ascension.perk.talents.HomuraResetNegation;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import com.whatever.aegis_ascension.quest.QuestManager;
 import net.minecraft.server.level.ServerPlayer;
@@ -30,12 +31,15 @@ public final class PlayerSessionLifecycle {
             ServerCatalogSync.clear(serverPlayer);
             AngelsAegis.resetTimer(serverPlayer);
             ShieldMechanic.clear(serverPlayer);
+            PerkData.get(serverPlayer).ifPresent(
+                    data -> QuestManager.failQuestsOnLogout(serverPlayer, data));
             QuestManager.clearTransientState(serverPlayer);
         }
         PlayerDataLifecycle.onPlayerLogout(player.getUUID());
     }
 
     public static void onPlayerRespawn(ServerPlayer player) {
+        HomuraResetNegation.notifyIfAbsorbed(player);
         AngelsAegis.resetTimer(player);
         ShieldMechanic.clear(player);
         QuestManager.resetWalkTracking(player);

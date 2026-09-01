@@ -10,6 +10,7 @@ import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
+import com.whatever.aegis_ascension.util.AegisModifiers;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.ai.attributes.Attribute;
@@ -34,19 +35,28 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatab
 public final class SkillEnhancement {
     public static final String DEFAULT_PRIMARY_ID = "attack_damage";
     private static final Gson GSON = new Gson();
+    private static final int MAX_CATALOG_ENTRIES = 256;
+    private static final int MAX_WIRE_ID_LENGTH = 128;
     private static final Catalog LOCAL_CATALOG = loadCatalog();
     private static final CatalogSnapshot LOCAL_SNAPSHOT = buildSnapshot(LOCAL_CATALOG);
     private static volatile CatalogSnapshot activeSnapshot = LOCAL_SNAPSHOT;
 
     private static CatalogSnapshot buildSnapshot(Catalog catalog) {
+        Objects.requireNonNull(catalog.enhancements, "Missing enhancements");
+        if (catalog.enhancements.size() > MAX_CATALOG_ENTRIES) {
+            throw new IllegalStateException(
+                    "Too many skill enhancements: " + catalog.enhancements.size()
+            );
+        }
         List<SkillEnhancement> values = new ArrayList<>();
         Map<String, SkillEnhancement> byId = new LinkedHashMap<>();
         for (EnhancementJson definition : catalog.enhancements) {
-            String id = definition.id;
+            Objects.requireNonNull(definition, "Null skill enhancement entry");
+            String id = requireWireId(definition.id, "Skill enhancement id");
             ResourceLocation attributeId = blank(definition.attribute)
                     ? null : requireLocation(definition.attribute, "attribute");
             String customStat = blank(definition.customStat)
-                    ? null : definition.customStat;
+                    ? null : requireWireId(definition.customStat, id + " custom_stat");
             if ((attributeId == null) == (customStat == null)) {
                 throw new IllegalStateException(
                         "Skill enhancement " + id
@@ -61,8 +71,8 @@ public final class SkillEnhancement {
 
             SkillEnhancement enhancement = new SkillEnhancement(
                     id,
-                    definition.name,
-                    definition.description,
+                    requireText(definition.name, id + " name"),
+                    requireText(definition.description, id + " description"),
                     requireLocation(definition.icon, "icon"),
                     Math.max(1, definition.iconTextureSize),
                     attributeId,
@@ -121,13 +131,11 @@ public final class SkillEnhancement {
         this.displayFormat = displayFormat;
         this.affectedByAllSkillEnhancementAttribute =
                 affectedByAllSkillEnhancementAttribute;
-        this.modifierId = UUID.nameUUIDFromBytes(
-                ("aegis_ascension:skill_enhancement/" + id).getBytes(StandardCharsets.UTF_8)
-        );
-        this.allSkillEnhancementAttributeModifierId = UUID.nameUUIDFromBytes(
-                ("aegis_ascension:all_skill_enhancement_attribute/" + id)
-                        .getBytes(StandardCharsets.UTF_8)
-        );
+        // mint() reproduces these exact ids: it hashes "aegis_ascension:" + path, the
+        // same seed used before, so modifiers already saved on players stay matched.
+        this.modifierId = AegisModifiers.mint("skill_enhancement/" + id);
+        this.allSkillEnhancementAttributeModifierId =
+                AegisModifiers.mint("all_skill_enhancement_attribute/" + id);
     }
 
     public String id() {
@@ -197,7 +205,7 @@ public final class SkillEnhancement {
     /** Installs a server-authoritative catalog in client memory without touching local files. */
     public static void installSyncedCatalog(String json) {
         Catalog catalog = Objects.requireNonNull(
-                GSON.fromJson(json, Catalog.class),
+                GSON.fromJson(Objects.requireNonNull(json, "json"), Catalog.class),
                 "Synchronized skill enhancement catalog was empty"
         );
         Objects.requireNonNull(catalog.enhancements, "Missing enhancements");
@@ -256,6 +264,21 @@ public final class SkillEnhancement {
         } catch (Exception exception) {
             throw new ExceptionInInitializerError(exception);
         }
+    }
+
+    private static String requireText(String value, String field) {
+        if (value == null || value.isBlank()) {
+            throw new IllegalStateException("Missing " + field);
+        }
+        return value;
+    }
+
+    private static String requireWireId(String value, String field) {
+        String id = requireText(value, field);
+        if (id.length() > MAX_WIRE_ID_LENGTH) {
+            throw new IllegalStateException(field + " exceeds " + MAX_WIRE_ID_LENGTH + " characters");
+        }
+        return id;
     }
 
     private static void appendBundledEnhancementIfMissing(

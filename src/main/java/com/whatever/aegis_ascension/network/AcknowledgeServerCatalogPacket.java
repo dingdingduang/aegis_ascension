@@ -11,8 +11,8 @@ import java.util.function.Supplier;
 public record AcknowledgeServerCatalogPacket(String hash) {
     public AcknowledgeServerCatalogPacket {
         hash = Objects.requireNonNull(hash, "hash");
-        if (hash.length() > NetworkLimits.MAX_CATALOG_HASH_CHARS) {
-            throw new IllegalArgumentException("Catalog hash is too long");
+        if (!hash.matches("[0-9a-f]{64}")) {
+            throw new IllegalArgumentException("Catalog hash is not a SHA-256 hex digest");
         }
     }
 

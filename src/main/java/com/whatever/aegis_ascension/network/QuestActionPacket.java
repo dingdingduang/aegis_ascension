@@ -7,14 +7,21 @@ import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
-public record QuestActionPacket(String questId, Action action) {
-    public enum Action { ACCEPT, CANCEL, SUBMIT }
+public record QuestActionPacket(String questId, Action action, int index) {
+    public enum Action { ACCEPT, CANCEL, SUBMIT, CHOOSE_REWARD }
+
+    public QuestActionPacket(String questId, Action action) {
+        this(questId, action, 0);
+    }
+
     public static void encode(QuestActionPacket packet, FriendlyByteBuf buffer) {
         buffer.writeUtf(packet.questId == null ? "" : packet.questId, 128);
         buffer.writeEnum(packet.action == null ? Action.ACCEPT : packet.action);
+        buffer.writeVarInt(Math.max(0, packet.index));
     }
     public static QuestActionPacket decode(FriendlyByteBuf buffer) {
-        return new QuestActionPacket(buffer.readUtf(128), buffer.readEnum(Action.class));
+        return new QuestActionPacket(buffer.readUtf(128), buffer.readEnum(Action.class),
+                buffer.readVarInt());
     }
     public static void handle(QuestActionPacket packet, Supplier<NetworkEvent.Context> contextSupplier) {
         NetworkEvent.Context context = contextSupplier.get();
@@ -25,11 +32,15 @@ public record QuestActionPacket(String questId, Action action) {
                 case ACCEPT -> QuestManager.accept(player, packet.questId);
                 case CANCEL -> QuestManager.cancel(player, packet.questId);
                 case SUBMIT -> QuestManager.submit(player, packet.questId);
+                case CHOOSE_REWARD ->
+                        QuestManager.chooseReward(player, packet.questId, packet.index);
             };
             // A successful submission synchronizes itself after consuming items and
             // granting rewards. Other actions (and rejected requests) receive one full
             // authoritative response so the UI cannot retain speculative state.
-            if (!(changed && packet.action == Action.SUBMIT)) {
+            // Submission and reward choice both synchronise themselves after granting.
+            if (!(changed && (packet.action == Action.SUBMIT
+                    || packet.action == Action.CHOOSE_REWARD))) {
                 if (changed) {
                     QuestManager.tick(player,
                             com.whatever.aegis_ascension.data.PerkData.of(player));

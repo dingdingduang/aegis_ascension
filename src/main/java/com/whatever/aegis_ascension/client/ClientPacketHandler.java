@@ -2,6 +2,7 @@ package com.whatever.aegis_ascension.client;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.aegis.Aegis;
+import com.whatever.aegis_ascension.network.SyncDisplayStatsPacket;
 import com.whatever.aegis_ascension.network.AcknowledgeServerCatalogPacket;
 import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.network.SyncPerkDataPacket;
@@ -15,6 +16,9 @@ import com.whatever.aegis_ascension.client.screen.ACGPerkSelectionScreen;
 import com.whatever.aegis_ascension.client.screen.ACGInventoryScreen;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.perk.SkillEnhancement;
+import com.whatever.aegis_ascension.perk.soullink.SoulLinkCatalog;
+import com.whatever.aegis_ascension.perk.talents.MysteriousDoll;
+import com.whatever.aegis_ascension.perk.talents.ShrineMaidenDance;
 import com.whatever.aegis_ascension.util.GeneralTextMethods;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.client.Minecraft;
@@ -33,26 +37,41 @@ public final class ClientPacketHandler {
             // already authoritative, and replacing object identities would invalidate server
             // maps keyed by Perk/Aegis/SkillEnhancement instances.
             if (!minecraft.hasSingleplayerServer()) {
+                // Soul Links must be installed before talents because talent pool
+                // prerequisites are validated against the active Soul Link catalog.
+                SoulLinkCatalog.installSyncedCatalog(packet.soulLinksJson());
                 Perk.installSyncedCatalog(packet.talentsJson());
                 Aegis.installSyncedCatalog(packet.aegisesJson());
                 SkillEnhancement.installSyncedCatalog(packet.skillEnhancementsJson());
                 VirtualItems.installSyncedCatalog(packet.virtualItemsJson());
+                MysteriousDoll.installSyncedCatalog(packet.mysteriousDollJson());
+                ShrineMaidenDance.installSyncedCatalog(packet.shrineMaidenDanceJson());
             }
+            // Installed in both cases: unlike the catalogs above, this is a client-only
+            // display cache with no object identity shared with an integrated server.
+            ClientQuestCatalog.install(packet.questsJson());
             ModNetworking.sendToServer(new AcknowledgeServerCatalogPacket(packet.hash()));
             AegisAscensionMod.getLogger().info(
                     "Installed server catalog snapshot {} ({} talents, {} Aegises, "
-                            + "{} skill enhancements, {} virtual items)",
+                            + "{} skill enhancements, {} virtual items, {} Soul Links, "
+                            + "{} Mysterious Doll outcomes, {} Shrine Maiden outcomes)",
                     packet.hash(),
                     Perk.values().size(),
                     Aegis.values().size(),
                     SkillEnhancement.values().size(),
-                    VirtualItems.all().size()
+                    VirtualItems.all().size(),
+                    SoulLinkCatalog.values().size(),
+                    MysteriousDoll.outcomes().size(),
+                    ShrineMaidenDance.outcomeCount()
             );
         } catch (RuntimeException exception) {
+            SoulLinkCatalog.resetSyncedCatalog();
             Perk.resetSyncedCatalog();
             Aegis.resetSyncedCatalog();
             SkillEnhancement.resetSyncedCatalog();
             VirtualItems.resetSyncedCatalog();
+            MysteriousDoll.resetSyncedCatalog();
+            ShrineMaidenDance.resetSyncedCatalog();
             AegisAscensionMod.getLogger().error(
                     "Rejected invalid server catalog snapshot " + packet.hash(),
                     exception
@@ -94,6 +113,7 @@ public final class ClientPacketHandler {
                 packet.perkRanks(),
                 packet.enabledManualTalents(),
                 packet.displayStats(),
+                packet.displayStatScope(),
                 packet.skillEnhancementRanks(),
                 packet.skillEnhancementOffers(),
                 packet.primarySkillEnhancement(),
@@ -119,6 +139,13 @@ public final class ClientPacketHandler {
         if (packet.aegisSelectionCharges() <= 0
                 || !ClientPerkState.hasAvailableAegisChoice()) {
             ClientPerkState.endAegisOfferSession();
+        }
+    }
+
+    public static void handle(SyncDisplayStatsPacket packet) {
+        ClientPerkState.setDisplayStats(packet.displayStats(), packet.scope());
+        if (Minecraft.getInstance().screen instanceof ACGPerkSelectionScreen acgScreen) {
+            acgScreen.refreshFromServer();
         }
     }
 
