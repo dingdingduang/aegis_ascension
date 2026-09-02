@@ -7,12 +7,14 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatab
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.aegis.AegisConstants;
 import com.whatever.aegis_ascension.client.ClientPerkState;
+import com.whatever.aegis_ascension.client.CustomStatSettings;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.perk.SkillEnhancement;
 import com.whatever.aegis_ascension.perk.SoulLink;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
+import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
@@ -61,6 +63,7 @@ public final class CustomStats {
             stat(INDEPENDENT_SKILL_DAMAGE, PERK_HAYASE_YUKA, Format.PERCENT),
             stat(INDEPENDENT_SKILL_AREA, PERK_OTOGI_NOAH, Format.PERCENT),
             stat(DAMAGE_REDUCTION, PERK_BEATER, Format.PERCENT),
+            attributeStat(DODGE_CHANCE, PERK_CLEAR_MIND_STATE, Format.PERCENT),
             stat(SHIELD_GAIN, PERK_KOHARU_SPRITE, Format.PERCENT),
             stat(REVIVES_REMAINING, PERK_BOUNDARY_OF_LIFE_AND_DEATH, Format.INTEGER),
             stat(TALENT_OPTION_BONUS, PERK_FLOWER_FAIRY, Format.INTEGER),
@@ -72,15 +75,39 @@ public final class CustomStats {
                     AegisConstants.ARCANE, Format.PERCENT)
     );
 
+    private static volatile List<Definition> resolved;
+
     private CustomStats() {
     }
 
     public static List<Definition> definitions() {
-        return DEFINITIONS;
+        List<Definition> current = resolved;
+        if (current == null) {
+            current = applyIconOverrides();
+            resolved = current;
+        }
+        return current;
+    }
+
+    /**
+     * The built-in table with the player's local icon choices laid over it. Resolved once
+     * per session, the same lifetime {@link CustomStatSettings} itself has.
+     */
+    private static List<Definition> applyIconOverrides() {
+        CustomStatSettings settings = CustomStatSettings.get();
+        List<Definition> overridden = new ArrayList<>(DEFINITIONS.size());
+        for (Definition definition : DEFINITIONS) {
+            ResourceLocation icon = settings.icon(definition.key())
+                    .orElse(definition.icon());
+            overridden.add(icon.equals(definition.icon()) ? definition
+                    : new Definition(definition.key(), icon, definition.format(),
+                            definition.attributeBacked()));
+        }
+        return List.copyOf(overridden);
     }
 
     public static List<TalentCollectionCard> cards() {
-        return DEFINITIONS.stream().map(definition -> {
+        return definitions().stream().map(definition -> {
             Breakdown breakdown = breakdown(definition);
             double value = breakdown.finalValue();
             Component valueText = getLiteralString(
@@ -136,7 +163,7 @@ public final class CustomStats {
     }
 
     public static Definition definition(String key) {
-        return DEFINITIONS.stream()
+        return definitions().stream()
                 .filter(candidate -> candidate.key().equals(key))
                 .findFirst()
                 .orElse(null);

@@ -1,0 +1,120 @@
+{
+  "schema_version": 1,
+  "value_conventions": {
+    "overrides": "Stat id to icon override. Every stat ships with its built-in source listed, so this file is the full editable table.",
+    "source": "A talent, Aegis, or Soul Link id whose icon this stat borrows. Ids are the ones used in talents.json, aegises.json, and soul_links.json.",
+    "icon": "A texture path such as aegis_ascension:textures/gui/talents/perk_frieren.png. Used when present and valid; an unparsable path falls back to source.",
+    "errors": "An unknown id or an unparsable path is logged and ignored, leaving that stat's built-in icon in place."
+  },
+  "overrides": {
+    "attack_damage": {
+      "source": "attack_damage",
+      "icon": "aegis_ascension:textures/gui/customstat/flame.png"
+    },
+    "armor": {
+      "source": "armor"
+    },
+    "attack_speed": {
+      "source": "attack_speed"
+    },
+    "all_skill_enhancement_attribute": {
+      "source": "perk_noelle"
+    },
+    "breakthrough_effect": {
+      "source": "perk_plana"
+    },
+    "final_damage": {
+      "source": "perk_kokona"
+    },
+    "independent_damage_amplification": {
+      "source": "soul_love_as_eternal_as_this_moment"
+    },
+    "damage_bonus": {
+      "source": "perk_because_you_exist_as_i_write"
+    },
+    "attack_damage_amplification": {
+      "source": "perk_righteous_knight"
+    },
+    "magic_damage": {
+      "source": "perk_magic_blade"
+    },
+    "physical_damage_amplification": {
+      "source": "perk_flickering_light"
+    },
+    "magic_damage_amplification": {
+      "source": "perk_master_spark"
+    },
+    "skill_damage": {
+      "source": "perk_skill_damage_conversion"
+    },
+    "true_damage": {
+      "source": "perk_seven_colored_magician"
+    },
+    "health_regeneration": {
+      "source": "perk_healing_magic"
+    },
+    "mana_regeneration": {
+      "source": "perk_magic_blade"
+    },
+    "healing_power": {
+      "source": "perk_blessing_of_the_world_tree"
+    },
+    "summon_power": {
+      "source": "perk_noelle"
+    },
+    "summon_count": {
+      "source": "perk_plateau_witch"
+    },
+    "critical_chance": {
+      "source": "perk_ink_dyed_sakura"
+    },
+    "critical_damage": {
+      "source": "perk_half_human_half_phantom_gardener"
+    },
+    "luck": {
+      "source": "perk_alice"
+    },
+    "lucky_strike": {
+      "source": "perk_lucky_arrow"
+    },
+    "primary_attribute_flat": {
+      "source": "perk_arona"
+    },
+    "attack_range": {
+      "source": "perk_wind_arrow"
+    },
+    "cooldown_reduction": {
+      "source": "perk_ningning_ciallo"
+    },
+    "independent_skill_damage": {
+      "source": "perk_hayase_yuka"
+    },
+    "independent_skill_area": {
+      "source": "perk_otogi_noah"
+    },
+    "damage_reduction": {
+      "source": "perk_beater"
+    },
+    "dodge_chance": {
+      "source": "perk_clear_mind_state"
+    },
+    "shield_gain": {
+      "source": "perk_koharu_sprite"
+    },
+    "revives_remaining": {
+      "source": "perk_boundary_of_life_and_death"
+    },
+    "talent_option_bonus": {
+      "source": "perk_flower_fairy"
+    },
+    "barrage_missile_speed": {
+      "source": "arcane_aegis"
+    },
+    "barrage_damage": {
+      "source": "arcane_aegis"
+    },
+    "barrage_area": {
+      "source": "arcane_aegis"
+    }
+  }
+}

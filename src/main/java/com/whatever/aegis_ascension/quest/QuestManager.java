@@ -1732,7 +1732,7 @@ public final class QuestManager {
             else player.giveExperiencePoints(refund);
         }
         if (GoldCurrency.enabled() && definition.goldReward() > 0L) {
-            GoldCurrency.grant(data, definition.goldReward());
+            GoldCurrency.grantReward(data, definition.goldReward());
         }
         if (definition.experience() > 0) {
             AegisExperienceSystem.grantQuestExperience(

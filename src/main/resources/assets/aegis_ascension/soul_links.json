@@ -82,8 +82,7 @@
       "icon": "aegis_ascension:textures/gui/soul_links/soul_magician_master_and_apprentice.png",
       "bonus_stats": {
         "fern_trigger_chance_bonus": 0.1,
-        "frieren_primary_attribute_flat_per_step": 1,
-        "frieren_max_mana_per_step": 10
+        "frieren_conversion_multiplier": 2
       },
       "enabled": true,
       "source_row": 139
@@ -259,9 +258,9 @@
         "collector_effect_multiplier": 2.0,
         "hanako_effect_multiplier": 2.0,
         "negate_koharu_critical_penalty": 1,
-        "armor_shred_per_stack": 10,
-        "armor_shred_max_stacks": 100,
-        "armor_shred_duration_seconds": 10,
+        "armor_penetration_flat_per_stack": 10,
+        "armor_penetration_flat_max_stacks": 100,
+        "armor_penetration_flat_duration_seconds": 10,
         "force_zero_armor_at_max_stacks": 1
       },
       "enabled": true,

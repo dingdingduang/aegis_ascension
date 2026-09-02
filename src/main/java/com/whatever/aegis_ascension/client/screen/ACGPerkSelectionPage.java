@@ -5,6 +5,7 @@ import static com.whatever.aegis_ascension.util.GeneralClientMethods.drawCentere
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getLiteralString;
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
+import com.whatever.aegis_ascension.perk.TalentConstants;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.aegis.AegisConstants;
@@ -245,13 +246,15 @@ final class ACGPerkSelectionPage implements ACGAwaitingPage {
                 Math.min(180, context.contentWidth() / 2 - 24));
         context.drawLevelProgress(graphics,
                 "screen.aegis_ascension.acg.perk_progress",
-                "screen.aegis_ascension.acg.perk_progress_max", perkInterval,
+                "screen.aegis_ascension.acg.perk_progress_max",
+                TalentConstants.HIGHEST_PERK_LEVEL, perkInterval,
                 PlatformServices.config().maximumPerkChargesFromExperience(),
                 context.contentTop() + 12,
                 context.contentX() + context.contentWidth() / 4, trackWidth);
         context.drawLevelProgress(graphics,
                 "screen.aegis_ascension.acg.breakthrough_progress",
-                "screen.aegis_ascension.acg.breakthrough_progress_max", perkInterval,
+                "screen.aegis_ascension.acg.breakthrough_progress_max",
+                TalentConstants.HIGHEST_PERK_LEVEL, perkInterval,
                 PlatformServices.config().maximumBreakthroughsFromExperience(),
                 context.contentTop() + 12,
                 context.contentX() + context.contentWidth() * 3 / 4, trackWidth);

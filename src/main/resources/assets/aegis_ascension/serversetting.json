@@ -5,8 +5,18 @@
     "default": 1
   },
   "maximum_effective_damage_reduction": 0.7,
+  "maximum_effective_dodge_chance": 0.7,
   "true_damage_affected_by_critical_damage": true,
   "true_damage_affected_by_lucky_strike": true,
   "true_damage_affected_by_final_damage": true,
-  "true_damage_affected_by_royal_sacred_flame": true
+  "true_damage_affected_by_royal_sacred_flame": true,
+  "true_damage_affected_by_skill_damage": true,
+  "true_damage_affected_by_damage_bonus": false,
+  "true_damage_affected_by_physical_amplification": false,
+  "true_damage_affected_by_magic_amplification": false,
+  "true_damage_affected_by_attack_amplification": false,
+  "true_damage_affected_by_distance_bonus": false,
+  "outcome_banner_fade_in_ticks": 10,
+  "outcome_banner_stay_ticks": 70,
+  "outcome_banner_fade_out_ticks": 20
 }

@@ -758,9 +758,9 @@ public final class ACGPerkSelectionScreen extends Screen {
      * @param y         top of the line, so several tracks can stack.
      */
     void drawLevelProgress(GuiGraphics graphics, String progressKey, String maxKey,
-                           int interval, int maxAwards, int y) {
-        drawLevelProgress(graphics, progressKey, maxKey, interval, maxAwards, y,
-                contentX + contentWidth / 2, 180);
+                           String highestLevelKey, int interval, int maxAwards, int y) {
+        drawLevelProgress(graphics, progressKey, maxKey, highestLevelKey, interval,
+                maxAwards, y, contentX + contentWidth / 2, 180);
     }
 
     /**
@@ -769,7 +769,7 @@ public final class ACGPerkSelectionScreen extends Screen {
      *                 stops two side-by-side tracks running into each other on a narrow pane.
      */
     void drawLevelProgress(GuiGraphics graphics, String progressKey, String maxKey,
-                           int interval, int maxAwards, int y,
+                           String highestLevelKey, int interval, int maxAwards, int y,
                            int centerX, int barWidth) {
         if (minecraft == null || minecraft.player == null) {
             return;
@@ -782,7 +782,15 @@ public final class ACGPerkSelectionScreen extends Screen {
         // maxAwards * step.
         long finalMilestone = (long) Math.max(0, maxAwards) * step;
 
-        if (level >= finalMilestone) {
+        // Awards are gated on the highest level ever reached, not the current one. After a
+        // level drop the next award still sits above that mark, so counting from the
+        // current level would promise a charge the server will never grant. Falling back
+        // to the current level keeps the old reading when the stat has not arrived yet.
+        int highestLevel = Math.max(level,
+                (int) Math.round(ClientPerkState.getDisplayStat(highestLevelKey)));
+        long nextMilestone = ((long) (highestLevel / step) + 1L) * step;
+
+        if (nextMilestone > finalMilestone) {
             drawCenteredString(graphics, font, getLiteralString(font.plainSubstrByWidth(
                             getTranslatableString(maxKey, maxAwards).getString(), barWidth)),
                     centerX, y, ACGTheme.TEXT_MUTED);
@@ -791,9 +799,9 @@ public final class ACGPerkSelectionScreen extends Screen {
             return;
         }
 
-        int previousMilestone = (level / step) * step;
-        int nextMilestone = previousMilestone + step;
-        float progress = (level - previousMilestone) / (float) step;
+        long previousMilestone = nextMilestone - step;
+        float progress = Math.max(0.0F, Math.min(1.0F,
+                (level - previousMilestone) / (float) step));
         drawCenteredString(graphics, font, getLiteralString(font.plainSubstrByWidth(
                         getTranslatableString(progressKey, level, nextMilestone).getString(),
                         barWidth)),

@@ -29,6 +29,10 @@ import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
 /** Handles active combat, healing, revival, kill, and combat-tick talent effects. */
 public final class TalentCombatEffects {
     private static final ThreadLocal<Boolean> DESTRUCTION_HEALING =
@@ -52,10 +56,9 @@ public final class TalentCombatEffects {
         TeamStar.tick(player, data);
         if (player.tickCount % 20 == 0) {
             IronSpellsCompat.updateAttributeModifiers(player, data);
-            double current = data.getCustomStat(MAGICIAN_PRIMARY_ATTRIBUTE_FLAT);
-            double updated = magicianPrimaryAttributeFlat(player, data);
-            if (Math.abs(current - updated) > 1.0E-9D
-                    || !isMagicConversionHealthCurrent(player, data)) {
+            // Primary Stat no longer tracks live Max Mana, so only Magic Conversion's
+            // health bonus still needs a periodic correctness check.
+            if (!isMagicConversionHealthCurrent(player, data)) {
                 recalculateAttributes(player, data);
             }
         }
@@ -256,26 +259,52 @@ public final class TalentCombatEffects {
             amount *= damageAttackAmplificationCalculation(data);
         }
         amount *= FocusedShot.arrowDamageMultiplier(attacker, data, source);
-        if (data.owns(PERK_GANYUS_BLESSING)) {
-            Perk ganyu = requiredPerk(PERK_GANYUS_BLESSING);
-            double distance = attacker.distanceTo(target);
-            if (distance >= ganyu.stat(MINIMUM_DAMAGE_DISTANCE)) {
-                amount *= Math.max(0.0D, 1.0D
-                        + (distance - ganyu.stat(DISTANCE_DAMAGE_OFFSET))
-                        * ganyu.stat(DAMAGE_MULTIPLIER_PER_DISTANCE));
-            }
-        }
-        double armorIgnore = 0.0D;
+        amount *= ganyuDistanceMultiplier(attacker, data, target);
+        // Hanako and Flickering Light are excluded from the Apothic mapping because
+        // they only apply to one damage category, so they are always summed here.
+        double armorPenetration = 0.0D;
         if (context.physicalDamage() && data.owns(PERK_HANAKOS_BLESSING)) {
-            armorIgnore += stat(PERK_HANAKOS_BLESSING, PHYSICAL_ARMOR_IGNORE)
+            armorPenetration += stat(PERK_HANAKOS_BLESSING, ARMOR_PENETRATION_PERCENTAGE)
                     * MakeUpWorkClub.hanakoMultiplier(data);
         }
-        if (data.owns(PERK_ET_OMNIA_VANITAS)
-                && !ApothicAttributesCompat.handlesMappedAttribute(attacker, ARMOR_SHRED)) {
-            armorIgnore += stat(PERK_ET_OMNIA_VANITAS, ARMOR_SHRED);
+        if (context.directMeleeAttack() && data.owns(PERK_FLICKERING_LIGHT)) {
+            armorPenetration += stat(PERK_FLICKERING_LIGHT, ARMOR_PENETRATION_PERCENTAGE);
         }
-        amount = compensateForArmorIgnore(amount, target, source, armorIgnore);
+        if (!ApothicAttributesCompat.handlesMappedAttribute(
+                attacker, ARMOR_PENETRATION_PERCENTAGE)) {
+            armorPenetration += unconditionalArmorPenetration(data);
+        }
+        amount = compensateForArmorPenetration(amount, target, source, armorPenetration);
         return (float) Math.min(Float.MAX_VALUE, amount);
+    }
+
+    /**
+     * Armor Penetration from every talent that applies it to any hit, used only when
+     * Apothic is not publishing the same total as an attribute.
+     *
+     * <p>The talents handled just above are skipped: they apply under a damage-category
+     * condition an attribute cannot express, which is exactly why the mapping in
+     * talents.json excludes them. Reading that list rather than naming ids here keeps
+     * this sum and the published attribute describing the same split.</p>
+     */
+    private static double unconditionalArmorPenetration(PlayerPerkData data) {
+        Set<String> conditional = new HashSet<>(
+                Set.of(PERK_HANAKOS_BLESSING, PERK_FLICKERING_LIGHT)
+        );
+        Perk.apothicAttributeMappings().stream()
+                .filter(mapping -> mapping.customStat().equals(ARMOR_PENETRATION_PERCENTAGE))
+                .forEach(mapping -> conditional.addAll(mapping.excludedPerks()));
+
+        double total = 0.0D;
+        for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
+            Perk perk = entry.getKey();
+            if (conditional.contains(perk.id())
+                    || (perk.manuallyToggleable() && !data.isTalentEnabled(perk.id()))) {
+                continue;
+            }
+            total += perk.stat(ARMOR_PENETRATION_PERCENTAGE) * entry.getValue();
+        }
+        return total;
     }
 
     private static float modifyIncomingHurt(
@@ -285,6 +314,12 @@ public final class TalentCombatEffects {
     ) {
         if (data.owns(PERK_TSUKIYUKI_MIYAKO) && victim.getRandom().nextDouble()
                 < stat(PERK_TSUKIYUKI_MIYAKO, IGNORE_DAMAGE_CHANCE)) {
+            return 0.0F;
+        }
+        // Apothic Attributes rolls Dodge Chance itself on the attribute this mod
+        // publishes into, so rolling here as well would give one hit two chances.
+        if (!ApothicAttributesCompat.handlesDodge(victim)
+                && victim.getRandom().nextDouble() < effectiveDodgeChance(victim, data)) {
             return 0.0F;
         }
         double multiplier = 1.0D - effectiveDamageResistance(data);
@@ -520,38 +555,12 @@ public final class TalentCombatEffects {
     /** Runs revival and kill effects; true means the loader should cancel the death. */
     public static boolean onLivingDeath(LivingEntity target, DamageSource source) {
         if (target instanceof ServerPlayer player) {
-//            AegisAscensionMod.LOGGER.info(
-//                    "[ReviveDebug] LivingDeathEvent entered: player={}, source={}, sourceEntity={}, "
-//                            + "health={}, maxHealth={}, removed={}, removalReason={}, deadOrDying={}, "
-//                            + "deathTime={}, hurtTime={}, invulnerableTime={}, alreadyCanceled={}",
-//                    player.getGameProfile().getName(),
-//                    event.getSource().getMsgId(),
-//                    event.getSource().getEntity() == null
-//                            ? "none"
-//                            : event.getSource().getEntity().getType().toString(),
-//                    player.getHealth(),
-//                    player.getMaxHealth(),
-//                    player.isRemoved(),
-//                    player.getRemovalReason(),
-//                    player.isDeadOrDying(),
-//                    player.deathTime,
-//                    player.hurtTime,
-//                    player.invulnerableTime,
-//                    event.isCanceled()
-//            );
             boolean revived = PerkData.get(player).map(data -> {
                 if (data.owns(PERK_BOUNDARY_OF_LIFE_AND_DEATH)
                         && data.getCustomStat(REVIVES_REMAINING) > 0.0D) {
                     double revivesBefore = data.getCustomStat(REVIVES_REMAINING);
                     data.addCustomStat(REVIVES_REMAINING, -1.0D);
                     Perk boundary = requiredPerk(PERK_BOUNDARY_OF_LIFE_AND_DEATH);
-//                    AegisAscensionMod.LOGGER.info(
-//                            "[ReviveDebug] Selecting revive: player={}, perk={}, usesBefore={}, usesAfter={}",
-//                            player.getGameProfile().getName(),
-//                            boundary.id(),
-//                            revivesBefore,
-//                            data.getCustomStat(REVIVES_REMAINING)
-//                    );
                     data.addCustomStat(REVIVE_LUCK, boundary.stat(LUCKY_STRIKE_PER_REVIVE));
                     revive(player, boundary);
                     recalculateAttributes(player, data);
@@ -562,12 +571,6 @@ public final class TalentCombatEffects {
                         && data.getCustomStat(BLAZING_REVIVE_USED) == 0.0D) {
                     data.setCustomStat(BLAZING_REVIVE_USED, 1.0D);
                     Perk blazing = requiredPerk(PERK_BLAZING_FEATHER_STARWEAVER);
-//                    AegisAscensionMod.LOGGER.info(
-//                            "[ReviveDebug] Selecting revive: player={}, perk={}, blazingReviveUsed={}",
-//                            player.getGameProfile().getName(),
-//                            blazing.id(),
-//                            data.getCustomStat(BLAZING_REVIVE_USED)
-//                    );
                     data.setCustomStat(BLAZING_BREAKTHROUGH_DAMAGE,
                             blazing.stat(FINAL_DAMAGE_AFTER_REVIVE));
                     revive(player, blazing);
@@ -576,31 +579,8 @@ public final class TalentCombatEffects {
                 return false;
             }).orElse(false);
             if (revived) {
-//                AegisAscensionMod.LOGGER.info(
-//                        "[ReviveDebug] LivingDeathEvent canceled after revive: player={}, health={}, "
-//                                + "maxHealth={}, removed={}, removalReason={}, deadOrDying={}, "
-//                                + "deathTime={}, hurtTime={}, invulnerableTime={}",
-//                        player.getGameProfile().getName(),
-//                        player.getHealth(),
-//                        player.getMaxHealth(),
-//                        player.isRemoved(),
-//                        player.getRemovalReason(),
-//                        player.isDeadOrDying(),
-//                        player.deathTime,
-//                        player.hurtTime,
-//                        player.invulnerableTime
-//                );
                 return true;
             }
-//            AegisAscensionMod.LOGGER.info(
-//                    "[ReviveDebug] No revive was available: player={}, health={}, removed={}, "
-//                            + "removalReason={}, deadOrDying={}",
-//                    player.getGameProfile().getName(),
-//                    player.getHealth(),
-//                    player.isRemoved(),
-//                    player.getRemovalReason(),
-//                    player.isDeadOrDying()
-//            );
         }
 
         if (!(source.getEntity() instanceof ServerPlayer killer)) {
@@ -698,8 +678,6 @@ public final class TalentCombatEffects {
     private static void logMaxHealthModifiers(String stage, ServerPlayer player) {
         AttributeInstance instance = GeneralServerMethods.getAttributeInstance(player, Attributes.MAX_HEALTH);
         if (instance == null) {
-//            AegisAscensionMod.LOGGER.warn("[ReviveDebug] {}: MAX_HEALTH attribute is null for {}",
-//                    stage, player.getGameProfile().getName());
             return;
         }
         StringBuilder modifiers = new StringBuilder();
@@ -710,14 +688,6 @@ public final class TalentCombatEffects {
                     .append(' ').append(GeneralServerMethods.getAttributeOperation(modifier))
                     .append(' ').append(modifier.getAmount()).append(']');
         }
-//        AegisAscensionMod.LOGGER.info(
-//                "[ReviveDebug] {}: MAX_HEALTH base={} value={} finiteValue={} modifiers:{}",
-//                stage,
-//                instance.getBaseValue(),
-//                instance.getValue(),
-//                Double.isFinite(instance.getValue()),
-//                modifiers.length() == 0 ? " none" : modifiers.toString()
-//        );
     }
 
     private static void revive(ServerPlayer player, Perk sourcePerk) {
@@ -725,41 +695,9 @@ public final class TalentCombatEffects {
         double reviveFraction = sourcePerk.stat(REVIVE_HEALTH_FRACTION);
         float requestedHealth = Math.max(1.0F, player.getMaxHealth() * (float) reviveFraction);
         int requestedInvulnerability = integerStat(sourcePerk, INVULNERABILITY_TICKS);
-//        AegisAscensionMod.LOGGER.info(
-//                "[ReviveDebug] Before revive(): player={}, perk={}, fraction={}, requestedHealth={}, "
-//                        + "requestedInvulnerability={}, health={}, maxHealth={}, removed={}, "
-//                        + "removalReason={}, deadOrDying={}, deathTime={}, hurtTime={}",
-//                player.getGameProfile().getName(),
-//                sourcePerk.id(),
-//                reviveFraction,
-//                requestedHealth,
-//                requestedInvulnerability,
-//                player.getHealth(),
-//                player.getMaxHealth(),
-//                player.isRemoved(),
-//                player.getRemovalReason(),
-//                player.isDeadOrDying(),
-//                player.deathTime,
-//                player.hurtTime
-//        );
         player.setHealth(requestedHealth);
         player.invulnerableTime = requestedInvulnerability;
         player.clearFire();
-//        AegisAscensionMod.LOGGER.info(
-//                "[ReviveDebug] After revive(): player={}, perk={}, health={}, maxHealth={}, "
-//                        + "removed={}, removalReason={}, deadOrDying={}, deathTime={}, hurtTime={}, "
-//                        + "invulnerableTime={}",
-//                player.getGameProfile().getName(),
-//                sourcePerk.id(),
-//                player.getHealth(),
-//                player.getMaxHealth(),
-//                player.isRemoved(),
-//                player.getRemovalReason(),
-//                player.isDeadOrDying(),
-//                player.deathTime,
-//                player.hurtTime,
-//                player.invulnerableTime
-//        );
     }
 
     /** Returns only the Final Damage bucket used by converted True Damage. */
@@ -786,7 +724,7 @@ public final class TalentCombatEffects {
      * LivingHurt runs before vanilla armor absorption. Scale its input so the later
      * full-armor calculation produces the same result as a reduced armor value.
      */
-    private static double compensateForArmorIgnore(double amount, LivingEntity target,
+    private static double compensateForArmorPenetration(double amount, LivingEntity target,
                                                     DamageSource source,
                                                     double ignoredFraction) {
         double ignored = Mth.clamp(ignoredFraction, 0.0D, 1.0D);

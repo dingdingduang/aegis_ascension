@@ -114,6 +114,37 @@ final class TrueDamageMechanic {
         if (settings.trueDamageAffectedByRoyalSacredFlame()) {
             commonMultiplier *= royalSacredFlameMultiplier(owner, data);
         }
+        // Gated on the spell check the normal path uses, so converted melee does not
+        // start scaling on a stat it never scaled on before.
+        if (supportedSpell && settings.trueDamageAffectedBySkillDamage()) {
+            commonMultiplier *= damageSkillCalculation(owner, data);
+        }
+        if (settings.trueDamageAffectedByDamageBonus()) {
+            commonMultiplier *= damageDamageBonusCalculation(owner, data);
+        }
+        if (settings.trueDamageAffectedByDistanceBonus()) {
+            commonMultiplier *= ganyuDistanceMultiplier(owner, data, target);
+        }
+        // The type-gated buckets need the damage context, which is not free to build. All
+        // three default to off, so the common path never pays for it.
+        if (settings.trueDamageAffectedByPhysicalAmplification()
+                || settings.trueDamageAffectedByMagicAmplification()
+                || settings.trueDamageAffectedByAttackAmplification()) {
+            DamageCalculationContext context =
+                    DamageCalculationContext.create(owner, target, source);
+            if (context.physicalDamage()
+                    && settings.trueDamageAffectedByPhysicalAmplification()) {
+                commonMultiplier *= damagePhysicalCalculation(data);
+            }
+            if (context.magicDamage()
+                    && settings.trueDamageAffectedByMagicAmplification()) {
+                commonMultiplier *= damageMagicCalculation(data);
+            }
+            if (context.directMeleeAttack()
+                    && settings.trueDamageAffectedByAttackAmplification()) {
+                commonMultiplier *= damageAttackAmplificationCalculation(data);
+            }
+        }
         commonMultiplier *= FocusedShot.arrowDamageMultiplier(owner, data, source);
 
         double convertedMain = 0.0D;

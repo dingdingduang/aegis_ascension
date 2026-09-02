@@ -5,6 +5,7 @@ import static com.whatever.aegis_ascension.util.GeneralClientMethods.detectOpaqu
 import static com.whatever.aegis_ascension.util.GeneralClientMethods.drawCenteredString;
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
+import com.whatever.aegis_ascension.perk.TalentConstants;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.client.ClientPerkState;
@@ -146,6 +147,7 @@ final class ACGAegisSelectionPage implements ACGAwaitingPage {
         context.drawLevelProgress(graphics,
                 "screen.aegis_ascension.acg.aegis_progress",
                 "screen.aegis_ascension.acg.aegis_progress_max",
+                TalentConstants.HIGHEST_AEGIS_LEVEL,
                 PlatformServices.config().aegisLevelsPerCharge(),
                 Math.max(0, PlatformServices.config().maximumAegisCharges() - 1),
                 context.contentTop() + 12);

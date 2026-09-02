@@ -1,36 +1,103 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "value_conventions": {
     "weight": "Relative selection weight. The default weights total 1.0.",
     "percentages": "Decimal fractions: 0.50 means 50%; -1.0 means -100%.",
-    "item_rolls": "Each roll independently chooses one enabled registered item type.",
-    "title_ticks": "20 ticks = 1 second. Timings for the on-screen result banner."
+    "amount": "Meaning depends on type: the stat delta, the item rolls, or the Aegis count.",
+    "format": "How amount is rendered: number, percent, or absolute_percent."
   },
-  "settings": {
-    "zombie_max_health": 10000,
-    "zombie_minimum_attack_damage": 100,
-    "zombie_attack_speed": 4,
-    "breakthrough_effect_bonus": 0.50,
-    "health_halving_threshold": 0.50,
-    "health_multiplier_above_threshold": 0.50,
-    "fallback_health": 1,
-    "all_skill_enhancement_attribute_penalty": -0.30,
-    "random_item_rolls": 3,
-    "damage_reduction_penalty": -1.00,
-    "skill_enhancement_charges_min": 1,
-    "skill_enhancement_charges_max": 10,
-    "title_fade_in_ticks": 10,
-    "title_stay_ticks": 70,
-    "title_fade_out_ticks": 20
+  "supported_types": {
+    "custom_stat": "Adds amount to the player custom stat named by stat. Set attributed to credit the talent in the stat breakdown.",
+    "random_aegis": "Grants amount random enabled, unowned Aegises.",
+    "random_item": "Independently rolls amount random enabled registered item types.",
+    "charge_grant": "Grants min to max charges of the kind named by charge: skill_enhancement, perk, perk_refresh, or aegis.",
+    "spawn_hostile": "Spawns entity, hostile to the player, with the given attribute overrides.",
+    "health_strike": "Above threshold Health multiplies current Health by multiplier_above, otherwise sets it to fallback_health; lightning optionally follows."
+  },
+  "negation": {
+    "negated_by_law_of_cycle": "When true, Law of Cycle cancels this outcome.",
+    "negated_conversion": "How Madoka with Homura repays a negated outcome: percentage, damage_reduction, or nonnumeric."
   },
   "outcomes": [
-    { "id": "hostile_zombie", "enabled": true, "weight": 0.05 },
-    { "id": "breakthrough_effect", "enabled": true, "weight": 0.10 },
-    { "id": "divine_punishment", "enabled": true, "weight": 0.20 },
-    { "id": "all_skill_penalty", "enabled": true, "weight": 0.25 },
-    { "id": "random_items", "enabled": true, "weight": 0.08 },
-    { "id": "damage_reduction_penalty", "enabled": true, "weight": 0.20 },
-    { "id": "skill_enhancement_charges", "enabled": true, "weight": 0.10 },
-    { "id": "random_aegis", "enabled": true, "weight": 0.02 }
+    {
+      "id": "hostile_zombie",
+      "type": "spawn_hostile",
+      "enabled": true,
+      "weight": 0.05,
+      "entity": "minecraft:zombie",
+      "max_health": 10000,
+      "minimum_attack_damage": 100,
+      "attack_speed": 4,
+      "negated_by_law_of_cycle": true,
+      "negated_conversion": "nonnumeric"
+    },
+    {
+      "id": "breakthrough_effect",
+      "type": "custom_stat",
+      "enabled": true,
+      "weight": 0.10,
+      "stat": "breakthrough_effect_multiplier_bonus",
+      "amount": 0.50,
+      "format": "percent"
+    },
+    {
+      "id": "divine_punishment",
+      "type": "health_strike",
+      "enabled": true,
+      "weight": 0.20,
+      "threshold": 0.50,
+      "multiplier_above": 0.50,
+      "fallback_health": 1,
+      "lightning": true,
+      "negated_by_law_of_cycle": true,
+      "negated_conversion": "nonnumeric"
+    },
+    {
+      "id": "all_skill_penalty",
+      "type": "custom_stat",
+      "enabled": true,
+      "weight": 0.25,
+      "stat": "all_skill_enhancement_attribute",
+      "amount": -0.30,
+      "format": "percent",
+      "attributed": true,
+      "negated_by_law_of_cycle": true,
+      "negated_conversion": "percentage"
+    },
+    {
+      "id": "random_items",
+      "type": "random_item",
+      "enabled": true,
+      "weight": 0.08,
+      "amount": 3
+    },
+    {
+      "id": "damage_reduction_penalty",
+      "type": "custom_stat",
+      "enabled": true,
+      "weight": 0.20,
+      "stat": "damage_reduction",
+      "amount": -1.00,
+      "format": "percent",
+      "attributed": true,
+      "negated_by_law_of_cycle": true,
+      "negated_conversion": "damage_reduction"
+    },
+    {
+      "id": "skill_enhancement_charges",
+      "type": "charge_grant",
+      "enabled": true,
+      "weight": 0.10,
+      "charge": "skill_enhancement",
+      "min": 1,
+      "max": 10
+    },
+    {
+      "id": "random_aegis",
+      "type": "random_aegis",
+      "enabled": true,
+      "weight": 0.02,
+      "amount": 1
+    }
   ]
 }

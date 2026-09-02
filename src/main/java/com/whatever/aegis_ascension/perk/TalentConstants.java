@@ -50,6 +50,8 @@ public final class TalentConstants {
     public static final String PERK_NINGNING_CIALLO = "perk_ningning_ciallo";
     public static final String PERK_NANAMI_CIALLO = "perk_nanami_ciallo";
     public static final String PERK_ROLLING_IN_WEALTH = "perk_rolling_in_wealth";
+    public static final String PERK_GOLDEN_RULE = "perk_golden_rule";
+    public static final String PERK_EST = "perk_est";
     public static final String PERK_ENIGMA = "perk_enigma";
     public static final String PERK_AQUAS_BLESSING = "perk_aquas_blessing";
     public static final String PERK_SHRINE_MAIDEN_DANCE = "perk_shrine_maiden_dance";
@@ -165,10 +167,15 @@ public final class TalentConstants {
     public static final String ALL_SKILL_ENHANCEMENT_ATTRIBUTE =
             "all_skill_enhancement_attribute";
     public static final String ARMOR = "armor";
-    public static final String ARMOR_IGNORE = "armor_ignore";
-    public static final String ARMOR_PIERCE = "armor_pierce";
-    public static final String ARMOR_SHRED = "armor_shred";
-    public static final String PHYSICAL_ARMOR_IGNORE = "physical_armor_ignore";
+    /** Armor points ignored outright, published as attributeslib:armor_pierce. */
+    public static final String ARMOR_PENETRATION_FLAT = "armor_penetration_flat";
+    /**
+     * Fraction of the target's Armor ignored, 0.30 meaning 30%. Published as
+     * attributeslib:armor_shred, except for talents the mapping excludes because
+     * their contribution is conditional and applied by mod logic instead.
+     */
+    public static final String ARMOR_PENETRATION_PERCENTAGE =
+            "armor_penetration_percentage";
     public static final String ARONA_BREAKTHROUGH_PRIMARY_ATTRIBUTE_FLAT_BONUS = "arona_breakthrough_primary_attribute_flat_bonus";
     /** Unscaled Primary points accumulated by Arona's Breakthrough effect. */
     public static final String ARONA_PRIMARY_FLAT = "arona_primary_flat";
@@ -253,6 +260,7 @@ public final class TalentConstants {
             "dominus_shield_damage_bonus";
     public static final String DISTANCE_PER_STACK = "distance_per_stack";
     public static final String DODGE_CHANCE = "dodge_chance";
+    public static final String DODGE_CHANCE_STEP = "dodge_chance_step";
     public static final String DOUBLE_DAMAGE_CHANCE = "double_damage_chance";
     public static final String DOUBLE_DAMAGE_MULTIPLIER = "double_damage_multiplier";
     public static final String DOUBLE_BREAKTHROUGH_CHANCE = "double_breakthrough_chance";
@@ -282,6 +290,8 @@ public final class TalentConstants {
     public static final String BREAKTHROUGH_EFFECT = "breakthrough_effect";
     public static final String BREAKTHROUGH_EFFECT_MULTIPLIER_BONUS = "breakthrough_effect_multiplier_bonus";
     public static final String BREAKTHROUGH_EXPERIENCE = "breakthrough_experience";
+    public static final String BREAKTHROUGH_GOLD_MIN = "breakthrough_gold_min";
+    public static final String BREAKTHROUGH_GOLD_MAX = "breakthrough_gold_max";
     public static final String BREAKTHROUGH_FINAL_DAMAGE = "breakthrough_final_damage";
     public static final String BREAKTHROUGH_LUCK_FLAT = "breakthrough_luck_flat";
     public static final String BREAKTHROUGH_HEALING_POWER = "breakthrough_healing_power";
@@ -304,9 +314,19 @@ public final class TalentConstants {
     public static final String BREAKTHROUGH_SWISS_ROLLS = "breakthrough_swiss_rolls";
     public static final String BREAKTHROUGH_TRUE_DAMAGE = "breakthrough_true_damage";
     public static final String BREAKTHROUGH_ATTACK_RANGE = "breakthrough_attack_range";
-    public static final String EVASION_FLAT = "evasion_flat";
     public static final String EXECUTE_HEALTH_FRACTION = "execute_health_fraction";
     public static final String EXPERIENCE_GAINED = "experience_gained";
+    public static final String AEGIS_ASCENSION_EXPERIENCE_GAINED =
+            "aegis_ascension_experience_gained";
+    public static final String GOLD_REWARD_GAINED = "gold_reward_gained";
+    public static final String IMMEDIATE_GOLD = "immediate_gold";
+    public static final String GOLD_PER_STACK = "gold_per_stack";
+    public static final String SKILL_DAMAGE_PER_GOLD_STACK =
+            "skill_damage_per_gold_stack";
+    public static final String SKILL_DAMAGE_GOLD_CAP = "skill_damage_gold_cap";
+    public static final String ATTACK_DAMAGE_PER_GOLD_STACK =
+            "attack_damage_per_gold_stack";
+    public static final String ATTACK_DAMAGE_GOLD_CAP = "attack_damage_gold_cap";
     public static final String EXPERIENCE_PER_ELITE_KILL = "experience_per_elite_kill";
     public static final String FERN_TRIGGER_CHANCE_BONUS = "fern_trigger_chance_bonus";
     public static final String FRIEREN_PRIMARY_ATTRIBUTE_FLAT_PER_STEP =
@@ -386,6 +406,10 @@ public final class TalentConstants {
     public static final String MAGIC_CONVERSION_TRIGGER_COUNT =
             "magic_conversion_trigger_count";
     public static final String MANA_PER_PRIMARY_STAT = "mana_per_primary_stat";
+
+    /** Display-only mirrors of the high-water levels the milestone awards gate on. */
+    public static final String HIGHEST_PERK_LEVEL = "highest_perk_level";
+    public static final String HIGHEST_AEGIS_LEVEL = "highest_aegis_level";
     public static final String MANA_REGENERATION = "mana_regeneration";
     public static final String MANA_REGENERATION_MULTIPLIER =
             "mana_regeneration_multiplier";
@@ -486,7 +510,8 @@ public final class TalentConstants {
     public static final String INDEPENDENT_SKILL_AREA = "independent_skill_area";
     public static final String INDEPENDENT_SKILL_DAMAGE = "independent_skill_damage";
     public static final String SKILL_DAMAGE = "skill_damage";
-    public static final String SKILL_DAMAGE_PER_EVASION = "skill_damage_per_evasion";
+    public static final String SKILL_DAMAGE_PER_DODGE_CHANCE_STEP =
+            "skill_damage_per_dodge_chance_step";
     public static final String SKILL_DAMAGE_PER_LUCKY_STRIKE = "skill_damage_per_lucky_strike";
     public static final String SKILL_DAMAGE_PER_OWNED_TALENT = "skill_damage_per_owned_talent";
     public static final String SKILL_DAMAGE_PER_STACK = "skill_damage_per_stack";

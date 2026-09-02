@@ -80,6 +80,33 @@ public final class MysteriousDoll {
         }
         grant(selected, player, data, itemPool);
         data.applyChosenPerks(player);
+        announce(player, label(selected));
+    }
+
+    private static void announce(ServerPlayer player, Component outcome) {
+        OutcomeAnnouncement.announce(
+                player,
+                getTranslatableString("message.aegis_ascension.mysterious_doll.title"),
+                outcome,
+                "message.aegis_ascension.mysterious_doll.broadcast"
+        );
+    }
+
+    /**
+     * The short form of an outcome for the banner and the broadcast: the same pieces the
+     * tooltip shows, minus the weight, which nobody wants read out when they win.
+     */
+    private static Component label(Outcome outcome) {
+        String key = "message.aegis_ascension.mysterious_doll.label." + outcome.type();
+        return switch (outcome.type()) {
+            case CUSTOM_STAT -> getTranslatableString(
+                    key, statName(outcome), formatSignedAmount(outcome));
+            case RANDOM_AEGIS, RANDOM_ITEM -> getTranslatableString(
+                    key, nonNegativeCount(outcome.amount()));
+            case RANDOM_TALENT -> getTranslatableString(
+                    key, nonNegativeCount(outcome.amount()), outcome.tier());
+            default -> getLiteralString(outcome.id());
+        };
     }
 
     /** Builds the talent tooltip from the same JSON entries used by the server roll. */

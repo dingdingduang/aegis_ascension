@@ -26,6 +26,7 @@ public final class AegisConstants {
     public static final String FREE_PERK_CHOICES = "free_perk_choices";
     public static final String PERK_REFRESH_CHARGE_PER_CHARGE =
             "perk_refresh_charge_per_charge";
+    public static final String SHOP_REFRESH_CHARGES = "shop_refresh_charges";
     public static final String RANDOM_PERK_MIN = "random_perk_min";
     public static final String RANDOM_PERK_MAX = "random_perk_max";
     public static final String RANDOM_PERK_ONE_CHANCE = "random_perk_one_chance";

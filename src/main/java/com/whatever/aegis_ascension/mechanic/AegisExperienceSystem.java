@@ -140,10 +140,14 @@ public final class AegisExperienceSystem {
         return false;
     }
 
-    /** Grants a quest's experience in the currently selected progression currency. */
-    public static AwardResult grantQuestExperience(ServerPlayer player,
-                                                   PlayerPerkData data,
-                                                   long amount) {
+    /**
+     * Grants experience in the currently selected progression currency. Every reward that
+     * calls itself "Experience" must come through here: handing out vanilla XP while the
+     * server runs on Aegis Ascension Experience moves nothing the player is progressing.
+     */
+    public static AwardResult grantExperience(ServerPlayer player,
+                                              PlayerPerkData data,
+                                              long amount) {
         long reward = Math.max(0L, amount);
         if (usesMinecraftDefaultLevel()) {
             if (reward > 0L) {
@@ -152,7 +156,60 @@ public final class AegisExperienceSystem {
             return new AwardResult(reward, data.getAegisAscensionRank(),
                     data.getAegisAscensionRank());
         }
-        return addExperience(data, reward);
+        // The vanilla branch above is already amplified by ServerGameplayHandler as the
+        // XP orbs arrive, so the AAE bonus belongs here and only here.
+        return addExperience(data, amplifyAegisExperience(data, reward));
+    }
+
+    /**
+     * Grants whole levels of progression. On the Aegis Ascension track a "level" is a
+     * rank, so this raises the rank directly and keeps the experience already banked
+     * toward the next one - a reward must never cost the player progress they earned.
+     *
+     * <p>Charges for the new ranks are handed out by the milestone pass that already runs
+     * each server tick. Awarding them inline would let a rank reward trigger a
+     * Breakthrough that grants more ranks, and recurse.</p>
+     */
+    public static AwardResult grantLevels(ServerPlayer player, PlayerPerkData data,
+                                          int levels) {
+        int granted = Math.max(0, levels);
+        if (usesMinecraftDefaultLevel()) {
+            if (granted > 0) {
+                player.giveExperienceLevels(granted);
+            }
+            return new AwardResult(granted, data.getAegisAscensionRank(),
+                    data.getAegisAscensionRank());
+        }
+        normalize(data);
+        int previousRank = data.getAegisAscensionRank();
+        int maximum = PlatformServices.config().aegisAscensionMaximumRank();
+        int newRank = Math.min(maximum, previousRank + granted);
+        // normalize() holds banked experience at zero once the cap is reached; match it.
+        long banked = newRank >= maximum ? 0L : data.getAegisAscensionExperience();
+        data.setAegisAscensionProgress(newRank, banked);
+        return new AwardResult(granted, previousRank, newRank);
+    }
+
+    /** Applies the owned talents' Aegis Ascension Experience bonus to a reward. */
+    private static long amplifyAegisExperience(PlayerPerkData data, long reward) {
+        if (reward <= 0L) {
+            return 0L;
+        }
+        double multiplier = 1.0D + TalentEffects.aegisExperienceGainBonus(data);
+        if (!Double.isFinite(multiplier) || multiplier <= 0.0D) {
+            return 0L;
+        }
+        double amplified = reward * multiplier;
+        return !Double.isFinite(amplified)
+                ? MAX_SAFE_EXPERIENCE
+                : (long) Math.min(MAX_SAFE_EXPERIENCE, Math.max(0.0D, Math.round(amplified)));
+    }
+
+    /** Grants a quest's experience in the currently selected progression currency. */
+    public static AwardResult grantQuestExperience(ServerPlayer player,
+                                                   PlayerPerkData data,
+                                                   long amount) {
+        return grantExperience(player, data, amount);
     }
 
     /** Applies all level-based mod milestones using the selected progression source. */

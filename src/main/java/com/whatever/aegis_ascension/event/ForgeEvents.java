@@ -20,9 +20,7 @@ import com.whatever.aegis_ascension.perk.talents.HomuraResetNegation;
 import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -174,68 +172,12 @@ public final class ForgeEvents {
             return;
         }
 
-//        logPlayerState("Abnormal player tick", player, true);
         ServerTickHandler.onPlayerTick(player);
         ShieldMechanic.tick(player);
         AngelsAegis.tick(player);
         KoharuShield.tick(player);
     }
 
-    // ------------------------------------------------------------------
-    // TEMPORARY damage bracket, paired with the [ReviveDebug] trace.
-    // /kill deals Float.MAX_VALUE and the player's health lands on NaN before any
-    // LivingDeathEvent fires. These four handlers straddle every mod handler on both damage
-    // events, so the log shows the amount entering and leaving the chain - which tells us
-    // whether this mod produces the NaN or merely receives it from something else.
-    // ------------------------------------------------------------------
-
-//    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-//    public static void traceHurtIn(LivingHurtEvent event) {
-//        traceDamage("LivingHurt IN ", event.getEntity(), event.getAmount(), event.isCanceled());
-//    }
-//
-//    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-//    public static void traceHurtOut(LivingHurtEvent event) {
-//        traceDamage("LivingHurt OUT", event.getEntity(), event.getAmount(), event.isCanceled());
-//    }
-//
-//    @SubscribeEvent(priority = EventPriority.HIGHEST, receiveCanceled = true)
-//    public static void traceDamageIn(LivingDamageEvent event) {
-//        traceDamage("LivingDamage IN ", event.getEntity(), event.getAmount(), event.isCanceled());
-//    }
-//
-//    @SubscribeEvent(priority = EventPriority.LOWEST, receiveCanceled = true)
-//    public static void traceDamageOut(LivingDamageEvent event) {
-//        traceDamage("LivingDamage OUT", event.getEntity(), event.getAmount(), event.isCanceled());
-//    }
-
-//    private static void traceDamage(String stage, Entity entity, float amount, boolean canceled) {
-//        if (!(entity instanceof ServerPlayer player)) {
-//            return;
-//        }
-//        // Silent while everything is finite. The dead-alive bug is intermittent and its
-//        // trigger is still unknown, so this stays in as a watchdog rather than a trace: it
-//        // says nothing during normal play and names the exact hit if a value ever flips.
-//        if (Float.isFinite(amount)
-//                && Float.isFinite(player.getHealth())
-//                && Float.isFinite(player.getAbsorptionAmount())) {
-//            return;
-//        }
-//        AegisAscensionMod.LOGGER.warn(
-//                "[ReviveDebug] {}: player={}, amount={}, finiteAmount={}, canceled={}, health={}, "
-//                        + "finiteHealth={}, maxHealth={}, absorption={}, finiteAbsorption={}",
-//                stage,
-//                player.getGameProfile().getName(),
-//                amount,
-//                Float.isFinite(amount),
-//                canceled,
-//                player.getHealth(),
-//                Float.isFinite(player.getHealth()),
-//                player.getMaxHealth(),
-//                player.getAbsorptionAmount(),
-//                Float.isFinite(player.getAbsorptionAmount())
-//        );
-//    }
 
     /** Converts enabled Magic Blade player attacks before vanilla mitigation begins. */
     @SubscribeEvent(priority = EventPriority.HIGHEST)
@@ -323,24 +265,6 @@ public final class ForgeEvents {
     public static void onLivingDeath(LivingDeathEvent event) {
         if (TalentEffects.onLivingDeath(event.getEntity(), event.getSource())) {
             event.setCanceled(true);
-        }
-        if (event.getEntity() instanceof ServerPlayer player) {
-            AegisAscensionMod.LOGGER.info(
-                    "[ReviveDebug] ForgeEvents after TalentEffects.onLivingDeath: player={}, "
-                            + "eventCanceled={}, health={}, maxHealth={}, removed={}, "
-                            + "removalReason={}, deadOrDying={}, deathTime={}, hurtTime={}, "
-                            + "invulnerableTime={}",
-                    player.getGameProfile().getName(),
-                    event.isCanceled(),
-                    player.getHealth(),
-                    player.getMaxHealth(),
-                    player.isRemoved(),
-                    player.getRemovalReason(),
-                    player.isDeadOrDying(),
-                    player.deathTime,
-                    player.hurtTime,
-                    player.invulnerableTime
-            );
         }
         // Homura's XP snapshot is captured by the LOWEST-priority handler below, after
         // every revive path has had a chance to cancel this death.
@@ -462,70 +386,5 @@ public final class ForgeEvents {
         }
     }
 
-//    private static void logPlayerState(String stage, ServerPlayer player, boolean abnormalOnly) {
-//        boolean abnormal = player.getHealth() <= 0.0F
-//                || !Float.isFinite(player.getHealth())
-//                || !Float.isFinite(player.getMaxHealth())
-//                || player.isRemoved();
-//        if (abnormalOnly && !abnormal) {
-//            LAST_ABNORMAL_STATE_LOG_TICK.remove(player.getUUID());
-//            return;
-//        }
-//
-//        if (abnormalOnly) {
-//            long gameTime = player.serverLevel().getGameTime();
-//            Long previous = LAST_ABNORMAL_STATE_LOG_TICK.get(player.getUUID());
-//            if (previous != null && gameTime - previous < ABNORMAL_STATE_LOG_INTERVAL_TICKS) {
-//                return;
-//            }
-//            LAST_ABNORMAL_STATE_LOG_TICK.put(player.getUUID(), gameTime);
-//        }
-//
-//        String damageSource = player.getLastDamageSource() == null
-//                ? "none"
-//                : player.getLastDamageSource().getMsgId();
-//        String message = "[ReviveDebug] {}: player={}, health={}, maxHealth={}, finiteHealth={}, "
-//                + "finiteMaxHealth={}, removed={}, removalReason={}, alive={}, deadOrDying={}, "
-//                + "deathTime={}, hurtTime={}, invulnerableTime={}, lastDamageSource={}, gameTime={}";
-//        if (abnormal) {
-//            AegisAscensionMod.LOGGER.warn(
-//                    message,
-//                    stage,
-//                    player.getGameProfile().getName(),
-//                    player.getHealth(),
-//                    player.getMaxHealth(),
-//                    Float.isFinite(player.getHealth()),
-//                    Float.isFinite(player.getMaxHealth()),
-//                    player.isRemoved(),
-//                    player.getRemovalReason(),
-//                    player.isAlive(),
-//                    player.isDeadOrDying(),
-//                    player.deathTime,
-//                    player.hurtTime,
-//                    player.invulnerableTime,
-//                    damageSource,
-//                    player.serverLevel().getGameTime()
-//            );
-//        } else {
-//            AegisAscensionMod.LOGGER.info(
-//                    message,
-//                    stage,
-//                    player.getGameProfile().getName(),
-//                    player.getHealth(),
-//                    player.getMaxHealth(),
-//                    Float.isFinite(player.getHealth()),
-//                    Float.isFinite(player.getMaxHealth()),
-//                    player.isRemoved(),
-//                    player.getRemovalReason(),
-//                    player.isAlive(),
-//                    player.isDeadOrDying(),
-//                    player.deathTime,
-//                    player.hurtTime,
-//                    player.invulnerableTime,
-//                    damageSource,
-//                    player.serverLevel().getGameTime()
-//            );
-//        }
-//    }
 
 }

@@ -1,6 +1,7 @@
 package com.whatever.aegis_ascension.mechanic;
 
 import static com.whatever.aegis_ascension.perk.TalentConstants.*;
+import static com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.FRIEREN_CONVERSION_MULTIPLIER;
 import static com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.TEAM_RADIANCE_RANK;
 
 import com.whatever.aegis_ascension.aegis.Aegis;
@@ -26,6 +27,8 @@ import com.whatever.aegis_ascension.perk.soullink.TeamRadiance;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.util.AegisModifiers;
 import com.whatever.aegis_ascension.util.DisplayStatScope;
+import com.whatever.aegis_ascension.util.DodgeMath;
+import com.whatever.aegis_ascension.util.GoldScalingMath;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import com.whatever.aegis_ascension.util.StatAttribution;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
@@ -89,13 +92,12 @@ public final class TalentStatService {
                     TeamStar.damageBonus(serverPlayer)
             );
         }
-        // Frieren's Soul Link reads the live Max Mana attribute. Publish Magic
-        // Conversion first so its newest value is included in the same recalculation.
         IronSpellsCompat.updateAttributeModifiers(player, data);
-        data.setCustomStat(
-                MAGICIAN_PRIMARY_ATTRIBUTE_FLAT,
-                magicianPrimaryAttributeFlat(player, data)
-        );
+        // Magician Master and Apprentice no longer derives Primary Stat from Max Mana;
+        // it multiplies Frieren's Primary-Stat-to-Mana conversion instead. Writing zero
+        // retires the value from saves that still carry it, so an old character does not
+        // keep a Primary Stat bonus the soul link no longer grants.
+        data.setCustomStat(MAGICIAN_PRIMARY_ATTRIBUTE_FLAT, 0.0D);
         AttributeTotals totals = new AttributeTotals();
         boolean ignoreNegatives = data.owns(PERK_LAW_OF_THE_CYCLE)
                 && stat(PERK_LAW_OF_THE_CYCLE, IGNORE_NEGATIVE_EFFECTS) > 0.0D;
@@ -143,6 +145,7 @@ public final class TalentStatService {
                 totals.attackMultiplier += stacks
                         * perk.stat(ATTACK_DAMAGE_PER_STACK)
                         * rank;
+                totals.attackMultiplier += shirokoGoldAttackDamage(data) * rank;
             }
         }
 
@@ -429,11 +432,26 @@ public final class TalentStatService {
                 && Math.abs(current.getAmount() - expected) < 1.0E-9D;
     }
 
+    /**
+     * Elven Magician converts Primary Stat into Max Mana, multiplied by Magician Master
+     * and Apprentice when that soul link is active.
+     *
+     * <p>Conversion runs one way only. The soul link used to grant Primary Stat per Max
+     * Mana, which closed a loop with this: mana raised Primary Stat, which raised mana
+     * again on the next recalculation pass. It now multiplies this conversion instead, so
+     * no Primary Stat source depends on mana and every flat source can be counted here.</p>
+     */
     public static double frierenMaximumMana(PlayerPerkData data) {
-        return data.owns(PERK_FRIEREN)
-                ? Math.max(0.0D, data.getCustomStat(PRIMARY_FLAT))
+        if (!data.owns(PERK_FRIEREN)) {
+            return 0.0D;
+        }
+        double multiplier = data.hasActiveSoulLink(SOUL_MAGICIAN_MASTER_AND_APPRENTICE)
+                ? Math.max(0.0D, bonusStat(
+                        SOUL_MAGICIAN_MASTER_AND_APPRENTICE, FRIEREN_CONVERSION_MULTIPLIER))
+                : 1.0D;
+        return Math.max(0.0D, totalPrimaryAttributeFlat(data))
                 * stat(PERK_FRIEREN, MANA_PER_PRIMARY_STAT)
-                : 0.0D;
+                * multiplier;
     }
 
     static boolean consumeCappedTrigger(PlayerPerkData data, Perk perk,
@@ -608,7 +626,7 @@ public final class TalentStatService {
         return amplification;
     }
 
-    static double skillDamageBonus(PlayerPerkData data,
+    static double skillDamageBonus(Player player, PlayerPerkData data,
                                            double currentLuckyStrike) {
         double skillDamage = data.getCustomStat(SKILL_DAMAGE)
                 + data.getCustomStat(INNATE_SKILL_DAMAGE)
@@ -616,9 +634,15 @@ public final class TalentStatService {
                 + allSkillEnhancementCustomStatBonus(data, SKILL_DAMAGE)
                 + primaryCustomStatBonus(data, SKILL_DAMAGE);
         if (data.owns(PERK_CLEAR_MIND_STATE)) {
-            skillDamage += sumOwnedStat(data, EVASION_FLAT)
-                    * stat(PERK_CLEAR_MIND_STATE, SKILL_DAMAGE_PER_EVASION);
+            // Calling the Blue Waves converts the accumulated chance, not the capped
+            // one, so Dodge Chance the cap discards still pays for itself.
+            skillDamage += DodgeMath.skillDamage(
+                    totalDodgeChance(player, data),
+                    stat(PERK_CLEAR_MIND_STATE, DODGE_CHANCE_STEP),
+                    stat(PERK_CLEAR_MIND_STATE, SKILL_DAMAGE_PER_DODGE_CHANCE_STEP)
+            );
         }
+        skillDamage += rollingInWealthSkillDamage(data);
         if (data.owns(PERK_METEOR_SPARKLE)) {
             skillDamage += currentLuckyStrike
                     * stat(PERK_METEOR_SPARKLE, SKILL_DAMAGE_PER_LUCKY_STRIKE);
@@ -664,6 +688,8 @@ public final class TalentStatService {
      */
     private static final Set<String> ESSENTIAL_DISPLAY_STATS = Set.of(
             TEAM_RADIANCE_RANK,
+            HIGHEST_PERK_LEVEL,
+            HIGHEST_AEGIS_LEVEL,
             StatAttribution.CUSTOM_STAT_PREFIX + AegisConstants.AUTHORITY_SELECT_ALL_USES
     );
 
@@ -693,6 +719,10 @@ public final class TalentStatService {
     private static Map<String, Double> buildCompleteDisplayStats(
             Player player, PlayerPerkData data, boolean includeAttribution) {
         Map<String, Double> stats = new LinkedHashMap<>();
+        // Published so the selection screens can show progress toward the level that will
+        // actually grant the next award, rather than the next multiple of the interval.
+        stats.put(HIGHEST_PERK_LEVEL, (double) data.getHighestPerkLevel());
+        stats.put(HIGHEST_AEGIS_LEVEL, (double) data.getHighestAegisLevel());
 
         double activeSoulLinks = data.getActiveSoulLinks().size();
         double summonCount = summonCount(data);
@@ -776,7 +806,7 @@ public final class TalentStatService {
             ) * activeSoulLinks * MakeUpWorkClub.collectorMultiplier(data);
         }
 
-        double skillDamage = skillDamageBonus(data, luckyStrike);
+        double skillDamage = skillDamageBonus(player, data, luckyStrike);
         double magicDamage = magicDamageBonus(data);
         double attackDamageAmplification = sumOwnedStat(
                 data,
@@ -874,6 +904,16 @@ public final class TalentStatService {
                 accumulatedDamageReduction);
         stats.put(DISPLAY_OTHER_FLAT_PREFIX + DAMAGE_REDUCTION, 0.0D);
         stats.put(DISPLAY_OTHER_PERCENT_PREFIX + DAMAGE_REDUCTION, 0.0D);
+        double dodgeChanceTotal = totalDodgeChance(player, data);
+        double ownDodgeChance = accumulatedDodgeChance(data);
+        stats.put(DODGE_CHANCE, displayedDodgeChance(player, data));
+        // Equipment and other mods reach this one through Apothic's attribute, so the
+        // "other" half carries everything that is not this mod's own accumulation.
+        stats.put(DISPLAY_FLAT_PREFIX + DODGE_CHANCE, 0.0D);
+        stats.put(DISPLAY_PERCENT_PREFIX + DODGE_CHANCE, ownDodgeChance);
+        stats.put(DISPLAY_OTHER_FLAT_PREFIX + DODGE_CHANCE, 0.0D);
+        stats.put(DISPLAY_OTHER_PERCENT_PREFIX + DODGE_CHANCE,
+                dodgeChanceTotal - ownDodgeChance);
         stats.put(SHIELD_GAIN, shieldGain(player, data));
         stats.put(REVIVES_REMAINING, data.getCustomStat(REVIVES_REMAINING));
         stats.put(TALENT_OPTION_BONUS, talentOptionBonus(player, data));
@@ -1040,6 +1080,77 @@ public final class TalentStatService {
         return sumOwnedStat(data, EXPERIENCE_GAINED);
     }
 
+    /**
+     * Bonus to Aegis Ascension Experience. Separate from {@link #experienceGainBonus},
+     * which only ever reaches vanilla XP orbs: a server running on the AAE track would
+     * otherwise see an XP talent move nothing it progresses on.
+     */
+    public static double aegisExperienceGainBonus(PlayerPerkData data) {
+        return sumOwnedStat(data, AEGIS_ASCENSION_EXPERIENCE_GAINED);
+    }
+
+    /**
+     * Bonus to Gold paid out as a reward. Deliberately not applied to refunds or sale
+     * payouts: multiplying money the player already owned back to them is a loop.
+     */
+    public static double goldRewardBonus(PlayerPerkData data) {
+        if (!aegisEconomyActive()) {
+            return 0.0D;
+        }
+        double bonus = sumOwnedStat(data, GOLD_REWARD_GAINED);
+        if (data.isAegisEnabled(AegisConstants.FORTUNE)) {
+            bonus += aegisStat(AegisConstants.FORTUNE, GOLD_REWARD_GAINED);
+        }
+        return bonus;
+    }
+
+    /** Extra manual shop rerolls granted per restock window. */
+    public static int shopRefreshCharges(PlayerPerkData data) {
+        if (!aegisEconomyActive() || !data.isAegisEnabled(AegisConstants.FORTUNE)) {
+            return 0;
+        }
+        return Math.max(0, (int) Math.round(
+                aegisStat(AegisConstants.FORTUNE, AegisConstants.SHOP_REFRESH_CHARGES)
+        ));
+    }
+
+    /**
+     * Whether the Aegis Ascension economy is the one in play. The Gold-scaling talents
+     * are dead weight on a vanilla-level server, where nothing pays Gold at all, so they
+     * are declared to exist only alongside the AAE progression track.
+     */
+    static boolean aegisEconomyActive() {
+        return !AegisExperienceSystem.usesMinecraftDefaultLevel();
+    }
+
+    /** Skill Damage Rolling in Wealth earns from the Gold the player is holding. */
+    static double rollingInWealthSkillDamage(PlayerPerkData data) {
+        if (!aegisEconomyActive() || !data.owns(PERK_ROLLING_IN_WEALTH)) {
+            return 0.0D;
+        }
+        Perk perk = requiredPerk(PERK_ROLLING_IN_WEALTH);
+        return GoldScalingMath.bonus(
+                data.getGoldCurrency(),
+                perk.stat(GOLD_PER_STACK),
+                perk.stat(SKILL_DAMAGE_PER_GOLD_STACK),
+                perk.stat(SKILL_DAMAGE_GOLD_CAP)
+        );
+    }
+
+    /** Attack Damage Shiroko earns from the Gold the player is holding. */
+    static double shirokoGoldAttackDamage(PlayerPerkData data) {
+        if (!aegisEconomyActive() || !data.owns(PERK_SHIROKO)) {
+            return 0.0D;
+        }
+        Perk perk = requiredPerk(PERK_SHIROKO);
+        return GoldScalingMath.bonus(
+                data.getGoldCurrency(),
+                perk.stat(GOLD_PER_STACK),
+                perk.stat(ATTACK_DAMAGE_PER_GOLD_STACK),
+                perk.stat(ATTACK_DAMAGE_GOLD_CAP)
+        );
+    }
+
     /** Optional mana mods consume this as an additive regeneration multiplier. */
     public static double manaRegenerationMultiplier(PlayerPerkData data) {
         return sumOwnedStat(data, MANA_REGENERATION_MULTIPLIER);
@@ -1190,6 +1301,46 @@ public final class TalentStatService {
         );
     }
 
+    /**
+     * Dodge Chance contributed by this mod alone: talents, Soul Links, and the
+     * persisted custom stat. Mirrors what {@code ApothicAttributesCompat} publishes
+     * as the {@code dodge_chance} modifier, so the two never disagree.
+     */
+    static double accumulatedDodgeChance(PlayerPerkData data) {
+        return data.getCustomStat(DODGE_CHANCE)
+                + sumOwnedStat(data, DODGE_CHANCE)
+                + data.getActiveSoulLinks().stream()
+                .mapToDouble(link -> link.bonusStat(DODGE_CHANCE))
+                .sum();
+    }
+
+    /**
+     * Complete uncapped Dodge Chance. With Apothic Attributes present this is the live
+     * attribute, which already contains this mod's published share alongside equipment
+     * and any other mod; without it, this mod's own accumulation is the whole value.
+     */
+    static double totalDodgeChance(Player player, PlayerPerkData data) {
+        return ApothicAttributesCompat.dodgeChance(player, accumulatedDodgeChance(data));
+    }
+
+    /**
+     * The chance this mod's own dodge roll uses. Apothic owns the roll when it is
+     * installed, so the cap applies only to the roll this mod performs itself.
+     */
+    static double effectiveDodgeChance(Player player, PlayerPerkData data) {
+        return DodgeMath.effectiveChance(
+                totalDodgeChance(player, data),
+                ServerSettings.get().maximumEffectiveDodgeChance()
+        );
+    }
+
+    /** Dodge Chance as the player sees it: whatever will actually be rolled. */
+    static double displayedDodgeChance(Player player, PlayerPerkData data) {
+        return ApothicAttributesCompat.handlesDodge(player)
+                ? totalDodgeChance(player, data)
+                : effectiveDodgeChance(player, data);
+    }
+
     static double harmonyScalingFactor(PlayerPerkData data) {
         if (!data.isAegisEnabled(AegisConstants.HARMONY)) {
             return 0.0D;
@@ -1315,24 +1466,6 @@ public final class TalentStatService {
                 + VirtualItems.statBonus(data, VirtualItems.PRIMARY_ATTRIBUTE_FLAT);
     }
 
-    static double magicianPrimaryAttributeFlat(Player player, PlayerPerkData data) {
-        if (!data.hasActiveSoulLink(SOUL_MAGICIAN_MASTER_AND_APPRENTICE)) {
-            return 0.0D;
-        }
-        double manaPerStep = bonusStat(
-                SOUL_MAGICIAN_MASTER_AND_APPRENTICE,
-                FRIEREN_MAX_MANA_PER_STEP
-        );
-        if (manaPerStep <= 0.0D) {
-            return 0.0D;
-        }
-        double primaryPerStep = bonusStat(
-                SOUL_MAGICIAN_MASTER_AND_APPRENTICE,
-                FRIEREN_PRIMARY_ATTRIBUTE_FLAT_PER_STEP
-        );
-        return Math.floor(ManaCompat.maximumMana(player, data) / manaPerStep)
-                * primaryPerStep;
-    }
 
     private static double primaryAttributeMultiplier(PlayerPerkData data) {
         double value = data.getCustomStat(PRIMARY_ATTRIBUTE_MULTIPLIER);

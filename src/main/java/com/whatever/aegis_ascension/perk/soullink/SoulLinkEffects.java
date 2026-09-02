@@ -19,11 +19,13 @@ public final class SoulLinkEffects {
     public static void onTalentAcquired(ServerPlayer player, PlayerPerkData data) {
         TeamRadiance.refreshState(player, data, true);
         ShrineMaidenTeam.tick(player, data);
+        SoulLinkFormation.announceNewlyFormed(player, data);
     }
 
     /** Removes a persisted multiplayer rank before login/respawn attribute application. */
     public static void refreshCachedState(ServerPlayer player, PlayerPerkData data) {
         TeamRadiance.refreshState(player, data, false);
+        SoulLinkFormation.markExistingFormed(data);
     }
 
     public static double stat(String soulLinkId, String statKey) {

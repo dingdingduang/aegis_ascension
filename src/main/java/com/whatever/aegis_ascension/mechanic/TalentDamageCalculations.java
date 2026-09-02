@@ -14,6 +14,7 @@ import com.whatever.aegis_ascension.perk.talents.PerfectAndElegantServant;
 import com.whatever.aegis_ascension.perk.talents.TeamStar;
 import com.whatever.aegis_ascension.virtualitem.VirtualItems;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
 import java.util.Map;
@@ -83,7 +84,27 @@ final class TalentDamageCalculations {
     }
 
     static double damageSkillCalculation(Player player, PlayerPerkData data) {
-        return additiveMultiplier(skillDamageBonus(data, luckyStrike(player, data)));
+        return additiveMultiplier(
+                skillDamageBonus(player, data, luckyStrike(player, data))
+        );
+    }
+
+    /**
+     * Ganyu's Blessing distance bonus. Extracted so the converted damage path can apply the
+     * same curve rather than reimplementing it.
+     */
+    static double ganyuDistanceMultiplier(ServerPlayer attacker, PlayerPerkData data,
+                                          LivingEntity target) {
+        if (!data.owns(PERK_GANYUS_BLESSING)) {
+            return 1.0D;
+        }
+        Perk ganyu = Perk.byId(PERK_GANYUS_BLESSING).orElseThrow();
+        double distance = attacker.distanceTo(target);
+        if (distance < ganyu.stat(MINIMUM_DAMAGE_DISTANCE)) {
+            return 1.0D;
+        }
+        return safeMultiplier(1.0D + (distance - ganyu.stat(DISTANCE_DAMAGE_OFFSET))
+                * ganyu.stat(DAMAGE_MULTIPLIER_PER_DISTANCE));
     }
 
     static double damageTrueCalculation(PlayerPerkData data) {

@@ -26,6 +26,8 @@ public final class ApothicAttributesCompat {
             PlatformServices.resources().create(MOD_ID, CRIT_CHANCE);
     private static final ResourceLocation CRIT_DAMAGE_ATTRIBUTE =
             PlatformServices.resources().create(MOD_ID, CRIT_DAMAGE);
+    private static final ResourceLocation DODGE_CHANCE_ATTRIBUTE =
+            PlatformServices.resources().create(MOD_ID, DODGE_CHANCE);
     private static final UUID CRIT_CHANCE_MODIFIER_ID =
             AegisModifiers.adopt("407cebb7-4ff4-4a3d-a805-fd79cd86b753");
     private static final UUID CRIT_DAMAGE_MODIFIER_ID =
@@ -63,6 +65,26 @@ public final class ApothicAttributesCompat {
                         && mapping.customStat().equals(customStat)
                         && getInstance(player, mapping.attribute()) != null
         );
+    }
+
+    /**
+     * True when Apothic's Dodge Chance attribute carries this mod's published share.
+     * Apothic then owns the dodge roll itself, so Aegis Ascension must not perform a
+     * second one, exactly as it defers the critical-hit roll.
+     */
+    public static boolean handlesDodge(Player player) {
+        return handlesMappedAttribute(player, DODGE_CHANCE);
+    }
+
+    /**
+     * Total Dodge Chance including equipment and other mods, or {@code fallback} when
+     * Apothic is absent and this mod's own accumulated chance is the whole story.
+     */
+    public static double dodgeChance(Player player, double fallback) {
+        if (!handlesDodge(player)) {
+            return fallback;
+        }
+        return GeneralServerMethods.getAttributeValue(player, DODGE_CHANCE_ATTRIBUTE, fallback);
     }
 
     public static double criticalChance(Player player, double fallback) {
@@ -201,6 +223,9 @@ public final class ApothicAttributesCompat {
         double amount = data.getCustomStat(mapping.customStat());
         for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
             Perk perk = entry.getKey();
+            if (mapping.excludedPerks().contains(perk.id())) {
+                continue;
+            }
             if (!perk.manuallyToggleable() || data.isTalentEnabled(perk.id())) {
                 amount += perk.stat(mapping.customStat()) * entry.getValue();
             }

@@ -31,6 +31,9 @@ public final class SoulLinkConstants {
     public static final String SOUL_MAKE_UP_WORK_CLUB = "soul_make_up_work_club";
     public static final String SOUL_MADOKA_WITH_HOMURA = "soul_madoka_with_homura";
 
+    public static final String FRIEREN_CONVERSION_MULTIPLIER =
+            "frieren_conversion_multiplier";
+
     public static final String TEAM_RADIANCE_RANK = "team_radiance_rank";
     public static final String TEAM_RADIANCE_RANK_CAP = "rank_cap";
     public static final String TEAM_RADIANCE_TALENT_OPTION_RANK =
@@ -63,10 +66,12 @@ public final class SoulLinkConstants {
     public static final String HANAKO_EFFECT_MULTIPLIER = "hanako_effect_multiplier";
     public static final String NEGATE_KOHARU_CRITICAL_PENALTY =
             "negate_koharu_critical_penalty";
-    public static final String ARMOR_SHRED_PER_STACK = "armor_shred_per_stack";
-    public static final String ARMOR_SHRED_MAX_STACKS = "armor_shred_max_stacks";
-    public static final String ARMOR_SHRED_DURATION_SECONDS =
-            "armor_shred_duration_seconds";
+    public static final String ARMOR_PENETRATION_FLAT_PER_STACK =
+            "armor_penetration_flat_per_stack";
+    public static final String ARMOR_PENETRATION_FLAT_MAX_STACKS =
+            "armor_penetration_flat_max_stacks";
+    public static final String ARMOR_PENETRATION_FLAT_DURATION_SECONDS =
+            "armor_penetration_flat_duration_seconds";
     public static final String FORCE_ZERO_ARMOR_AT_MAX_STACKS =
             "force_zero_armor_at_max_stacks";
 

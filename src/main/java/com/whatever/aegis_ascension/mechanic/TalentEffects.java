@@ -141,6 +141,18 @@ public final class TalentEffects {
         return TalentStatService.experienceGainBonus(data);
     }
 
+    public static double aegisExperienceGainBonus(PlayerPerkData data) {
+        return TalentStatService.aegisExperienceGainBonus(data);
+    }
+
+    public static double goldRewardBonus(PlayerPerkData data) {
+        return TalentStatService.goldRewardBonus(data);
+    }
+
+    public static int shopRefreshCharges(PlayerPerkData data) {
+        return TalentStatService.shopRefreshCharges(data);
+    }
+
     public static double manaRegenerationMultiplier(PlayerPerkData data) {
         return TalentStatService.manaRegenerationMultiplier(data);
     }

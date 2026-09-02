@@ -2,6 +2,7 @@ package com.whatever.aegis_ascension.client.screen;
 
 import static com.whatever.aegis_ascension.util.GeneralClientMethods.drawCenteredString;
 
+import net.minecraft.client.renderer.Rect2i;
 import com.whatever.aegis_ascension.client.ClientLifecycle;
 import com.whatever.aegis_ascension.client.ClientSettings;
 import com.whatever.aegis_ascension.client.ClientStorageState;
@@ -39,6 +40,9 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
     private static final int CONTENT_MARGIN = 10;
     private static final int TOP_MARGIN = 12;
     private static final int BOTTOM_MARGIN = 12;
+
+    /** Breathing room between the inventory slots and the area handed to JEI. */
+    private static final int JEI_AREA_GAP = 6;
     private static final int BASE_DIVIDER_X = 260;
     private static final int MIN_INVENTORY_PANE_WIDTH = 194;
     /** Last Curios slot ends near x=241; this keeps storage safely to its right. */
@@ -104,6 +108,41 @@ public final class ACGInventoryScreen extends AbstractContainerScreen<ACGInvento
         inventoryLabelY = 108;
         titleLabelX = 29;
         titleLabelY = 8;
+    }
+
+    /**
+     * The empty region under the inventory slots and left of the storage pane, which is
+     * where JEI's ingredient list is confined to. Derived from the live layout rather than
+     * fixed numbers, so it follows the responsive divider and the Curios column.
+     *
+     * <p>Nothing else draws here, so the panel keeps its full size and the storage pane is
+     * untouched. Returns an empty rectangle when the overlay is switched off.</p>
+     */
+    public Rect2i jeiFreeArea() {
+        if (!ClientSettings.get().showJeiOverlay) {
+            return new Rect2i(0, 0, 0, 0);
+        }
+        int slotsBottom = 0;
+        for (Slot slot : menu.slots) {
+            slotsBottom = Math.max(slotsBottom, slot.y + 16);
+        }
+        // Span the bottom row of slots rather than the whole inventory pane, so the list
+        // sits directly under the inventory columns instead of being pushed to the pane's
+        // right edge by JEI's own horizontal alignment.
+        int left = Integer.MAX_VALUE;
+        int right = Integer.MIN_VALUE;
+        for (Slot slot : menu.slots) {
+            if (slot.y + 16 >= slotsBottom) {
+                left = Math.min(left, slot.x);
+                right = Math.max(right, slot.x + 16);
+            }
+        }
+        int top = topPos + slotsBottom + JEI_AREA_GAP;
+        int bottom = topPos + imageHeight - JEI_AREA_GAP;
+        if (left > right || bottom - top <= 0) {
+            return new Rect2i(0, 0, 0, 0);
+        }
+        return new Rect2i(leftPos + left, top, right - left, bottom - top);
     }
 
     @Override

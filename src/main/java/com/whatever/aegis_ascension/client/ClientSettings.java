@@ -103,6 +103,22 @@ public final class ClientSettings {
     public boolean showShieldHud = true;
     /** Whether to show the owned Gold balance in the ACG screen's top bar. */
     public boolean showGoldCurrency = true;
+
+    /** Locked Soul Links are hidden by default so the tab shows what you actually have. */
+    public boolean showUnformedSoulLinks = false;
+
+    /**
+     * Whether the Inventory and Crafting screen leaves JEI a band along the bottom. When
+     * false the screen reports the whole viewport as its own and JEI finds no room, which
+     * is how this screen behaved before the band existed.
+     */
+    public boolean showJeiOverlay = true;
+
+    /**
+     * Settings sections the player has collapsed, by section id. A list rather than a set
+     * to match {@link #scrollModeTabs} and keep the saved JSON stable.
+     */
+    public java.util.List<String> collapsedSettingSections = new java.util.ArrayList<>();
     /** Screen corner the shield HUD anchors to. */
     public HudAnchor shieldHudAnchor = HudAnchor.TOP_RIGHT;
     /** Shield HUD horizontal offset from its anchor, in pixels (positive moves right). */

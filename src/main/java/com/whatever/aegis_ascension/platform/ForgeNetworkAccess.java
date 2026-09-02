@@ -2,6 +2,7 @@ package com.whatever.aegis_ascension.platform;
 
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.network.*;
+import com.whatever.aegis_ascension.util.GeneralClientMethods;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraftforge.network.NetworkDirection;
@@ -35,7 +36,7 @@ public final class ForgeNetworkAccess implements NetworkAccess {
     private static final String PROTOCOL_VERSION = "43";
 
     private final SimpleChannel channel = NetworkRegistry.newSimpleChannel(
-            ResourceLocation.fromNamespaceAndPath(AegisAscensionMod.MOD_ID, "main"),
+            GeneralClientMethods.fromNamespaceAndPath(AegisAscensionMod.MOD_ID, "main"),
             () -> PROTOCOL_VERSION,
             PROTOCOL_VERSION::equals,
             PROTOCOL_VERSION::equals

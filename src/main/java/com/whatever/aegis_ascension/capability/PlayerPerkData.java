@@ -221,6 +221,15 @@ public final class PlayerPerkData {
         }
     }
 
+    public void addAegisSelectionCharges(int amount) {
+        if (amount > 0) {
+            aegisSelectionCharges = (int) Math.min(
+                    Integer.MAX_VALUE,
+                    (long) aegisSelectionCharges + amount
+            );
+        }
+    }
+
     // Grants the Perk refresh rewards that occur once per actual Breakthrough.
     public void grantBreakthroughPerkRefreshCharges() {
         double refreshCharges = 0.0D;
@@ -302,6 +311,15 @@ public final class PlayerPerkData {
         selectedPrimarySkillEnhancement = enhancement;
         primarySkillEnhancementChosen = true;
         return true;
+    }
+
+    /** The highest progression level reached, which is what perk milestones gate on. */
+    public int getHighestPerkLevel() {
+        return highestPerkLevel;
+    }
+
+    public int getHighestAegisLevel() {
+        return highestAegisLevel;
     }
 
     public int getAegisSelectionCharges() {

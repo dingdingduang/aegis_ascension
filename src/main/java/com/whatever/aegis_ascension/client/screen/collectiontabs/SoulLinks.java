@@ -1,6 +1,7 @@
 package com.whatever.aegis_ascension.client.screen.collectiontabs;
 
 import com.whatever.aegis_ascension.client.ClientPerkState;
+import com.whatever.aegis_ascension.client.ClientSettings;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.perk.SoulLink;
 import net.minecraft.network.chat.Component;
@@ -18,12 +19,19 @@ public final class SoulLinks {
     }
 
     public static List<TalentCollectionCard> cards() {
+        boolean showUnformed = ClientSettings.get().showUnformedSoulLinks;
         List<TalentCollectionCard> cards = new ArrayList<>();
         for (SoulLink soulLink : Perk.soulLinks()) {
             boolean active = ClientPerkState.isSoulLinkActive(soulLink);
+            boolean disabled = ClientPerkState.isSoulLinkDisabled(soulLink);
+            // Neither active nor disabled means the required talents are not all
+            // owned: the link is not formed, and is hidden unless asked for.
+            if (!active && !disabled && !showUnformed) {
+                continue;
+            }
             Component status;
             int color;
-            if (ClientPerkState.isSoulLinkDisabled(soulLink)) {
+            if (disabled) {
                 status = getTranslatableString(
                         "screen.aegis_ascension.collection.disabled"
                 );

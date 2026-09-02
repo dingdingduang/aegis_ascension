@@ -1,10 +1,8 @@
 {
-  "schema_version": 25,
+  "schema_version": 32,
   "source": "Illusion Poem",
   "value_conventions": {
-    "percentages": "Decimal fractions: 0.20 means 20%.",
-    "durations": "Seconds unless the key explicitly ends in _ticks.",
-    "multipliers": "Final multiplier values use 1.0 as 100%; additive multiplier bonuses use 0.20 as +20%."
+    "excluded_perks": "Talents listed on a mapping contribute to that custom stat under their own in-code condition instead of being published as an unconditional attribute."
   },
   "rarity_weights": {
     "R": 90,
@@ -27,18 +25,19 @@
       "enabled": true
     },
     {
-      "custom_stat": "armor_pierce",
+      "custom_stat": "armor_penetration_flat",
       "attribute": "attributeslib:armor_pierce",
       "operation": "addition",
       "scale": 1.0,
       "enabled": true
     },
     {
-      "custom_stat": "armor_shred",
+      "custom_stat": "armor_penetration_percentage",
       "attribute": "attributeslib:armor_shred",
       "operation": "addition",
       "scale": 1.0,
-      "enabled": true
+      "enabled": true,
+      "excluded_perks": ["perk_flickering_light", "perk_hanakos_blessing"]
     },
     {
       "custom_stat": "arrow_damage",
@@ -327,7 +326,7 @@
       "description": "perk.aegis_ascension.perk_flickering_light.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_flickering_light.png",
       "stats": {
-        "armor_ignore": 0.3
+        "armor_penetration_percentage": 0.3
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -373,7 +372,10 @@
         "attack_multiplier": 0.05,
         "attack_speed_multiplier": 0.2,
         "unspent_skill_enhancement_charges_per_stack": 1,
-        "attack_damage_per_stack": 0.01
+        "attack_damage_per_stack": 0.01,
+        "gold_per_stack": 1000,
+        "attack_damage_per_gold_stack": 0.01,
+        "attack_damage_gold_cap": 10.0
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -541,9 +543,10 @@
       "description": "perk.aegis_ascension.perk_clear_mind_state.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_clear_mind_state.png",
       "stats": {
-        "evasion_flat": 5,
+        "dodge_chance": 0.05,
         "primary_attribute_multiplier": 0.05,
-        "skill_damage_per_evasion": 0.05
+        "dodge_chance_step": 0.01,
+        "skill_damage_per_dodge_chance_step": 0.05
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -742,7 +745,10 @@
       "description": "perk.aegis_ascension.perk_rolling_in_wealth.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_rolling_in_wealth.png",
       "stats": {
-        "aegis_option_bonus": 2
+        "aegis_option_bonus": 1,
+        "gold_per_stack": 1000,
+        "skill_damage_per_gold_stack": 0.01,
+        "skill_damage_gold_cap": 10.0
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -848,7 +854,7 @@
       "stats": {
         "primary_attribute_multiplier": 0.1,
         "skill_enhancement_option_bonus": 1,
-        "mana_per_primary_stat": 10
+        "mana_per_primary_stat": 1.5
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -1185,7 +1191,7 @@
       "description": "perk.aegis_ascension.perk_zephyrs_care.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_zephyrs_care.png",
       "stats": {
-        "breakthrough_all_skill_enhancement_attribute": 2,
+        "breakthrough_all_skill_enhancement_attribute": 0.01,
         "breakthrough_experience": 500
       },
       "maxRank": 1,
@@ -1492,7 +1498,42 @@
       "icon": "aegis_ascension:textures/gui/talents/perk_aquas_blessing.png",
       "stats": {
         "max_health_multiplier": -0.5,
-        "experience_gained": 2.0
+        "experience_gained": 2.0,
+        "aegis_ascension_experience_gained": 1.0,
+        "gold_reward_gained": 1.0,
+        "breakthrough_gold_min": 750,
+        "breakthrough_gold_max": 1500
+      },
+      "maxRank": 1,
+      "manualToggle": false,
+      "source_row": 0
+    },
+    {
+      "id": "perk_golden_rule",
+      "tier": "SR",
+      "name": "perk.aegis_ascension.perk_golden_rule.name",
+      "description": "perk.aegis_ascension.perk_golden_rule.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_golden_rule.png",
+      "stats": {
+        "selection_charges_granted": 1,
+        "immediate_gold": 2000,
+        "breakthrough_gold_min": 1000,
+        "breakthrough_gold_max": 3000
+      },
+      "maxRank": 1,
+      "manualToggle": false,
+      "source_row": 0
+    },
+    {
+      "id": "perk_est",
+      "tier": "SSR",
+      "name": "perk.aegis_ascension.perk_est.name",
+      "description": "perk.aegis_ascension.perk_est.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_est.png",
+      "stats": {
+        "attack_speed_flat": 2,
+        "armor_penetration_percentage": 0.5,
+        "physical_damage_amplification": 0.8
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -1507,7 +1548,7 @@
       "stats": {
         "critical_chance": 0.3,
         "critical_damage": 1.0,
-        "armor_shred": 0.5
+        "armor_penetration_percentage": 0.35
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -1561,7 +1602,7 @@
       "description": "perk.aegis_ascension.perk_hanakos_blessing.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_hanakos_blessing.png",
       "stats": {
-        "physical_armor_ignore": 0.15
+        "armor_penetration_percentage": 0.15
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -1602,7 +1643,7 @@
       "description": "perk.aegis_ascension.perk_kisakis_blessing.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_kisakis_blessing.png",
       "stats": {
-        "aegis_option_bonus": 1
+        "aegis_option_bonus": 2
       },
       "maxRank": 1,
       "manualToggle": false,

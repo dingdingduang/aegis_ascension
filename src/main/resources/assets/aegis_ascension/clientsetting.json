@@ -12,6 +12,8 @@
   "miscellaneousExpanded": true,
   "showShieldHud": true,
   "showGoldCurrency": true,
+  "showUnformedSoulLinks": false,
+  "showJeiOverlay": true,
   "shieldHudAnchor": "TOP_RIGHT",
   "shieldHudOffsetX": -5,
   "shieldHudOffsetY": 5,

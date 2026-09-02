@@ -29,6 +29,8 @@ import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.perk.SkillEnhancement;
 import com.whatever.aegis_ascension.perk.SoulLink;
 import com.whatever.aegis_ascension.perk.talents.FairTrade;
+import com.whatever.aegis_ascension.util.DodgeMath;
+import com.whatever.aegis_ascension.util.GoldScalingMath;
 import com.whatever.aegis_ascension.util.StatAttribution;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import net.minecraft.client.gui.Font;
@@ -89,6 +91,8 @@ public final class ACGStatSourceBreakdown {
                     int stacks = ClientPerkState.getSkillEnhancementCharges()
                             / chargesPerStack;
                     multiplier += stacks * perk.stat(ATTACK_DAMAGE_PER_STACK) * rank;
+                    multiplier += goldBonus(perk, ATTACK_DAMAGE_PER_GOLD_STACK,
+                            ATTACK_DAMAGE_GOLD_CAP) * rank;
                 }
                 addSource(sources, perk.title(), perk.iconTexture(), 28,
                         multiplier, Format.PERCENT);
@@ -506,7 +510,20 @@ public final class ACGStatSourceBreakdown {
         }
         if (SKILL_DAMAGE.equals(statKey)) {
             if (perk.id().equals(PERK_CLEAR_MIND_STATE)) {
-                value += perk.stat(EVASION_FLAT) * perk.stat(SKILL_DAMAGE_PER_EVASION);
+                // The two halves rebuild the uncapped Dodge Chance the server
+                // converts; the shown Dodge Chance itself is already capped.
+                value += DodgeMath.skillDamage(
+                        ClientPerkState.getDisplayStat(
+                                DISPLAY_PERCENT_PREFIX + DODGE_CHANCE)
+                                + ClientPerkState.getDisplayStat(
+                                        DISPLAY_OTHER_PERCENT_PREFIX + DODGE_CHANCE),
+                        perk.stat(DODGE_CHANCE_STEP),
+                        perk.stat(SKILL_DAMAGE_PER_DODGE_CHANCE_STEP)
+                );
+            }
+            if (perk.id().equals(PERK_ROLLING_IN_WEALTH)) {
+                value += goldBonus(perk, SKILL_DAMAGE_PER_GOLD_STACK,
+                        SKILL_DAMAGE_GOLD_CAP);
             }
             if (perk.id().equals(PERK_METEOR_SPARKLE)) {
                 value += ClientPerkState.getDisplayStat(LUCKY_STRIKE)
@@ -757,6 +774,22 @@ public final class ACGStatSourceBreakdown {
         return link != null && ClientPerkState.isSoulLinkActive(link)
                 ? Math.max(0.0D, link.bonusStat(GREAT_FAIRY_EFFECT_MULTIPLIER))
                 : 1.0D;
+    }
+
+    /**
+     * Mirrors the server's Gold-scaling talents, including the gate that switches them
+     * off entirely on a vanilla-level server.
+     */
+    private static double goldBonus(Perk perk, String bonusPerStackKey, String capKey) {
+        if (ClientPerkState.usesMinecraftDefaultLevel()) {
+            return 0.0D;
+        }
+        return GoldScalingMath.bonus(
+                ClientPerkState.getGoldCurrency(),
+                perk.stat(GOLD_PER_STACK),
+                perk.stat(bonusPerStackKey),
+                perk.stat(capKey)
+        );
     }
 
     private static double makeUpCollectorMultiplier() {

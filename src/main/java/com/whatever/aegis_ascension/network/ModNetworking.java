@@ -68,7 +68,7 @@ public final class ModNetworking {
                             config.isEnabled(resolvedType),
                             shop.getOffers(),
                             config.manualRefreshExperienceCost(resolvedType),
-                            shop.getRemainingManualRefreshes(),
+                            shop.getRemainingManualRefreshes(data),
                             shop.ticksUntilReset(player.serverLevel())
                     )
             );

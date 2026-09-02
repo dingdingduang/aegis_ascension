@@ -45,10 +45,10 @@ public record ManualRefreshShopPacket(ShopType shopType) {
                 var shop = data.getShopState(packet.shopType);
                 // Allowance is checked before the currency check so an exhausted player is
                 // told why rather than being asked for a balance they cannot spend anyway.
-                if (!shop.canManualRefresh()) {
+                if (!shop.canManualRefresh(data)) {
                     player.displayClientMessage(getTranslatableString(
                             "message.aegis_ascension.shop.refresh_limit",
-                            config.maxManualRefreshes(packet.shopType)), true);
+                            shop.maxManualRefreshes(data)), true);
                 } else if (GoldCurrency.enabled()
                         ? !GoldCurrency.canAfford(data, currencyCost)
                         : player.totalExperience < cost) {

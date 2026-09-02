@@ -35,6 +35,9 @@ public final class ServerSettings {
     @SerializedName("maximum_effective_damage_reduction")
     private Double maximumEffectiveDamageReduction = 0.70D;
 
+    @SerializedName("maximum_effective_dodge_chance")
+    private Double maximumEffectiveDodgeChance = 0.70D;
+
     @SerializedName("true_damage_affected_by_critical_damage")
     private Boolean trueDamageAffectedByCriticalDamage = true;
 
@@ -46,6 +49,33 @@ public final class ServerSettings {
 
     @SerializedName("true_damage_affected_by_royal_sacred_flame")
     private Boolean trueDamageAffectedByRoyalSacredFlame = true;
+
+    @SerializedName("true_damage_affected_by_skill_damage")
+    private Boolean trueDamageAffectedBySkillDamage = true;
+
+    @SerializedName("true_damage_affected_by_damage_bonus")
+    private Boolean trueDamageAffectedByDamageBonus = false;
+
+    @SerializedName("true_damage_affected_by_physical_amplification")
+    private Boolean trueDamageAffectedByPhysicalAmplification = false;
+
+    @SerializedName("true_damage_affected_by_magic_amplification")
+    private Boolean trueDamageAffectedByMagicAmplification = false;
+
+    @SerializedName("true_damage_affected_by_attack_amplification")
+    private Boolean trueDamageAffectedByAttackAmplification = false;
+
+    @SerializedName("true_damage_affected_by_distance_bonus")
+    private Boolean trueDamageAffectedByDistanceBonus = false;
+
+    @SerializedName("outcome_banner_fade_in_ticks")
+    private Integer outcomeBannerFadeInTicks = 10;
+
+    @SerializedName("outcome_banner_stay_ticks")
+    private Integer outcomeBannerStayTicks = 70;
+
+    @SerializedName("outcome_banner_fade_out_ticks")
+    private Integer outcomeBannerFadeOutTicks = 20;
 
     private ServerSettings() {
     }
@@ -88,6 +118,18 @@ public final class ServerSettings {
         return maximumEffectiveDamageReduction;
     }
 
+    /**
+     * Maximum Dodge Chance this mod's own dodge roll may use. Accumulated Dodge Chance
+     * remains uncapped so Clear Mind State still converts the discarded part, and so a
+     * later penalty can offset a bonus that exceeds this ceiling.
+     *
+     * <p>Ignored while Apothic Attributes owns the {@code dodge_chance} attribute: the
+     * roll is then that mod's, and this mod only contributes its share of the chance.</p>
+     */
+    public double maximumEffectiveDodgeChance() {
+        return maximumEffectiveDodgeChance;
+    }
+
     /** Whether a successful critical hit multiplies converted True Damage. */
     public boolean trueDamageAffectedByCriticalDamage() {
         return !Boolean.FALSE.equals(trueDamageAffectedByCriticalDamage);
@@ -106,6 +148,65 @@ public final class ServerSettings {
     /** Whether Seven-Colored Magician's Royal Sacred Flame can multiply True Damage. */
     public boolean trueDamageAffectedByRoyalSacredFlame() {
         return !Boolean.FALSE.equals(trueDamageAffectedByRoyalSacredFlame);
+    }
+
+    /**
+     * Whether Skill Damage still applies once a spell is converted to True Damage.
+     *
+     * <p>Conversion replaces the whole outgoing pipeline, so without this a caster who
+     * converts loses the one stat their build scales on.</p>
+     */
+    public boolean trueDamageAffectedBySkillDamage() {
+        return !Boolean.FALSE.equals(trueDamageAffectedBySkillDamage);
+    }
+
+    /**
+     * The remaining outgoing multipliers, off by default: conversion has always dropped
+     * these, so enabling one is an opt-in balance change rather than a bug fix. Each is
+     * gated on the same damage type as the normal path, so converted melee never starts
+     * scaling on a spell-only bucket.
+     */
+    public boolean trueDamageAffectedByDamageBonus() {
+        return Boolean.TRUE.equals(trueDamageAffectedByDamageBonus);
+    }
+
+    public boolean trueDamageAffectedByPhysicalAmplification() {
+        return Boolean.TRUE.equals(trueDamageAffectedByPhysicalAmplification);
+    }
+
+    public boolean trueDamageAffectedByMagicAmplification() {
+        return Boolean.TRUE.equals(trueDamageAffectedByMagicAmplification);
+    }
+
+    public boolean trueDamageAffectedByAttackAmplification() {
+        return Boolean.TRUE.equals(trueDamageAffectedByAttackAmplification);
+    }
+
+    public boolean trueDamageAffectedByDistanceBonus() {
+        return Boolean.TRUE.equals(trueDamageAffectedByDistanceBonus);
+    }
+
+    /**
+     * Timing for the fading banner the gacha talents show the player who rolled. Shared
+     * by every such talent, so the catalogs stay pure outcome lists. 20 ticks = 1 second.
+     */
+    public int outcomeBannerFadeInTicks() {
+        return clampTicks(outcomeBannerFadeInTicks, 10);
+    }
+
+    public int outcomeBannerStayTicks() {
+        return clampTicks(outcomeBannerStayTicks, 70);
+    }
+
+    public int outcomeBannerFadeOutTicks() {
+        return clampTicks(outcomeBannerFadeOutTicks, 20);
+    }
+
+    private static int clampTicks(Integer value, int fallback) {
+        if (value == null) {
+            return fallback;
+        }
+        return Math.max(0, Math.min(12_000, value));
     }
 
     private static ServerSettings load() {
@@ -173,6 +274,21 @@ public final class ServerSettings {
             maximumEffectiveDamageReduction = Math.max(
                     0.0D,
                     Math.min(1.0D, maximumEffectiveDamageReduction)
+            );
+        }
+
+        if (maximumEffectiveDodgeChance == null
+                || !Double.isFinite(maximumEffectiveDodgeChance)) {
+            AegisAscensionMod.getLogger().warn(
+                    "Invalid maximum effective Dodge Chance {} in {}; using 0.7",
+                    maximumEffectiveDodgeChance,
+                    FILE
+            );
+            maximumEffectiveDodgeChance = 0.70D;
+        } else {
+            maximumEffectiveDodgeChance = Math.max(
+                    0.0D,
+                    Math.min(1.0D, maximumEffectiveDodgeChance)
             );
         }
 

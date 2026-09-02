@@ -159,12 +159,25 @@ public final class Perk {
                         "Invalid scale for Apothic custom stat: " + customStat
                 );
             }
+            List<String> excludedPerks = validateIds(
+                    mapping.excludedPerks,
+                    "Apothic attribute mapping excluded_perks"
+            );
+            for (String perkId : excludedPerks) {
+                if (!byId.containsKey(perkId)) {
+                    throw new IllegalStateException(
+                            "Apothic custom stat " + customStat
+                                    + " excludes missing talent " + perkId
+                    );
+                }
+            }
             attributeMappings.add(new ApothicAttributeMapping(
                     customStat,
                     requireLocation(mapping.attribute),
                     requireOperation(mapping.operation),
                     mapping.scale,
-                    mapping.enabled
+                    mapping.enabled,
+                    List.copyOf(excludedPerks)
             ));
         }
 
@@ -815,6 +828,8 @@ public final class Perk {
         private String operation;
         private double scale = 1.0D;
         private boolean enabled = true;
+        @SerializedName("excluded_perks")
+        private List<String> excludedPerks;
     }
 
     private record CatalogSnapshot(

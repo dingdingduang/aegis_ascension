@@ -16,7 +16,7 @@ import net.minecraft.world.entity.ai.attributes.Attributes;
 
 import java.util.UUID;
 
-/** Talent multipliers and the timed, non-renewing Armor Shred debuff. */
+/** Talent multipliers and the timed, non-renewing flat Armor Penetration debuff. */
 public final class MakeUpWorkClub {
     private static final String STACKS_TAG = "aegis_ascension.make_up_armor_shred_stacks";
     private static final String EXPIRES_TAG = "aegis_ascension.make_up_armor_shred_expires";
@@ -61,12 +61,13 @@ public final class MakeUpWorkClub {
         }
 
         int maximum = Math.max(1, (int) Math.round(
-                stat(SOUL_MAKE_UP_WORK_CLUB, ARMOR_SHRED_MAX_STACKS)
+                stat(SOUL_MAKE_UP_WORK_CLUB, ARMOR_PENETRATION_FLAT_MAX_STACKS)
         ));
         int stacks = Math.min(maximum, persistentData.getInt(STACKS_TAG) + 1);
         if (!persistentData.contains(EXPIRES_TAG)) {
             long durationTicks = Math.max(1L, Math.round(
-                    stat(SOUL_MAKE_UP_WORK_CLUB, ARMOR_SHRED_DURATION_SECONDS) * 20.0D
+                    stat(SOUL_MAKE_UP_WORK_CLUB, ARMOR_PENETRATION_FLAT_DURATION_SECONDS)
+                            * 20.0D
             ));
             persistentData.putLong(EXPIRES_TAG, now + durationTicks);
         }
@@ -88,7 +89,7 @@ public final class MakeUpWorkClub {
         GeneralServerMethods.removeAttributeModifier(entity, Attributes.ARMOR, ZERO_ARMOR_MODIFIER_ID);
 
         double armorPerStack = Math.abs(stat(
-                SOUL_MAKE_UP_WORK_CLUB, ARMOR_SHRED_PER_STACK
+                SOUL_MAKE_UP_WORK_CLUB, ARMOR_PENETRATION_FLAT_PER_STACK
         ));
         GeneralServerMethods.addTransientAttributeModifier(
                 entity,

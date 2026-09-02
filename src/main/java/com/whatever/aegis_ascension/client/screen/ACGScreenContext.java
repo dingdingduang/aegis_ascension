@@ -73,15 +73,15 @@ final class ACGScreenContext {
     void switchMode(ACGPerkSelectionScreen.UIMode mode) { screen.switchMode(mode); }
 
     void drawLevelProgress(GuiGraphics graphics, String progressKey, String maxKey,
-                           int interval, int maxAwards, int y) {
+                           String highestLevelKey, int interval, int maxAwards, int y) {
         screen.drawLevelProgress(
-                graphics, progressKey, maxKey, interval, maxAwards, y);
+                graphics, progressKey, maxKey, highestLevelKey, interval, maxAwards, y);
     }
 
     void drawLevelProgress(GuiGraphics graphics, String progressKey, String maxKey,
-                           int interval, int maxAwards, int y,
+                           String highestLevelKey, int interval, int maxAwards, int y,
                            int centerX, int barWidth) {
-        screen.drawLevelProgress(graphics, progressKey, maxKey,
+        screen.drawLevelProgress(graphics, progressKey, maxKey, highestLevelKey,
                 interval, maxAwards, y, centerX, barWidth);
     }
 }

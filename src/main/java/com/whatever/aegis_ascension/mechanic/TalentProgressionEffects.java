@@ -11,6 +11,7 @@ import com.whatever.aegis_ascension.aegis.AegisConstants;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.compat.SummonCompat;
 import com.whatever.aegis_ascension.perk.Perk;
+import com.whatever.aegis_ascension.perk.talents.TalentGoldRewards;
 import com.whatever.aegis_ascension.perk.talents.MysteriousDoll;
 import com.whatever.aegis_ascension.perk.talents.ShrineMaidenDance;
 import com.whatever.aegis_ascension.perk.soullink.MistyLake;
@@ -39,8 +40,8 @@ public final class TalentProgressionEffects {
 
 //                triggerBreakthroughs(player, data, charges);
             }
-            case PERK_YURIZONO_SEIA ->
-                    player.giveExperienceLevels(integerStat(perk, IMMEDIATE_LEVEL_GAIN));
+            case PERK_YURIZONO_SEIA -> AegisExperienceSystem.grantLevels(
+                    player, data, integerStat(perk, IMMEDIATE_LEVEL_GAIN));
             case PERK_BOUNDARY_OF_LIFE_AND_DEATH -> {
                 // This is the talent's initial runtime state, not a permanent
                 // accumulated reward. Reacquiring it after a progression reset must
@@ -57,6 +58,12 @@ public final class TalentProgressionEffects {
                 if (triggerRewardChains) {
                     ShrineMaidenDance.roll(player, data);
                 }
+            }
+            case PERK_GOLDEN_RULE -> {
+                data.addSelectionCharges(Math.max(
+                        0, integerStat(perk, SELECTION_CHARGES_GRANTED)
+                ));
+                TalentGoldRewards.grantImmediate(data, perk);
             }
             case PERK_WORLD_IS_MINE -> data.addSkillEnhancementCharges(Math.max(
                     0,
@@ -273,7 +280,7 @@ public final class TalentProgressionEffects {
             data.addCustomStat(ARONA_PRIMARY_FLAT, primaryGain * multiplier);
         }
         if (data.owns(PERK_YURIZONO_SEIA)) {
-            player.giveExperienceLevels(Math.max(1, (int) Math.round(
+            AegisExperienceSystem.grantLevels(player, data, Math.max(1, (int) Math.round(
                     stat(PERK_YURIZONO_SEIA, BREAKTHROUGH_LEVEL_GAIN) * multiplier
             )));
         }
@@ -294,15 +301,16 @@ public final class TalentProgressionEffects {
             )));
         }
         if (data.owns(PERK_ZEPHYRS_CARE)) {
-            player.giveExperiencePoints(Math.max(1, (int) Math.round(
+            AegisExperienceSystem.grantExperience(player, data, Math.max(1L, Math.round(
                     stat(PERK_ZEPHYRS_CARE, BREAKTHROUGH_EXPERIENCE) * multiplier
             )));
         }
         if (data.owns(PERK_WORLD_IS_MINE)) {
-            player.giveExperiencePoints(Math.max(0, (int) Math.round(
+            AegisExperienceSystem.grantExperience(player, data, Math.max(0L, Math.round(
                     stat(PERK_WORLD_IS_MINE, BREAKTHROUGH_EXPERIENCE) * multiplier
             )));
         }
+        TalentGoldRewards.grantBreakthrough(player, data, multiplier);
         if (data.owns(PERK_TEACHER_FOX)) {
             data.addCustomStat(TEACHER_HEALTH_MULTIPLIER,
                     stat(PERK_TEACHER_FOX, BREAKTHROUGH_MAX_HEALTH_MULTIPLIER) * multiplier);

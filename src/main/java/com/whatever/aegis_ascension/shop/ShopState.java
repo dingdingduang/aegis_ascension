@@ -1,6 +1,7 @@
 package com.whatever.aegis_ascension.shop;
 
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
+import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
@@ -61,15 +62,26 @@ public final class ShopState {
     }
 
     /** Manual rerolls still available before the next automatic restock refills them. */
-    public int getRemainingManualRefreshes() {
+    public int getRemainingManualRefreshes(PlayerPerkData data) {
         if (!ShopConfig.get().isEnabled(shopType)) {
             return 0;
         }
-        return Math.max(0, ShopConfig.get().maxManualRefreshes(shopType) - refreshCount);
+        return Math.max(0, maxManualRefreshes(data) - refreshCount);
     }
 
-    public boolean canManualRefresh() {
-        return getRemainingManualRefreshes() > 0;
+    /**
+     * The configured allowance plus whatever the player's own effects add. Talents and
+     * Aegises extend the allowance rather than refunding spent rerolls, so gaining one
+     * mid-window is worth the same as having had it from the restock.
+     */
+    public int maxManualRefreshes(PlayerPerkData data) {
+        int configured = ShopConfig.get().maxManualRefreshes(shopType);
+        int granted = data == null ? 0 : TalentEffects.shopRefreshCharges(data);
+        return Math.max(0, configured + Math.max(0, granted));
+    }
+
+    public boolean canManualRefresh(PlayerPerkData data) {
+        return getRemainingManualRefreshes(data) > 0;
     }
 
     /**
@@ -112,7 +124,7 @@ public final class ShopState {
      * @return false if no manual refreshes remain.
      */
     public boolean manualRefresh(RandomSource random, PlayerPerkData data) {
-        if (!ShopConfig.get().isEnabled(shopType) || !canManualRefresh()) {
+        if (!ShopConfig.get().isEnabled(shopType) || !canManualRefresh(data)) {
             return false;
         }
         reroll(random, data);
