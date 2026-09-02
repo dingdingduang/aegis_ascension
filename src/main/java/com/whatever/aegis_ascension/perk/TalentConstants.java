@@ -44,6 +44,8 @@ public final class TalentConstants {
     public static final String PERK_BARRAGE_CONTROL_MAGIC = "perk_barrage_control_magic";
     public static final String PERK_MOMO = "perk_momo";
     public static final String PERK_MIDORI = "perk_midori";
+    public static final String PERK_XIAO_GREEN = "perk_xiao_green";
+    public static final String PERK_XIAO_PEACH = "perk_xiao_peach";
     public static final String PERK_CONGYU_CIALLO = "perk_congyu_ciallo";
     public static final String PERK_YOSHINO_CIALLO = "perk_yoshino_ciallo";
     public static final String PERK_SHIZURU_CIALLO = "perk_shizuru_ciallo";

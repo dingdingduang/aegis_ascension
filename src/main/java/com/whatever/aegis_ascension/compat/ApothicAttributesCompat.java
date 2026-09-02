@@ -221,6 +221,15 @@ public final class ApothicAttributesCompat {
             return criticalDamageBonus;
         }
         double amount = data.getCustomStat(mapping.customStat());
+        if (data.hasActiveSoulLink(SOUL_GAME_DEVELOPMENT_CLUB)
+            && (mapping.customStat().equals(DRAW_SPEED)
+            || mapping.customStat().equals(ARROW_DAMAGE)
+            || mapping.customStat().equals(ARROW_VELOCITY))) {
+            amount *= 1.0D + data.getActiveSoulLinks().stream()
+                .filter(link -> link.id().equals(SOUL_GAME_DEVELOPMENT_CLUB))
+                .mapToDouble(link -> link.bonusStat(MIDORI_MOMO_STAT_MULTIPLIER_BONUS))
+                .sum();
+        }
         for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
             Perk perk = entry.getKey();
             if (mapping.excludedPerks().contains(perk.id())) {
