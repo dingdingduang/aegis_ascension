@@ -44,14 +44,16 @@
       "attribute": "attributeslib:arrow_damage",
       "operation": "addition",
       "scale": 1.0,
-      "enabled": true
+      "enabled": true,
+      "excluded_perks": ["perk_xiao_peach"]
     },
     {
       "custom_stat": "arrow_velocity",
       "attribute": "attributeslib:arrow_velocity",
       "operation": "addition",
       "scale": 1.0,
-      "enabled": true
+      "enabled": true,
+      "excluded_perks": ["perk_xiao_green"]
     },
     {
       "custom_stat": "cold_damage",
@@ -79,7 +81,8 @@
       "attribute": "attributeslib:draw_speed",
       "operation": "addition",
       "scale": 1.0,
-      "enabled": true
+      "enabled": true,
+      "excluded_perks": ["perk_alice"]
     },
     {
       "custom_stat": "experience_gained",
@@ -353,10 +356,10 @@
       "description": "perk.aegis_ascension.perk_alice.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_alice.png",
       "stats": {
-        "luck_threshold": 2,
-        "luck_flat_if_above": 1,
-        "luck_gain_trigger_limit": 1,
-        "talent_option_bonus_if_below": 2
+        "kill_trigger_chance": 0.01,
+        "draw_speed": 0.01,
+        "nearby_spawn_radius": 6.0,
+        "spawned_mob_max_health_multiplier": 1.15
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -1764,23 +1767,23 @@
       },
       "maxRank": 1,
       "manualToggle": false,
-      "source_row": 0
+      "source_row": 45
     },
     {
       "id": "perk_xiao_peach",
-      "tier": "SR",
+      "tier": "R",
       "name": "perk.aegis_ascension.perk_xiao.peach.name",
       "description": "perk.aegis_ascension.perk_xiao.peach.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_momo.png",
       "stats": {
         "kill_trigger_chance": 0.025,
-        "arrow_damage": 0.1,
+        "arrow_damage": 0.025,
         "nearby_spawn_radius": 6.0,
         "spawned_mob_max_health_multiplier": 1.1
       },
       "maxRank": 1,
       "manualToggle": false,
-      "source_row": 0
+      "source_row": 44
     }
   ]
 }

@@ -595,6 +595,29 @@ public final class TalentCombatEffects {
                         SOUL_DEATH_GODS_AUTHORITY, ADDITIONAL_TRIGGER_COUNT));
             }
             for (int run = 0; run < killEffectRuns; run++) {
+                double killTriggerChanceBonus = data.hasActiveSoulLink(
+                        SOUL_GAME_DEVELOPMENT_CLUB
+                ) ? bonusStat(SOUL_GAME_DEVELOPMENT_CLUB, KILL_TRIGGER_CHANCE) : 0.0D;
+                double gainMultiplier = data.hasActiveSoulLink(
+                        SOUL_GAME_DEVELOPMENT_CLUB
+                ) ? 1.0D + bonusStat(
+                        SOUL_GAME_DEVELOPMENT_CLUB, MIDORI_MOMO_STAT_MULTIPLIER_BONUS
+                ) : 1.0D;
+                if (data.owns(PERK_ALICE)
+                        && killer.getRandom().nextDouble() < stat(
+                        PERK_ALICE, KILL_TRIGGER_CHANCE) + killTriggerChanceBonus) {
+                    data.addCustomStat(DRAW_SPEED, stat(PERK_ALICE, DRAW_SPEED) * gainMultiplier);
+                }
+                if (data.owns(PERK_XIAO_GREEN)
+                        && killer.getRandom().nextDouble() < stat(
+                        PERK_XIAO_GREEN, KILL_TRIGGER_CHANCE) + killTriggerChanceBonus) {
+                    data.addCustomStat(ARROW_VELOCITY, stat(PERK_XIAO_GREEN, ARROW_VELOCITY) * gainMultiplier);
+                }
+                if (data.owns(PERK_XIAO_PEACH)
+                        && killer.getRandom().nextDouble() < stat(
+                        PERK_XIAO_PEACH, KILL_TRIGGER_CHANCE) + killTriggerChanceBonus) {
+                    data.addCustomStat(ARROW_DAMAGE, stat(PERK_XIAO_PEACH, ARROW_DAMAGE) * gainMultiplier);
+                }
                 if (data.owns(PERK_LUNAR_GODDESSS_BLESSING)
                         && killer.getRandom().nextDouble() < stat(
                         PERK_LUNAR_GODDESSS_BLESSING, KILL_TRIGGER_CHANCE)) {
