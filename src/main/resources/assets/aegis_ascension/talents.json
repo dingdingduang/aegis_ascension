@@ -1548,7 +1548,8 @@
       "stats": {
         "critical_damage": 0.6,
         "nearby_spawn_radius": 6.0,
-        "spawned_mob_max_health_multiplier": 1.0
+        "spawned_mob_max_health_multiplier": 1.0,
+        "apotheosis_boss_spawn_chance": 0.005
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -1763,7 +1764,8 @@
         "kill_trigger_chance": 0.025,
         "arrow_velocity": 0.01,
         "nearby_spawn_radius": 10.0,
-        "spawned_mob_max_health_multiplier": 1.5
+        "spawned_mob_max_health_multiplier": 1.5,
+        "apotheosis_boss_spawn_chance": 0.005
       },
       "maxRank": 1,
       "manualToggle": false,
