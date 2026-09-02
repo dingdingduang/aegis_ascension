@@ -44,8 +44,6 @@ public final class TalentConstants {
     public static final String PERK_BARRAGE_CONTROL_MAGIC = "perk_barrage_control_magic";
     public static final String PERK_MOMO = "perk_momo";
     public static final String PERK_MIDORI = "perk_midori";
-    public static final String PERK_XIAO_GREEN = "perk_xiao_green";
-    public static final String PERK_XIAO_PEACH = "perk_xiao_peach";
     public static final String PERK_CONGYU_CIALLO = "perk_congyu_ciallo";
     public static final String PERK_YOSHINO_CIALLO = "perk_yoshino_ciallo";
     public static final String PERK_SHIZURU_CIALLO = "perk_shizuru_ciallo";
@@ -183,7 +181,11 @@ public final class TalentConstants {
     public static final String ARONA_PRIMARY_FLAT = "arona_primary_flat";
     public static final String ARROW_DAMAGE = "arrow_damage";
     public static final String ARROW_VELOCITY = "arrow_velocity";
-    public static final String APOTHEOSIS_BOSS_SPAWN_CHANCE = "apotheosis_boss_spawn_chance";
+    public static final String ARROW_DAMAGE_PER_TRIGGER =
+            "arrow_damage_per_trigger";
+    public static final String ARROW_VELOCITY_PER_TRIGGER =
+            "arrow_velocity_per_trigger";
+    public static final String DRAW_SPEED_PER_TRIGGER = "draw_speed_per_trigger";
     public static final String ATTACK_DAMAGE = "attack_damage";
     public static final String ATTACK_DAMAGE_AMPLIFICATION = "attack_damage_amplification";
     public static final String ATTACK_DAMAGE_AMPLIFICATION_CAP = "attack_damage_amplification_cap";
@@ -425,13 +427,10 @@ public final class TalentConstants {
     public static final String MAX_MANA_FLAT_PER_DAMAGE = "max_mana_flat_per_damage";
     public static final String MAX_MANA_RESTORE_PER_ATTACK = "max_mana_restore_per_attack";
     public static final String MAX_TRIGGER_COUNT = "max_trigger_count";
-    public static final String MIDORI_MOMO_STAT_MULTIPLIER_BONUS = "midori_momo_stat_multiplier_bonus";
     public static final String MINING_SPEED = "mining_speed";
     public static final String MISSING_HEALTH_RESTORE = "missing_health_restore";
     public static final String MYSTERIOUS_DOLL_REWARD_SOURCE_PREFIX = "mysterious_doll_reward.";
     public static final String NEARBY_SPAWN_RADIUS = "nearby_spawn_radius";
-    public static final String SPAWNED_MOB_MAX_HEALTH_MULTIPLIER =
-            "spawned_mob_max_health_multiplier";
     public static final String MOVEMENT_SPEED_MULTIPLIER = "movement_speed_multiplier";
     public static final String OFFER_BONUS = "offer_bonus";
     public static final String ONE_EXTRA_ROLL_CHANCE = "one_extra_roll_chance";

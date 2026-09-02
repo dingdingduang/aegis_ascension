@@ -11,7 +11,7 @@ import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.perk.soullink.GourmetGuild;
 import com.whatever.aegis_ascension.perk.talents.CashBack;
 import com.whatever.aegis_ascension.perk.talents.FairTrade;
-import com.whatever.aegis_ascension.perk.talents.Frenzy;
+import com.whatever.aegis_ascension.perk.talents.NearbySpawnBuff;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,7 +39,7 @@ public final class ServerGameplayHandler {
             }
             SummonCompat.updateJoinedSummon(living);
             if (living instanceof Mob mob) {
-                Frenzy.onMobJoined(mob);
+                NearbySpawnBuff.onMobJoined(mob);
             }
         });
     }

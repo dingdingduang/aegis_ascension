@@ -1,5 +1,7 @@
 package com.whatever.aegis_ascension.util;
 
+import com.whatever.aegis_ascension.AegisAscensionMod;
+
 import java.util.Locale;
 
 /** Stable IDs and JSON stat keys used by the Aegis system. */
@@ -21,6 +23,9 @@ public final class GeneralConstants {
     public static final String TIER_R = "R";
     public static final String TIER_SR = "SR";
     public static final String TIER_SSR = "SSR";
+
+    public static final String COLON = ":";
+    public static final String SLASH = "/";
 
     /** Uppercases and trims a config tier string, falling back to R when unrecognised. */
     public static String normalizeTier(String tier) {

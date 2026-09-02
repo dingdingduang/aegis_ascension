@@ -33,13 +33,16 @@ public final class TalentProgressionEffects {
                                         boolean triggerRewardChains) {
         recalculateAttributes(player, data);
 
-        switch (perk.id()) {
-            case PERK_SILENT_DAWN -> {
-                int charges = integerStat(perk, SELECTION_CHARGES_GRANTED);
-                data.addSelectionCharges(charges);
+        // Driven by the stat rather than by talent id, so a talent grants selection
+        // charges on acquisition by declaring selection_charges_granted and nothing else.
+        int charges = Math.max(0, integerStat(perk, SELECTION_CHARGES_GRANTED));
+        if (charges > 0) {
+            data.addSelectionCharges(charges);
 
-//                triggerBreakthroughs(player, data, charges);
-            }
+//            triggerBreakthroughs(player, data, charges);
+        }
+
+        switch (perk.id()) {
             case PERK_YURIZONO_SEIA -> AegisExperienceSystem.grantLevels(
                     player, data, integerStat(perk, IMMEDIATE_LEVEL_GAIN));
             case PERK_BOUNDARY_OF_LIFE_AND_DEATH -> {
@@ -59,12 +62,7 @@ public final class TalentProgressionEffects {
                     ShrineMaidenDance.roll(player, data);
                 }
             }
-            case PERK_GOLDEN_RULE -> {
-                data.addSelectionCharges(Math.max(
-                        0, integerStat(perk, SELECTION_CHARGES_GRANTED)
-                ));
-                TalentGoldRewards.grantImmediate(data, perk);
-            }
+            case PERK_GOLDEN_RULE -> TalentGoldRewards.grantImmediate(data, perk);
             case PERK_WORLD_IS_MINE -> data.addSkillEnhancementCharges(Math.max(
                     0,
                     integerStat(perk, SKILL_ENHANCEMENT_CHARGES_GRANTED)

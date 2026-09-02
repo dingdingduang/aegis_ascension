@@ -31,11 +31,6 @@ import java.util.function.Predicate;
 
 /** A data-driven talent loaded from config/aegis_ascension/talents.json. */
 public final class Perk {
-    //TODO: remove from nbt when retire a talent
-//    private static final List<String> RETIRED_TALENT_IDS = List.of(
-//            "perk_magic_conversion"
-//    );
-
     public enum Tier {
         R,
         SR,
@@ -48,6 +43,12 @@ public final class Perk {
     /** Talents contributed by dependent mods, by owning mod id, in registration order. */
     private static final Map<String, List<TalentJson>> REGISTERED_TALENTS =
             new LinkedHashMap<>();
+    private static final List<AttributeMappingJson> APOTHIC_ATTRIBUTE_MAPPINGS =
+            loadSideTable("apothic_attribute_mappings.json",
+                    ApothicAttributeMappingsFile.class).apothicAttributeMappings;
+    private static final List<NearbySpawnBuffJson> NEARBY_SPAWN_BUFFS =
+            loadSideTable("nearby_spawn_buffs.json",
+                    NearbySpawnBuffsFile.class).nearbySpawnBuffs;
     private static final Catalog LOCAL_CATALOG = loadCatalog();
     private static volatile Catalog effectiveCatalog = buildEffectiveCatalog();
     private static volatile CatalogSnapshot localSnapshot = buildSnapshot(effectiveCatalog);
@@ -60,10 +61,6 @@ public final class Perk {
     private static CatalogSnapshot buildSnapshot(Catalog catalog, boolean trustServerAvailability) {
         Objects.requireNonNull(catalog.perks, "Missing perks");
         Objects.requireNonNull(catalog.rarityWeights, "Missing rarity_weights");
-        Objects.requireNonNull(
-                catalog.apothicAttributeMappings,
-                "Missing apothic_attribute_mappings"
-        );
         if (catalog.perks.size() > MAX_CATALOG_ENTRIES) {
             throw new IllegalStateException("Too many talents: " + catalog.perks.size());
         }
@@ -148,7 +145,7 @@ public final class Perk {
         }
 
         List<ApothicAttributeMapping> attributeMappings = new ArrayList<>();
-        for (AttributeMappingJson mapping : catalog.apothicAttributeMappings) {
+        for (AttributeMappingJson mapping : APOTHIC_ATTRIBUTE_MAPPINGS) {
             Objects.requireNonNull(mapping, "Null Apothic attribute mapping");
             String customStat = requireWireId(
                     mapping.customStat,
@@ -163,12 +160,17 @@ public final class Perk {
                     mapping.excludedPerks,
                     "Apothic attribute mapping excluded_perks"
             );
-            for (String perkId : excludedPerks) {
-                if (!byId.containsKey(perkId)) {
-                    throw new IllegalStateException(
-                            "Apothic custom stat " + customStat
-                                    + " excludes missing talent " + perkId
-                    );
+            // Checked only against this installation's own talents. A server's catalogue
+            // may legitimately lack a talent the local table excludes, and an id that
+            // matches nothing simply never excludes anything.
+            if (!trustServerAvailability) {
+                for (String perkId : excludedPerks) {
+                    if (!byId.containsKey(perkId)) {
+                        throw new IllegalStateException(
+                                "Apothic custom stat " + customStat
+                                        + " excludes missing talent " + perkId
+                        );
+                    }
                 }
             }
             attributeMappings.add(new ApothicAttributeMapping(
@@ -178,6 +180,17 @@ public final class Perk {
                     mapping.scale,
                     mapping.enabled,
                     List.copyOf(excludedPerks)
+            ));
+        }
+
+        List<NearbySpawnBuffMapping> spawnBuffs = new ArrayList<>();
+        for (NearbySpawnBuffJson buff : NEARBY_SPAWN_BUFFS) {
+            Objects.requireNonNull(buff, "Null nearby spawn buff");
+            spawnBuffs.add(new NearbySpawnBuffMapping(
+                    requireWireId(buff.stat, "Nearby spawn buff stat"),
+                    requireLocation(buff.attribute),
+                    requireOperation(buff.operation),
+                    buff.enabled
             ));
         }
 
@@ -195,7 +208,8 @@ public final class Perk {
                 List.copyOf(values),
                 Collections.unmodifiableMap(byId),
                 Collections.unmodifiableMap(weights),
-                List.copyOf(attributeMappings)
+                List.copyOf(attributeMappings),
+                List.copyOf(spawnBuffs)
         );
     }
 
@@ -430,6 +444,11 @@ public final class Perk {
         return activeSnapshot.apothicAttributeMappings();
     }
 
+    /** The stat-to-attribute table used for mobs spawning near a talent's owner. */
+    public static List<NearbySpawnBuffMapping> nearbySpawnBuffs() {
+        return activeSnapshot.nearbySpawnBuffs();
+    }
+
     /**
      * Registers the talents a dependent mod ships at {@code assets/<modId>/talents.json}
      * inside its own jar.
@@ -593,7 +612,6 @@ public final class Perk {
     private static Catalog buildEffectiveCatalog(Map<String, List<TalentJson>> registered) {
         Catalog effective = new Catalog();
         effective.rarityWeights = LOCAL_CATALOG.rarityWeights;
-        effective.apothicAttributeMappings = LOCAL_CATALOG.apothicAttributeMappings;
         List<TalentJson> perks = new ArrayList<>(LOCAL_CATALOG.perks);
         registered.values().forEach(perks::addAll);
         effective.perks = List.copyOf(perks);
@@ -626,10 +644,6 @@ public final class Perk {
         );
         Objects.requireNonNull(catalog.rarityWeights, "Missing rarity_weights");
         Objects.requireNonNull(catalog.perks, "Missing perks");
-        Objects.requireNonNull(
-                catalog.apothicAttributeMappings,
-                "Missing apothic_attribute_mappings"
-        );
         // The server already filtered this catalog according to its installed mods. A
         // remote client's optional-mod set must not veto an offer the server considers valid.
         for (TalentJson talent : catalog.perks) {
@@ -669,13 +683,6 @@ public final class Perk {
                 Objects.requireNonNull(catalog, "Talent catalog was empty");
                 Objects.requireNonNull(catalog.rarityWeights, "Missing rarity_weights");
                 Objects.requireNonNull(catalog.perks, "Missing perks");
-                if (catalog.apothicAttributeMappings == null) {
-                    Catalog bundled = loadBundledCatalog();
-                    catalog.apothicAttributeMappings = Objects.requireNonNull(
-                            bundled.apothicAttributeMappings,
-                            "Bundled catalog is missing apothic_attribute_mappings"
-                    );
-                }
                 return catalog;
             }
         } catch (Exception exception) {
@@ -740,25 +747,59 @@ public final class Perk {
         return value;
     }
 
-    private static Catalog loadBundledCatalog() throws Exception {
-        return Objects.requireNonNull(
-                GSON.fromJson(loadBundledCatalogJson(), Catalog.class),
-                "Bundled talent catalog was empty"
-        );
+    /**
+     * Reads one of the small tables that live beside talents.json in their own file,
+     * copying the bundled default into the config directory on first run exactly as the
+     * talent catalogue itself does.
+     *
+     * <p>A file that exists but has lost its table falls back to the bundled copy, so an
+     * edit that empties it cannot silently switch the feature off.</p>
+     */
+    private static <T> T loadSideTable(String fileName, Class<T> type) {
+        Path configPath = PlatformServices.paths()
+                .modConfigDirectory(AegisAscensionMod.MOD_ID)
+                .resolve(fileName);
+        try {
+            Files.createDirectories(configPath.getParent());
+            if (Files.notExists(configPath)) {
+                Files.copy(bundledSideTable(fileName), configPath);
+            }
+            T parsed;
+            try (var reader = Files.newBufferedReader(configPath, StandardCharsets.UTF_8)) {
+                parsed = GSON.fromJson(reader, type);
+            }
+            if (parsed == null || sideTableOf(parsed) == null) {
+                try (var stream = bundledSideTable(fileName);
+                     var reader = new java.io.InputStreamReader(stream, StandardCharsets.UTF_8)) {
+                    parsed = GSON.fromJson(reader, type);
+                }
+            }
+            return Objects.requireNonNull(parsed, "Empty table file: " + fileName);
+        } catch (Exception exception) {
+            throw new ExceptionInInitializerError(exception);
+        }
     }
 
-    private static com.google.gson.JsonObject loadBundledCatalogJson() throws Exception {
-        try (var stream = Perk.class.getResourceAsStream(
-                "/assets/aegis_ascension/talents.json")) {
-            if (stream == null) {
-                throw new IllegalStateException(
-                        "Missing default assets/aegis_ascension/talents.json"
-                );
-            }
-            try (var reader = new java.io.InputStreamReader(stream, StandardCharsets.UTF_8)) {
-                return com.google.gson.JsonParser.parseReader(reader).getAsJsonObject();
-            }
+    private static java.io.InputStream bundledSideTable(String fileName) {
+        java.io.InputStream stream = Perk.class.getResourceAsStream(
+                "/assets/aegis_ascension/" + fileName
+        );
+        if (stream == null) {
+            throw new IllegalStateException(
+                    "Missing default assets/aegis_ascension/" + fileName
+            );
         }
+        return stream;
+    }
+
+    private static List<?> sideTableOf(Object parsed) {
+        if (parsed instanceof ApothicAttributeMappingsFile file) {
+            return file.apothicAttributeMappings;
+        }
+        if (parsed instanceof NearbySpawnBuffsFile file) {
+            return file.nearbySpawnBuffs;
+        }
+        return List.of();
     }
 
     private static AttributeOperation requireOperation(String value) {
@@ -775,8 +816,6 @@ public final class Perk {
     private static final class Catalog {
         @SerializedName("rarity_weights")
         private RarityWeights rarityWeights;
-        @SerializedName("apothic_attribute_mappings")
-        private List<AttributeMappingJson> apothicAttributeMappings;
         private List<TalentJson> perks = List.of();
     }
 
@@ -821,6 +860,25 @@ public final class Perk {
         private int sourceRow;
     }
 
+    private static final class NearbySpawnBuffJson {
+        private String stat;
+        private String attribute;
+        private String operation;
+        private boolean enabled = true;
+    }
+
+    /** The whole of apothic_attribute_mappings.json. */
+    private static final class ApothicAttributeMappingsFile {
+        @SerializedName("apothic_attribute_mappings")
+        private List<AttributeMappingJson> apothicAttributeMappings;
+    }
+
+    /** The whole of nearby_spawn_buffs.json. */
+    private static final class NearbySpawnBuffsFile {
+        @SerializedName("nearby_spawn_buffs")
+        private List<NearbySpawnBuffJson> nearbySpawnBuffs;
+    }
+
     private static final class AttributeMappingJson {
         @SerializedName("custom_stat")
         private String customStat;
@@ -836,7 +894,8 @@ public final class Perk {
             List<Perk> values,
             Map<String, Perk> byId,
             Map<Tier, Integer> rarityWeights,
-            List<ApothicAttributeMapping> apothicAttributeMappings
+            List<ApothicAttributeMapping> apothicAttributeMappings,
+            List<NearbySpawnBuffMapping> nearbySpawnBuffs
     ) {
     }
 }

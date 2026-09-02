@@ -13,10 +13,12 @@ import com.whatever.aegis_ascension.compat.ManaCompat;
 import com.whatever.aegis_ascension.compat.SummonCompat;
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.perk.Perk;
+import com.whatever.aegis_ascension.perk.talents.ArcheryStats;
 import com.whatever.aegis_ascension.perk.talents.FocusedShot;
 import com.whatever.aegis_ascension.perk.talents.DominusLapidis;
 import com.whatever.aegis_ascension.perk.talents.PerfectAndElegantServant;
 import com.whatever.aegis_ascension.perk.talents.TeamStar;
+import com.whatever.aegis_ascension.perk.soullink.GameDevelopmentClub;
 import com.whatever.aegis_ascension.perk.soullink.MakeUpWorkClub;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import net.minecraft.server.level.ServerPlayer;
@@ -259,6 +261,7 @@ public final class TalentCombatEffects {
             amount *= damageAttackAmplificationCalculation(data);
         }
         amount *= FocusedShot.arrowDamageMultiplier(attacker, data, source);
+        amount *= ArcheryStats.arrowDamageMultiplier(attacker, data, source);
         amount *= ganyuDistanceMultiplier(attacker, data, target);
         // Hanako and Flickering Light are excluded from the Apothic mapping because
         // they only apply to one damage category, so they are always summed here.
@@ -335,6 +338,46 @@ public final class TalentCombatEffects {
         }
         // /kill deals Float.MAX_VALUE, so clamp multipliers before converting to float.
         return (float) Math.min(Float.MAX_VALUE, amount);
+    }
+
+    /**
+     * Rolls every owned talent's {@code kill_trigger_chance} and banks what it grants.
+     *
+     * <p>Each granted stat is named by its own {@code *_per_trigger} key and accumulates
+     * into the matching custom stat, which is also what gets published to Apothic. The
+     * grant is deliberately a custom stat rather than a flat talent stat: a flat one
+     * would be handed out in full the moment the talent is taken, on top of everything
+     * the kills have already earned.</p>
+     */
+    private static void grantKillTriggerStats(ServerPlayer killer, PlayerPerkData data) {
+        for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
+            Perk perk = entry.getKey();
+            if (!perk.stats().containsKey(KILL_TRIGGER_CHANCE)
+                    || (perk.manuallyToggleable() && !data.isTalentEnabled(perk.id()))) {
+                continue;
+            }
+            double chance = perk.stat(KILL_TRIGGER_CHANCE);
+            for (int rank = 0; rank < Math.max(0, entry.getValue()); rank++) {
+                if (killer.getRandom().nextDouble() >= chance) {
+                    continue;
+                }
+                grantIfDeclared(data, perk, ARROW_DAMAGE_PER_TRIGGER, ARROW_DAMAGE);
+                grantIfDeclared(data, perk, ARROW_VELOCITY_PER_TRIGGER, ARROW_VELOCITY);
+                grantIfDeclared(data, perk, DRAW_SPEED_PER_TRIGGER, DRAW_SPEED);
+            }
+        }
+    }
+
+    private static void grantIfDeclared(PlayerPerkData data, Perk perk,
+                                        String perTriggerKey, String customStatKey) {
+        if (!perk.stats().containsKey(perTriggerKey)) {
+            return;
+        }
+        double amount = perk.stat(perTriggerKey)
+                * GameDevelopmentClub.memberGainMultiplier(data, perk);
+        if (Double.isFinite(amount) && amount != 0.0D) {
+            data.addAttributedCustomStat(perk.id(), customStatKey, amount);
+        }
     }
 
     /** Returns whether an externally initiated heal should be canceled. */
@@ -595,29 +638,6 @@ public final class TalentCombatEffects {
                         SOUL_DEATH_GODS_AUTHORITY, ADDITIONAL_TRIGGER_COUNT));
             }
             for (int run = 0; run < killEffectRuns; run++) {
-                double killTriggerChanceBonus = data.hasActiveSoulLink(
-                        SOUL_GAME_DEVELOPMENT_CLUB
-                ) ? bonusStat(SOUL_GAME_DEVELOPMENT_CLUB, KILL_TRIGGER_CHANCE) : 0.0D;
-                double gainMultiplier = data.hasActiveSoulLink(
-                        SOUL_GAME_DEVELOPMENT_CLUB
-                ) ? 1.0D + bonusStat(
-                        SOUL_GAME_DEVELOPMENT_CLUB, MIDORI_MOMO_STAT_MULTIPLIER_BONUS
-                ) : 1.0D;
-                if (data.owns(PERK_ALICE)
-                        && killer.getRandom().nextDouble() < stat(
-                        PERK_ALICE, KILL_TRIGGER_CHANCE) + killTriggerChanceBonus) {
-                    data.addCustomStat(DRAW_SPEED, stat(PERK_ALICE, DRAW_SPEED) * gainMultiplier);
-                }
-                if (data.owns(PERK_XIAO_GREEN)
-                        && killer.getRandom().nextDouble() < stat(
-                        PERK_XIAO_GREEN, KILL_TRIGGER_CHANCE) + killTriggerChanceBonus) {
-                    data.addCustomStat(ARROW_VELOCITY, stat(PERK_XIAO_GREEN, ARROW_VELOCITY) * gainMultiplier);
-                }
-                if (data.owns(PERK_XIAO_PEACH)
-                        && killer.getRandom().nextDouble() < stat(
-                        PERK_XIAO_PEACH, KILL_TRIGGER_CHANCE) + killTriggerChanceBonus) {
-                    data.addCustomStat(ARROW_DAMAGE, stat(PERK_XIAO_PEACH, ARROW_DAMAGE) * gainMultiplier);
-                }
                 if (data.owns(PERK_LUNAR_GODDESSS_BLESSING)
                         && killer.getRandom().nextDouble() < stat(
                         PERK_LUNAR_GODDESSS_BLESSING, KILL_TRIGGER_CHANCE)) {
@@ -626,6 +646,7 @@ public final class TalentCombatEffects {
                             PHYSICAL_DAMAGE_AMPLIFICATION_PER_TRIGGER
                     ));
                 }
+                grantKillTriggerStats(killer, data);
                 if (data.owns(PERK_I_SHALL_INTERPRET_THE_RADIANCE)) {
                     Perk radiance = requiredPerk(PERK_I_SHALL_INTERPRET_THE_RADIANCE);
                     double damagePerTrigger = radiance.stat(DAMAGE_BONUS_PER_KILL);

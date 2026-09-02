@@ -1,5 +1,6 @@
 package com.whatever.aegis_ascension.event;
 
+import com.whatever.aegis_ascension.perk.talents.ArcheryStats;
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.aegis.AngelsAegis;
 import com.whatever.aegis_ascension.lifecycle.PlayerDataLifecycle;
@@ -8,7 +9,6 @@ import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import com.whatever.aegis_ascension.mechanic.ServerTickHandler;
 import com.whatever.aegis_ascension.mechanic.ServerGameplayHandler;
-import com.whatever.aegis_ascension.compat.ApotheosisCompat;
 import com.whatever.aegis_ascension.mechanic.ShieldMechanic;
 import com.whatever.aegis_ascension.mechanic.MagicBladeMechanic;
 import com.whatever.aegis_ascension.network.ServerCatalogSync;
@@ -35,7 +35,6 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
@@ -65,11 +64,6 @@ public final class ForgeEvents {
         if (event.getEntity() instanceof LivingEntity living) {
             ServerGameplayHandler.onLivingEntityJoined(living);
         }
-    }
-
-    @SubscribeEvent(priority = EventPriority.HIGH)
-    public static void onMobFinalizeSpawn(MobSpawnEvent.FinalizeSpawn event) {
-        ApotheosisCompat.onFinalizeSpawn(event);
     }
 
     /**
@@ -341,6 +335,28 @@ public final class ForgeEvents {
             return;
         }
         QuestManager.onArrowShot(player, arrow);
+    }
+
+    /** Speeds up a freshly loosed arrow before it has travelled anywhere. */
+    @SubscribeEvent
+    public static void onArrowLoosed(EntityJoinLevelEvent event) {
+        if (event.isCanceled() || event.getLevel().isClientSide()
+                || !(event.getEntity() instanceof AbstractArrow arrow)) {
+            return;
+        }
+        ArcheryStats.onArrowLoosed(arrow);
+    }
+
+    /** Applies accumulated Draw Speed to a bow or crossbow being pulled. */
+    @SubscribeEvent
+    public static void onItemUseTick(LivingEntityUseItemEvent.Tick event) {
+        if (!(event.getEntity() instanceof ServerPlayer player)) {
+            return;
+        }
+        int bonus = ArcheryStats.drawSpeedTickBonus(player, event.getItem());
+        if (bonus > 0) {
+            event.setDuration(Math.max(0, event.getDuration() - bonus));
+        }
     }
 
     @SubscribeEvent

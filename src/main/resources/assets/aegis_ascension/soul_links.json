@@ -1,5 +1,5 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "soul_links": [
     {
       "id": "soul_hakugyokurou",
@@ -139,14 +139,13 @@
     },
     {
       "id": "soul_game_development_club",
-      "required_perks": ["perk_xiao_peach", "perk_xiao_green", "perk_alice"],
+      "required_perks": ["perk_momo", "perk_midori", "perk_alice"],
       "synergy_name": "combination.aegis_ascension.soul_game_development_club.name",
       "description": "combination.aegis_ascension.soul_game_development_club.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_game_development_club.png",
       "bonus_stats": {
         "lucky_strike": 0.2,
-        "kill_trigger_chance": 0.025,
-        "midori_momo_stat_multiplier_bonus": 0.5
+        "member_gain_multiplier_bonus": 0.5
       },
       "enabled": true,
       "source_row": 145

@@ -1,153 +1,14 @@
 {
-  "schema_version": 32,
+  "schema_version": 36,
   "source": "Illusion Poem",
   "value_conventions": {
-    "excluded_perks": "Talents listed on a mapping contribute to that custom stat under their own in-code condition instead of being published as an unconditional attribute."
+    "moved_tables": "apothic_attribute_mappings and nearby_spawn_buffs now live in their own files of the same name, next to this one."
   },
   "rarity_weights": {
     "R": 90,
     "SR": 8,
     "SSR": 2
   },
-  "apothic_attribute_mappings": [
-    {
-      "custom_stat": "critical_chance",
-      "attribute": "attributeslib:crit_chance",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "critical_damage",
-      "attribute": "attributeslib:crit_damage",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "armor_penetration_flat",
-      "attribute": "attributeslib:armor_pierce",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "armor_penetration_percentage",
-      "attribute": "attributeslib:armor_shred",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true,
-      "excluded_perks": ["perk_flickering_light", "perk_hanakos_blessing"]
-    },
-    {
-      "custom_stat": "arrow_damage",
-      "attribute": "attributeslib:arrow_damage",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true,
-      "excluded_perks": ["perk_xiao_peach"]
-    },
-    {
-      "custom_stat": "arrow_velocity",
-      "attribute": "attributeslib:arrow_velocity",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true,
-      "excluded_perks": ["perk_xiao_green"]
-    },
-    {
-      "custom_stat": "cold_damage",
-      "attribute": "attributeslib:cold_damage",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "current_hp_damage",
-      "attribute": "attributeslib:current_hp_damage",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "dodge_chance",
-      "attribute": "attributeslib:dodge_chance",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "draw_speed",
-      "attribute": "attributeslib:draw_speed",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true,
-      "excluded_perks": ["perk_alice"]
-    },
-    {
-      "custom_stat": "experience_gained",
-      "attribute": "attributeslib:experience_gained",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "fire_damage",
-      "attribute": "attributeslib:fire_damage",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "ghost_health",
-      "attribute": "attributeslib:ghost_health",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "healing_received",
-      "attribute": "attributeslib:healing_received",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "life_steal",
-      "attribute": "attributeslib:life_steal",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "mining_speed",
-      "attribute": "attributeslib:mining_speed",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "overheal",
-      "attribute": "attributeslib:overheal",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "protection_pierce",
-      "attribute": "attributeslib:prot_pierce",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    },
-    {
-      "custom_stat": "protection_shred",
-      "attribute": "attributeslib:prot_shred",
-      "operation": "addition",
-      "scale": 1.0,
-      "enabled": true
-    }
-  ],
   "perks": [
     {
       "id": "perk_healing_magic",
@@ -356,10 +217,14 @@
       "description": "perk.aegis_ascension.perk_alice.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_alice.png",
       "stats": {
+        "luck_threshold": 2,
+        "luck_flat_if_above": 1,
+        "luck_gain_trigger_limit": 1,
+        "talent_option_bonus_if_below": 2,
         "kill_trigger_chance": 0.01,
-        "draw_speed": 0.01,
-        "nearby_spawn_radius": 6.0,
-        "spawned_mob_max_health_multiplier": 1.15
+        "draw_speed_per_trigger": 0.01,
+        "nearby_spawn_radius": 8.0,
+        "spawned_mob_max_health_multiplier": 0.5
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -632,6 +497,43 @@
       "maxRank": 1,
       "manualToggle": false,
       "source_row": 43
+    },
+    {
+      "id": "perk_momo",
+      "tier": "R",
+      "name": "perk.aegis_ascension.perk_momo.name",
+      "description": "perk.aegis_ascension.perk_momo.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_momo.png",
+      "stats": {
+        "lucky_strike_threshold": 1.5,
+        "lucky_strike_overflow_step": 0.1,
+        "final_damage_per_step": 0.01,
+        "kill_trigger_chance": 0.025,
+        "arrow_damage_per_trigger": 0.025,
+        "nearby_spawn_radius": 8.0,
+        "spawned_mob_max_health_multiplier": 0.25
+      },
+      "maxRank": 1,
+      "manualToggle": false,
+      "source_row": 44
+    },
+    {
+      "id": "perk_midori",
+      "tier": "R",
+      "name": "perk.aegis_ascension.perk_midori.name",
+      "description": "perk.aegis_ascension.perk_midori.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_midori.png",
+      "stats": {
+        "final_damage_step": 0.1,
+        "lucky_strike_per_step": 0.02,
+        "kill_trigger_chance": 0.025,
+        "arrow_velocity_per_trigger": 0.01,
+        "nearby_spawn_radius": 16.0,
+        "spawned_mob_max_health_multiplier": 0.5
+      },
+      "maxRank": 1,
+      "manualToggle": false,
+      "source_row": 45
     },
     {
       "id": "perk_congyu_ciallo",
@@ -1547,9 +1449,9 @@
       "icon": "aegis_ascension:textures/gui/talents/perk_frenzy.png",
       "stats": {
         "critical_damage": 0.6,
-        "nearby_spawn_radius": 6.0,
-        "spawned_mob_max_health_multiplier": 1.0,
-        "apotheosis_boss_spawn_chance": 0.005
+        "selection_charges_granted": 1,
+        "nearby_spawn_radius": 8.0,
+        "spawned_mob_max_health_multiplier": 1.0
       },
       "maxRank": 1,
       "manualToggle": false,
@@ -1753,39 +1655,6 @@
       "maxRank": 1,
       "manualToggle": false,
       "source_row": 0
-    },
-      {
-      "id": "perk_xiao_green",
-      "tier": "R",
-      "name": "perk.aegis_ascension.perk.xiao_green.name",
-      "description": "perk.aegis_ascension.perk_xiao.green.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_midori.png",
-      "stats": {
-        "kill_trigger_chance": 0.025,
-        "arrow_velocity": 0.01,
-        "nearby_spawn_radius": 10.0,
-        "spawned_mob_max_health_multiplier": 1.5,
-        "apotheosis_boss_spawn_chance": 0.005
-      },
-      "maxRank": 1,
-      "manualToggle": false,
-      "source_row": 45
-    },
-    {
-      "id": "perk_xiao_peach",
-      "tier": "R",
-      "name": "perk.aegis_ascension.perk_xiao.peach.name",
-      "description": "perk.aegis_ascension.perk_xiao.peach.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_momo.png",
-      "stats": {
-        "kill_trigger_chance": 0.025,
-        "arrow_damage": 0.025,
-        "nearby_spawn_radius": 6.0,
-        "spawned_mob_max_health_multiplier": 1.1
-      },
-      "maxRank": 1,
-      "manualToggle": false,
-      "source_row": 44
     }
   ]
 }

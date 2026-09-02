@@ -61,6 +61,8 @@ public final class SoulLinkConstants {
     public static final String SHRINE_MAIDEN_TEAM_REWARD_CLAIMED =
             "shrine_maiden_team_reward_claimed";
 
+    public static final String MEMBER_GAIN_MULTIPLIER_BONUS =
+            "member_gain_multiplier_bonus";
     public static final String COLLECTOR_EFFECT_MULTIPLIER =
             "collector_effect_multiplier";
     public static final String HANAKO_EFFECT_MULTIPLIER = "hanako_effect_multiplier";

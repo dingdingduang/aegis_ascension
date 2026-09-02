@@ -369,6 +369,33 @@ public final class PlayerPerkData {
         return Optional.of(granted);
     }
 
+    /**
+     * Grants one specific Aegis outright: no selection charge, no pending offer.
+     *
+     * <p>The chain effects a normal selection would set off still run, so an Aegis handed
+     * out this way behaves exactly like one the player chose.</p>
+     *
+     * @return false if the player already owns it.
+     */
+    public boolean grantAegis(ServerPlayer player, Aegis aegis) {
+        if (aegis == null || chosenAegises.contains(aegis)) {
+            return false;
+        }
+        boolean alreadyOwnedAnAegis = !chosenAegises.isEmpty();
+        chosenAegises.add(aegis);
+        clearChallengePenalty();
+        pendingAegisOffers.remove(aegis);
+        if (aegis.id().equals(AegisConstants.LUCKY) && alreadyOwnedAnAegis) {
+            grantRandomInactiveSoulLinkSet(player);
+        }
+        if (aegis.id().equals(AegisConstants.MIRACLE)) {
+            grantMiracleAegises(aegis, player);
+        }
+        applyChosenPerks(player);
+        releaseRemainingBreakthroughsIfNeeded(player);
+        return true;
+    }
+
     public boolean hasAegis(String aegisId) {
         return Aegis.byId(aegisId).map(chosenAegises::contains).orElse(false);
     }

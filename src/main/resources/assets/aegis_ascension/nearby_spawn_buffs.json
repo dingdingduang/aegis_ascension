@@ -1,0 +1,35 @@
+{
+  "schema_version": 1,
+  "value_conventions": {
+    "stat": "A talent stat. Any talent declaring it, alongside a nearby_spawn_radius, strengthens mobs spawning near its owner.",
+    "attribute": "The attribute that stat moves on the spawned mob.",
+    "operation": "addition, multiply_base, or multiply_total. multiply_base makes several talents add up; multiply_total makes them compound.",
+    "enabled": "false switches the row off without deleting it."
+  },
+  "nearby_spawn_buffs": [
+    {
+      "stat": "spawned_mob_max_health_multiplier",
+      "attribute": "minecraft:generic.max_health",
+      "operation": "multiply_base",
+      "enabled": true
+    },
+    {
+      "stat": "spawned_mob_attack_damage_multiplier",
+      "attribute": "minecraft:generic.attack_damage",
+      "operation": "multiply_base",
+      "enabled": true
+    },
+    {
+      "stat": "spawned_mob_movement_speed_multiplier",
+      "attribute": "minecraft:generic.movement_speed",
+      "operation": "multiply_base",
+      "enabled": true
+    },
+    {
+      "stat": "spawned_mob_armor_flat",
+      "attribute": "minecraft:generic.armor",
+      "operation": "addition",
+      "enabled": true
+    }
+  ]
+}

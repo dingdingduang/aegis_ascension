@@ -9,6 +9,7 @@ import com.google.gson.annotations.SerializedName;
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.util.GeneralConstants;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;
 import com.whatever.aegis_ascension.util.AegisModifiers;
 import net.minecraft.network.chat.Component;
@@ -40,6 +41,8 @@ public final class SkillEnhancement {
     private static final Catalog LOCAL_CATALOG = loadCatalog();
     private static final CatalogSnapshot LOCAL_SNAPSHOT = buildSnapshot(LOCAL_CATALOG);
     private static volatile CatalogSnapshot activeSnapshot = LOCAL_SNAPSHOT;
+    private static final String SKILL_ENHANCEMENT = "skill_enhancement";
+
 
     private static CatalogSnapshot buildSnapshot(Catalog catalog) {
         Objects.requireNonNull(catalog.enhancements, "Missing enhancements");
@@ -131,11 +134,9 @@ public final class SkillEnhancement {
         this.displayFormat = displayFormat;
         this.affectedByAllSkillEnhancementAttribute =
                 affectedByAllSkillEnhancementAttribute;
-        // mint() reproduces these exact ids: it hashes "aegis_ascension:" + path, the
-        // same seed used before, so modifiers already saved on players stay matched.
-        this.modifierId = AegisModifiers.mint("skill_enhancement/" + id);
+        this.modifierId = AegisModifiers.mint(SKILL_ENHANCEMENT + GeneralConstants.SLASH + id);
         this.allSkillEnhancementAttributeModifierId =
-                AegisModifiers.mint("all_skill_enhancement_attribute/" + id);
+                AegisModifiers.mint(TalentConstants.ALL_SKILL_ENHANCEMENT_ATTRIBUTE + GeneralConstants.SLASH + id);
     }
 
     public String id() {

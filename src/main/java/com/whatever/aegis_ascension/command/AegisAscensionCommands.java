@@ -8,6 +8,7 @@ import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.compat.SummonCompat;
 import com.whatever.aegis_ascension.perk.Perk;
+import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.perk.SkillEnhancement;
 import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
@@ -33,6 +34,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import static com.whatever.aegis_ascension.perk.TalentConstants.EXTRA_TALENT_SLOTS;
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getLiteralString;
 
 /** Administrative commands for saved progression, testing, and resets. */
@@ -206,6 +208,36 @@ public final class AegisAscensionCommands {
                                                                         StringArgumentType.getString(context, "key"),
                                                                         DoubleArgumentType.getDouble(context, "amount"),
                                                                         true))))))
+                        )
+                        .then(Commands.literal("talent")
+                                .requires(source -> source.hasPermission(2))
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("talent", StringArgumentType.word())
+                                                .suggests(TALENT_IDS)
+                                                .executes(context -> talentAdd(
+                                                        context.getSource(),
+                                                        context.getSource().getPlayerOrException(),
+                                                        StringArgumentType.getString(context, "talent")))
+                                                .then(Commands.argument("player", EntityArgument.player())
+                                                        .executes(context -> talentAdd(
+                                                                context.getSource(),
+                                                                EntityArgument.getPlayer(context, "player"),
+                                                                StringArgumentType.getString(context, "talent"))))))
+                        )
+                        .then(Commands.literal("aegis")
+                                .requires(source -> source.hasPermission(2))
+                                .then(Commands.literal("add")
+                                        .then(Commands.argument("aegis", StringArgumentType.word())
+                                                .suggests(AEGIS_IDS)
+                                                .executes(context -> aegisAdd(
+                                                        context.getSource(),
+                                                        context.getSource().getPlayerOrException(),
+                                                        StringArgumentType.getString(context, "aegis")))
+                                                .then(Commands.argument("player", EntityArgument.player())
+                                                        .executes(context -> aegisAdd(
+                                                                context.getSource(),
+                                                                EntityArgument.getPlayer(context, "player"),
+                                                                StringArgumentType.getString(context, "aegis"))))))
                         )
                         .then(Commands.literal("reset")
                                 .requires(source -> source.hasPermission(2))
@@ -515,6 +547,104 @@ public final class AegisAscensionCommands {
      * a hand-set key completes next time. Suggestions are advisory: any key is accepted,
      * because addon catalogs and runtime-only stats are not enumerable here.
      */
+    private static final SuggestionProvider<CommandSourceStack> TALENT_IDS =
+            (context, builder) -> {
+                Perk.values().stream()
+                        .map(Perk::id)
+                        .sorted()
+                        .filter(id -> id.startsWith(builder.getRemainingLowerCase()))
+                        .forEach(builder::suggest);
+                return builder.buildFuture();
+            };
+
+    private static final SuggestionProvider<CommandSourceStack> AEGIS_IDS =
+            (context, builder) -> {
+                Aegis.values().stream()
+                        .map(Aegis::id)
+                        .sorted()
+                        .filter(id -> id.startsWith(builder.getRemainingLowerCase()))
+                        .forEach(builder::suggest);
+                return builder.buildFuture();
+            };
+
+    /**
+     * Grants one talent outright, spending no selection charge and ignoring the offer
+     * roll. Acquisition rules still apply: a talent at max rank, locked behind a Soul
+     * Link, hidden by config, or blocked for want of a talent slot is refused with the
+     * reason rather than forced into a state the mod could not otherwise reach.
+     */
+    private static int talentAdd(CommandSourceStack source, ServerPlayer target,
+                                 String talentId) {
+        Perk perk = Perk.byId(talentId).orElse(null);
+        if (perk == null) {
+            source.sendFailure(getLiteralString("Unknown talent: " + talentId));
+            return 0;
+        }
+        PlayerPerkData data = PerkData.of(target);
+        String name = target.getGameProfile().getName();
+        if (!data.canAcquireTalent(perk)) {
+            source.sendFailure(getLiteralString(
+                    name + " cannot acquire " + perk.id() + ": " + refusalReason(data, perk)
+            ));
+            return 0;
+        }
+        if (!data.grantTalent(target, perk)) {
+            source.sendFailure(getLiteralString(
+                    "Failed to grant " + perk.id() + " to " + name + "."));
+            return 0;
+        }
+        SummonCompat.refreshOwnedSummons(target, data);
+        ModNetworking.syncTo(target);
+        int rank = data.getRank(perk);
+        source.sendSuccess(() -> getLiteralString(
+                "Granted " + perk.id() + " to " + name
+                        + (perk.maxRank() > 1 ? " (rank " + rank + "/" + perk.maxRank() + ")" : "")
+                        + "."), true);
+        return 1;
+    }
+
+    /** The specific rule that stopped an acquisition, for a message worth reading. */
+    private static String refusalReason(PlayerPerkData data, Perk perk) {
+        if (PlatformServices.config().isTalentHidden(perk.id())) {
+            return "it is hidden by the server configuration";
+        }
+        if (!perk.isUnlockedForPool(data)) {
+            return "its pool requirements are unmet";
+        }
+        if (!perk.canAcquire(data.getRank(perk))) {
+            return "it is already at max rank " + perk.maxRank();
+        }
+        if (data.getRank(perk) == 0
+                && data.getUniqueTalentCount() >= data.getMaxTalentSlots()
+                && perk.stat(EXTRA_TALENT_SLOTS) <= 0.0D) {
+            return "every talent slot is full (" + data.getUniqueTalentCount()
+                    + "/" + data.getMaxTalentSlots() + ")";
+        }
+        return "the talent is not currently acquirable";
+    }
+
+    /** Grants one Aegis outright, spending no Aegis charge and ignoring the offer roll. */
+    private static int aegisAdd(CommandSourceStack source, ServerPlayer target,
+                                String aegisId) {
+        Aegis aegis = Aegis.byId(aegisId).orElse(null);
+        if (aegis == null) {
+            source.sendFailure(getLiteralString("Unknown Aegis: " + aegisId));
+            return 0;
+        }
+        PlayerPerkData data = PerkData.of(target);
+        String name = target.getGameProfile().getName();
+        if (!data.grantAegis(target, aegis)) {
+            source.sendFailure(getLiteralString(
+                    name + " already owns " + aegis.id() + "."));
+            return 0;
+        }
+        SummonCompat.refreshOwnedSummons(target, data);
+        ModNetworking.syncTo(target);
+        source.sendSuccess(() -> getLiteralString(
+                "Granted " + aegis.id() + " to " + name + "."), true);
+        return 1;
+    }
+
     private static final SuggestionProvider<CommandSourceStack> STAT_KEYS =
             (context, builder) -> {
                 knownStatKeys(context.getSource()).stream()

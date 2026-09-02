@@ -1,0 +1,150 @@
+{
+  "schema_version": 1,
+  "value_conventions": {
+    "custom_stat": "The persisted stat this mod publishes onto the attribute below. A talent contributes by declaring a stat of this name.",
+    "attribute": "The Apothic Attributes (attributeslib) attribute the stat is published to. Ignored entirely when that mod is absent.",
+    "operation": "addition, multiply_base, or multiply_total.",
+    "scale": "Multiplies the published amount, for when this mod's unit and the attribute's differ.",
+    "enabled": "false stops publishing that stat without deleting the row; this mod then applies the stat itself where it can.",
+    "excluded_perks": "Talents listed on a mapping contribute to that custom stat under their own in-code condition instead of being published as an unconditional attribute."
+  },
+  "apothic_attribute_mappings": [
+    {
+      "custom_stat": "critical_chance",
+      "attribute": "attributeslib:crit_chance",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "critical_damage",
+      "attribute": "attributeslib:crit_damage",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "armor_penetration_flat",
+      "attribute": "attributeslib:armor_pierce",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "armor_penetration_percentage",
+      "attribute": "attributeslib:armor_shred",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true,
+      "excluded_perks": [
+        "perk_flickering_light",
+        "perk_hanakos_blessing"
+      ]
+    },
+    {
+      "custom_stat": "arrow_damage",
+      "attribute": "attributeslib:arrow_damage",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "arrow_velocity",
+      "attribute": "attributeslib:arrow_velocity",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "cold_damage",
+      "attribute": "attributeslib:cold_damage",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "current_hp_damage",
+      "attribute": "attributeslib:current_hp_damage",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "dodge_chance",
+      "attribute": "attributeslib:dodge_chance",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "draw_speed",
+      "attribute": "attributeslib:draw_speed",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "experience_gained",
+      "attribute": "attributeslib:experience_gained",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "fire_damage",
+      "attribute": "attributeslib:fire_damage",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "ghost_health",
+      "attribute": "attributeslib:ghost_health",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "healing_received",
+      "attribute": "attributeslib:healing_received",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "life_steal",
+      "attribute": "attributeslib:life_steal",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "mining_speed",
+      "attribute": "attributeslib:mining_speed",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "overheal",
+      "attribute": "attributeslib:overheal",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "protection_pierce",
+      "attribute": "attributeslib:prot_pierce",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    },
+    {
+      "custom_stat": "protection_shred",
+      "attribute": "attributeslib:prot_shred",
+      "operation": "addition",
+      "scale": 1.0,
+      "enabled": true
+    }
+  ]
+}
