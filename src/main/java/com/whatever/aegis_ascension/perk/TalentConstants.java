@@ -183,6 +183,7 @@ public final class TalentConstants {
     public static final String ARONA_PRIMARY_FLAT = "arona_primary_flat";
     public static final String ARROW_DAMAGE = "arrow_damage";
     public static final String ARROW_VELOCITY = "arrow_velocity";
+    public static final String APOTHEOSIS_BOSS_SPAWN_CHANCE = "apotheosis_boss_spawn_chance";
     public static final String ATTACK_DAMAGE = "attack_damage";
     public static final String ATTACK_DAMAGE_AMPLIFICATION = "attack_damage_amplification";
     public static final String ATTACK_DAMAGE_AMPLIFICATION_CAP = "attack_damage_amplification_cap";

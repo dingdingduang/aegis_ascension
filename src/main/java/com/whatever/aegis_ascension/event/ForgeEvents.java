@@ -8,6 +8,7 @@ import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import com.whatever.aegis_ascension.mechanic.ServerTickHandler;
 import com.whatever.aegis_ascension.mechanic.ServerGameplayHandler;
+import com.whatever.aegis_ascension.compat.ApotheosisCompat;
 import com.whatever.aegis_ascension.mechanic.ShieldMechanic;
 import com.whatever.aegis_ascension.mechanic.MagicBladeMechanic;
 import com.whatever.aegis_ascension.network.ServerCatalogSync;
@@ -34,6 +35,7 @@ import net.minecraftforge.event.entity.living.LivingHurtEvent;
 import net.minecraftforge.event.entity.living.LivingHealEvent;
 import net.minecraftforge.event.entity.living.LivingExperienceDropEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.living.MobSpawnEvent;
 import net.minecraftforge.event.entity.living.LivingEntityUseItemEvent;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.event.entity.ProjectileImpactEvent;
@@ -63,6 +65,11 @@ public final class ForgeEvents {
         if (event.getEntity() instanceof LivingEntity living) {
             ServerGameplayHandler.onLivingEntityJoined(living);
         }
+    }
+
+    @SubscribeEvent(priority = EventPriority.HIGH)
+    public static void onMobFinalizeSpawn(MobSpawnEvent.FinalizeSpawn event) {
+        ApotheosisCompat.onFinalizeSpawn(event);
     }
 
     /**
