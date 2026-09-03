@@ -1,120 +1,288 @@
 {
-  "schema_version": 1,
+  "schema_version": 2,
   "value_conventions": {
     "overrides": "Stat id to icon override. Every stat ships with its built-in source listed, so this file is the full editable table.",
     "source": "A talent, Aegis, or Soul Link id whose icon this stat borrows. Ids are the ones used in talents.json, aegises.json, and soul_links.json.",
     "icon": "A texture path such as aegis_ascension:textures/gui/talents/perk_frieren.png. Used when present and valid; an unparsable path falls back to source.",
+    "list_icon": "The texture drawn beside this stat in the list view. The bundled set lives in textures/gui/customstat/ as icon_000.png through icon_695.png; the numbers are the ones printed under each icon on the contact sheets in docs/customstat-icons/, so swapping an icon is a matter of reading a number off a sheet. Any other texture path works too. Avoid animated textures (vanilla clock, compass): their files are a vertical strip of frames and would be squashed into the row whole.",
+    "list_icon_size": "Edge length of the list_icon file, so it is scaled down whole rather than cropped. The bundled icons are 16, which is exactly the size a row draws them at, so they blit without resampling. 16 when omitted, which is also every vanilla item texture.",
+    "list_view": "Layout of the tab's list view: columns (1-4), row_height (12-32), show_group_headers, and the ordered groups. A stat left out of every group is appended under its own heading, so nothing disappears from a hand-edited file.",
     "errors": "An unknown id or an unparsable path is logged and ignored, leaving that stat's built-in icon in place."
+  },
+  "list_view": {
+    "columns": 2,
+    "row_height": 18,
+    "show_group_headers": true,
+    "groups": [
+      {
+        "title_key": "screen.aegis_ascension.collection.stat.group.offense",
+        "stats": [
+          "attack_damage",
+          "attack_speed",
+          "attack_damage_amplification",
+          "physical_damage_amplification",
+          "magic_damage",
+          "magic_damage_amplification",
+          "damage_bonus",
+          "final_damage",
+          "true_damage",
+          "skill_damage",
+          "independent_damage_amplification",
+          "critical_chance",
+          "critical_damage",
+          "lucky_strike",
+          "arrow_damage",
+          "independent_arrow_damage",
+          "arrow_velocity",
+          "draw_speed"
+        ]
+      },
+      {
+        "title_key": "screen.aegis_ascension.collection.stat.group.defense",
+        "stats": [
+          "armor",
+          "damage_reduction",
+          "dodge_chance",
+          "shield_gain",
+          "health_regeneration",
+          "mana_regeneration",
+          "revives_remaining"
+        ]
+      },
+      {
+        "title_key": "screen.aegis_ascension.collection.stat.group.utility",
+        "stats": [
+          "primary_attribute_flat",
+          "luck",
+          "attack_range",
+          "cooldown_reduction",
+          "healing_power",
+          "summon_power",
+          "summon_count",
+          "talent_option_bonus",
+          "breakthrough_effect",
+          "all_skill_enhancement_attribute",
+          "gold_reward_gained"
+        ]
+      },
+      {
+        "title_key": "screen.aegis_ascension.collection.stat.group.skills",
+        "stats": [
+          "independent_skill_damage",
+          "independent_skill_area",
+          "barrage_missile_speed",
+          "barrage_damage",
+          "barrage_area"
+        ]
+      }
+    ]
   },
   "overrides": {
     "attack_damage": {
       "source": "attack_damage",
-      "icon": "aegis_ascension:textures/gui/customstat/flame.png"
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_579.png",
+      "list_icon_size": 16
     },
     "armor": {
-      "source": "armor"
+      "source": "armor",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_019.png",
+      "list_icon_size": 16
     },
     "attack_speed": {
-      "source": "attack_speed"
+      "source": "attack_speed",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_554.png",
+      "list_icon_size": 16
     },
     "all_skill_enhancement_attribute": {
-      "source": "perk_noelle"
+      "source": "perk_plana",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_361.png",
+      "list_icon_size": 16
     },
     "breakthrough_effect": {
-      "source": "perk_plana"
+      "source": "perk_swiss_roll_moment",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_090.png",
+      "list_icon_size": 16
     },
     "final_damage": {
-      "source": "perk_kokona"
+      "source": "perk_because_you_exist_as_i_write",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_449.png",
+      "list_icon_size": 16
     },
     "independent_damage_amplification": {
-      "source": "soul_love_as_eternal_as_this_moment"
+      "source": "soul_love_as_eternal_as_this_moment",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_681.png",
+      "list_icon_size": 16
     },
     "damage_bonus": {
-      "source": "perk_because_you_exist_as_i_write"
+      "source": "perk_i_shall_interpret_the_radiance",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_384.png",
+      "list_icon_size": 16
     },
     "attack_damage_amplification": {
-      "source": "perk_righteous_knight"
+      "source": "perk_righteous_knight",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_105.png",
+      "list_icon_size": 16
     },
     "magic_damage": {
-      "source": "perk_magic_blade"
+      "source": "perk_frieren",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_332.png",
+      "list_icon_size": 16
     },
     "physical_damage_amplification": {
-      "source": "perk_flickering_light"
+      "source": "perk_flickering_light",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_102.png",
+      "list_icon_size": 16
     },
     "magic_damage_amplification": {
-      "source": "perk_master_spark"
+      "source": "perk_master_spark",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_448.png",
+      "list_icon_size": 16
     },
     "skill_damage": {
-      "source": "perk_skill_damage_conversion"
+      "source": "perk_fern",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_071.png",
+      "list_icon_size": 16
     },
     "true_damage": {
-      "source": "perk_seven_colored_magician"
+      "source": "perk_seven_colored_magician",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_386.png",
+      "list_icon_size": 16
     },
     "health_regeneration": {
-      "source": "perk_healing_magic"
+      "source": "perk_commander",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_241.png",
+      "list_icon_size": 16
     },
     "mana_regeneration": {
-      "source": "perk_magic_blade"
+      "source": "perk_healing_magic",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_648.png",
+      "list_icon_size": 16
     },
     "healing_power": {
-      "source": "perk_blessing_of_the_world_tree"
+      "source": "perk_blessing_of_the_world_tree",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_504.png",
+      "list_icon_size": 16
     },
     "summon_power": {
-      "source": "perk_noelle"
+      "source": "perk_plateau_witch",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_082.png",
+      "list_icon_size": 16
     },
     "summon_count": {
-      "source": "perk_plateau_witch"
+      "source": "perk_noelle",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_686.png",
+      "list_icon_size": 16
     },
     "critical_chance": {
-      "source": "perk_ink_dyed_sakura"
+      "source": "perk_ink_dyed_sakura",
+      "icon": "aegis_ascension:textures/gui/customstat/flame.png",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_581.png",
+      "list_icon_size": 16
     },
     "critical_damage": {
-      "source": "perk_half_human_half_phantom_gardener"
+      "source": "perk_half_human_half_phantom_gardener",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_366.png",
+      "list_icon_size": 16
     },
     "luck": {
-      "source": "perk_alice"
+      "source": "perk_konatas_blessing",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_526.png",
+      "list_icon_size": 16
     },
     "lucky_strike": {
-      "source": "perk_lucky_arrow"
+      "source": "perk_alice",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_151.png",
+      "list_icon_size": 16
     },
     "primary_attribute_flat": {
-      "source": "perk_arona"
+      "source": "perk_arona",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_407.png",
+      "list_icon_size": 16
     },
     "attack_range": {
-      "source": "perk_wind_arrow"
+      "source": "perk_murasames_blessing",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_520.png",
+      "list_icon_size": 16
     },
     "cooldown_reduction": {
-      "source": "perk_ningning_ciallo"
+      "source": "perk_ningning_ciallo",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_594.png",
+      "list_icon_size": 16
     },
     "independent_skill_damage": {
-      "source": "perk_hayase_yuka"
+      "source": "perk_hayase_yuka",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_425.png",
+      "list_icon_size": 16
     },
     "independent_skill_area": {
-      "source": "perk_otogi_noah"
+      "source": "perk_otogi_noah",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_560.png",
+      "list_icon_size": 16
     },
     "damage_reduction": {
-      "source": "perk_beater"
+      "source": "perk_mysterious_doll",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_447.png",
+      "list_icon_size": 16
     },
     "dodge_chance": {
-      "source": "perk_clear_mind_state"
+      "source": "perk_clear_mind_state",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_122.png",
+      "list_icon_size": 16
     },
     "shield_gain": {
-      "source": "perk_koharu_sprite"
+      "source": "perk_koharu_sprite",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_257.png",
+      "list_icon_size": 16
     },
     "revives_remaining": {
-      "source": "perk_boundary_of_life_and_death"
+      "source": "perk_boundary_of_life_and_death",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_191.png",
+      "list_icon_size": 16
     },
     "talent_option_bonus": {
-      "source": "perk_flower_fairy"
+      "source": "perk_kisakis_blessing",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_392.png",
+      "list_icon_size": 16
     },
     "barrage_missile_speed": {
-      "source": "arcane_aegis"
+      "source": "arcane_aegis",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_262.png",
+      "list_icon_size": 16
     },
     "barrage_damage": {
-      "source": "arcane_aegis"
+      "source": "arcane_aegis",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_422.png",
+      "list_icon_size": 16
     },
     "barrage_area": {
-      "source": "arcane_aegis"
+      "source": "arcane_aegis",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_500.png",
+      "list_icon_size": 16
+    },
+    "arrow_damage": {
+      "source": "perk_focused_shot",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_348.png",
+      "list_icon_size": 16
+    },
+    "arrow_velocity": {
+      "source": "perk_wind_arrow",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_034.png",
+      "list_icon_size": 16
+    },
+    "draw_speed": {
+      "source": "perk_lucky_arrow",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_342.png",
+      "list_icon_size": 16
+    },
+    "gold_reward_gained": {
+      "source": "perk_rolling_in_wealth",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_501.png",
+      "list_icon_size": 16
+    },
+    "independent_arrow_damage": {
+      "source": "perk_meteor_sparkle",
+      "list_icon": "aegis_ascension:textures/gui/customstat/icon_433.png",
+      "list_icon_size": 16
     }
   }
 }

@@ -34,7 +34,14 @@ public final class ACGCardWidget extends AbstractButton implements ClippableWidg
         /** Full-bleed card art (aegis_card / perk_card / perk_card / perk_card), used for offers. */
         BIG,
         /** Small icon + title + status row, used for collection grids. */
-        COMPACT
+        COMPACT,
+        /**
+         * One dense line — small icon, name, right-aligned value — for the Player Custom
+         * Stat list view. Sized to be read down a column rather than scanned as a grid, so
+         * it drops the card frame and the hover zoom that would make neighbouring rows
+         * jump into each other.
+         */
+        ROW
     }
 
     public record DetailLine(Component text, int color) {
@@ -168,7 +175,9 @@ public final class ACGCardWidget extends AbstractButton implements ClippableWidg
         int x = getX();
         int y = getY();
 
-        float target = active && hovered ? HOVER_SCALE : 1.0F;
+        // Rows sit two pixels apart: zooming one would visibly overlap its neighbours.
+        float target = active && hovered && presentation != Presentation.ROW
+                ? HOVER_SCALE : 1.0F;
         scale += (target - scale) * SCALE_EASING;
 
         graphics.pose().pushPose();
@@ -180,7 +189,11 @@ public final class ACGCardWidget extends AbstractButton implements ClippableWidg
             graphics.pose().translate(-centerX, -centerY, 0.0F);
         }
 
-        renderBackground(graphics, x, y, hovered);
+        if (presentation == Presentation.ROW) {
+            renderRowBackground(graphics, x, y, hovered);
+        } else {
+            renderBackground(graphics, x, y, hovered);
+        }
         if (selected) {
             if (GeneralClientMethods.resourceExists(ACGTheme.SELECTED_FRAME)) {
                 GeneralClientMethods.blitScaledRegion(graphics, ACGTheme.SELECTED_FRAME, x - 2, y - 2, width + 4, height + 4,
@@ -194,6 +207,7 @@ public final class ACGCardWidget extends AbstractButton implements ClippableWidg
         switch (presentation) {
             case BIG -> renderBig(graphics, x, y);
             case COMPACT -> renderCompact(graphics, x, y);
+            case ROW -> renderRow(graphics, x, y);
         }
 
         graphics.pose().popPose();
@@ -298,6 +312,52 @@ public final class ACGCardWidget extends AbstractButton implements ClippableWidg
         if (status != null) {
             GeneralClientMethods.drawCenteredString(graphics, font, status, x + width / 2,
                     y + height - 13, active ? statusColor : ACGTheme.TEXT_DISABLED);
+        }
+    }
+
+    /**
+     * A plate and a single accent stripe down the left edge, instead of the four-sided
+     * frame a card gets. At row density a full border per entry turns the column into a
+     * grid of boxes; the stripe still tells the eye where one stat ends and the next
+     * begins.
+     */
+    private void renderRowBackground(GuiGraphics graphics, int x, int y, boolean hovered) {
+        graphics.fill(x, y, x + width, y + height,
+                !active ? 0xCC1C1B22 : hovered ? 0xE03A3448 : 0xC0221F2C);
+        int stripe = !active ? 0xFF55505F : hovered ? ACGTheme.GOLD_BRIGHT : accentColor;
+        graphics.fill(x, y, x + 2, y + height, stripe);
+    }
+
+    private void renderRow(GuiGraphics graphics, int x, int y) {
+        var font = Minecraft.getInstance().font;
+        int size = Math.min(16, height - 2);
+        int iconX = x + 5;
+        int iconY = y + (height - size) / 2;
+        if (icon != null) {
+            GeneralClientMethods.blitScaledRegion(graphics, icon, iconX, iconY, size, size,
+                    0.0F, 0.0F, iconTextureSize, iconTextureSize,
+                    iconTextureSize, iconTextureSize);
+        }
+
+        int textY = y + (height - 8) / 2;
+        int textX = iconX + size + 4;
+        // The value is the reason to look at the row, so it keeps its full width and the
+        // name gives way. 6px of breathing room stops a long name from touching a value.
+        int valueWidth = status == null ? 0 : font.width(status);
+        int nameWidth = Math.max(12, x + width - 5 - valueWidth - 6 - textX);
+        String name = getMessage().getString();
+        String shown = font.plainSubstrByWidth(name, nameWidth);
+        if (shown.length() < name.length()) {
+            // Bare truncation reads as a typo ("All Skill Enhancem"); the ellipsis says
+            // the name continues and the hover panel has the rest.
+            shown = font.plainSubstrByWidth(name, nameWidth - font.width("…")) + "…";
+        }
+        graphics.drawString(font, shown, textX, textY,
+                active ? ACGTheme.TEXT_PRIMARY : ACGTheme.TEXT_DISABLED, false);
+
+        if (status != null) {
+            graphics.drawString(font, status, x + width - 5 - valueWidth, textY,
+                    active ? statusColor : ACGTheme.TEXT_DISABLED, false);
         }
     }
 

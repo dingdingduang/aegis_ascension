@@ -1,9 +1,12 @@
 {
-  "schema_version": 2,
+  "schema_version": 4,
   "soul_links": [
     {
       "id": "soul_hakugyokurou",
-      "required_perks": ["perk_ink_dyed_sakura", "perk_half_human_half_phantom_gardener"],
+      "required_perks": [
+        "perk_ink_dyed_sakura",
+        "perk_half_human_half_phantom_gardener"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_hakugyokurou.name",
       "description": "combination.aegis_ascension.soul_hakugyokurou.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_hakugyokurou.png",
@@ -16,17 +19,25 @@
     },
     {
       "id": "soul_logistics_combo",
-      "required_perks": ["perk_hayase_yuka", "perk_otogi_noah"],
+      "required_perks": [
+        "perk_hayase_yuka",
+        "perk_otogi_noah"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_logistics_combo.name",
       "description": "combination.aegis_ascension.soul_logistics_combo.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_logistics_combo.png",
-      "bonus_stats": {"breakthrough_independent_skill_area": 0.1},
+      "bonus_stats": {
+        "breakthrough_independent_skill_area": 0.1
+      },
       "enabled": true,
       "source_row": 133
     },
     {
       "id": "soul_scarlet_devil_mansion_sisters",
-      "required_perks": ["perk_crimson_young_moon", "perk_laevatein"],
+      "required_perks": [
+        "perk_crimson_young_moon",
+        "perk_laevatein"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_scarlet_devil_mansion_sisters.name",
       "description": "combination.aegis_ascension.soul_scarlet_devil_mansion_sisters.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_scarlet_devil_mansion_sisters.png",
@@ -39,7 +50,10 @@
     },
     {
       "id": "soul_millennium_echo",
-      "required_perks": ["perk_boundary_of_life_and_death", "perk_ink_dyed_sakura"],
+      "required_perks": [
+        "perk_boundary_of_life_and_death",
+        "perk_ink_dyed_sakura"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_millennium_echo.name",
       "description": "combination.aegis_ascension.soul_millennium_echo.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_millennium_echo.png",
@@ -53,17 +67,26 @@
     },
     {
       "id": "soul_trinity_tea_party",
-      "required_perks": ["perk_mika", "perk_yurizono_seia", "perk_nagisa_leisure_time"],
+      "required_perks": [
+        "perk_mika",
+        "perk_yurizono_seia",
+        "perk_nagisa_leisure_time"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_trinity_tea_party.name",
       "description": "combination.aegis_ascension.soul_trinity_tea_party.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_trinity_tea_party.png",
-      "bonus_stats": {"breakthrough_swiss_rolls": 1},
+      "bonus_stats": {
+        "breakthrough_swiss_rolls": 1
+      },
       "enabled": true,
       "source_row": 136
     },
     {
       "id": "soul_death_gods_authority",
-      "required_perks": ["perk_grim_reapers_contract", "perk_necromancer"],
+      "required_perks": [
+        "perk_grim_reapers_contract",
+        "perk_necromancer"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_death_gods_authority.name",
       "description": "combination.aegis_ascension.soul_death_gods_authority.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_death_gods_authority.png",
@@ -76,7 +99,10 @@
     },
     {
       "id": "soul_magician_master_and_apprentice",
-      "required_perks": ["perk_frieren", "perk_fern"],
+      "required_perks": [
+        "perk_frieren",
+        "perk_fern"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_magician_master_and_apprentice.name",
       "description": "combination.aegis_ascension.soul_magician_master_and_apprentice.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_magician_master_and_apprentice.png",
@@ -89,7 +115,10 @@
     },
     {
       "id": "soul_combo_technique",
-      "required_perks": ["perk_beater", "perk_flickering_light"],
+      "required_perks": [
+        "perk_beater",
+        "perk_flickering_light"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_combo_technique.name",
       "description": "combination.aegis_ascension.soul_combo_technique.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_combo_technique.png",
@@ -102,7 +131,10 @@
     },
     {
       "id": "soul_shittim_chest",
-      "required_perks": ["perk_arona", "perk_plana"],
+      "required_perks": [
+        "perk_arona",
+        "perk_plana"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_shittim_chest.name",
       "description": "combination.aegis_ascension.soul_shittim_chest.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_shittim_chest.png",
@@ -115,17 +147,25 @@
     },
     {
       "id": "soul_love_as_eternal_as_this_moment",
-      "required_perks": ["perk_ripples_of_the_past", "perk_because_you_exist_as_i_write"],
+      "required_perks": [
+        "perk_ripples_of_the_past",
+        "perk_because_you_exist_as_i_write"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_love_as_eternal_as_this_moment.name",
       "description": "combination.aegis_ascension.soul_love_as_eternal_as_this_moment.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_love_as_eternal_as_this_moment.png",
-      "bonus_stats": {"breakthrough_independent_damage_amplification": 0.05},
+      "bonus_stats": {
+        "breakthrough_independent_damage_amplification": 0.05
+      },
       "enabled": true,
       "source_row": 143
     },
     {
       "id": "soul_plum_blossom_garden",
-      "required_perks": ["perk_kokona", "perk_sunohara_shun"],
+      "required_perks": [
+        "perk_kokona",
+        "perk_sunohara_shun"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_plum_blossom_garden.name",
       "description": "combination.aegis_ascension.soul_plum_blossom_garden.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_plum_blossom_garden.png",
@@ -139,20 +179,42 @@
     },
     {
       "id": "soul_game_development_club",
-      "required_perks": ["perk_momo", "perk_midori", "perk_alice"],
+      "required_perks": [
+        "perk_momo",
+        "perk_midori",
+        "perk_alice"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_game_development_club.name",
       "description": "combination.aegis_ascension.soul_game_development_club.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_game_development_club.png",
       "bonus_stats": {
-        "lucky_strike": 0.2,
+        "independent_arrow_damage": 0.5,
         "member_gain_multiplier_bonus": 0.5
       },
       "enabled": true,
       "source_row": 145
     },
     {
+      "id": "soul_central_control_center",
+      "required_perks": [
+        "perk_hikari",
+        "perk_nozomi"
+      ],
+      "synergy_name": "combination.aegis_ascension.soul_central_control_center.name",
+      "description": "combination.aegis_ascension.soul_central_control_center.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_central_control_center.png",
+      "bonus_stats": {
+        "lucky_strike": 0.2,
+        "member_gain_multiplier_bonus": 0.5
+      },
+      "enabled": true,
+      "source_row": 0
+    },
+    {
       "id": "soul_yuzusoft_fan_level",
-      "required_perks": ["perk_congyu_ciallo"],
+      "required_perks": [
+        "perk_congyu_ciallo"
+      ],
       "rank_perks": [
         "perk_congyu_ciallo",
         "perk_yoshino_ciallo",
@@ -175,7 +237,10 @@
     },
     {
       "id": "soul_maripatchy_group",
-      "required_perks": ["perk_master_spark", "perk_seven_colored_magician"],
+      "required_perks": [
+        "perk_master_spark",
+        "perk_seven_colored_magician"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_maripatchy_group.name",
       "description": "combination.aegis_ascension.soul_maripatchy_group.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_maripatchy_group.png",
@@ -193,7 +258,9 @@
     },
     {
       "id": "soul_team_radiance",
-      "required_perks": ["perk_team_star"],
+      "required_perks": [
+        "perk_team_star"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_team_radiance.name",
       "description": "combination.aegis_ascension.soul_team_radiance.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_team_star.png",
@@ -213,7 +280,11 @@
     },
     {
       "id": "soul_gourmet_guild",
-      "required_perks": ["perk_pecorines_blessing", "perk_karyls_blessing", "perk_kokkoros_blessing"],
+      "required_perks": [
+        "perk_pecorines_blessing",
+        "perk_karyls_blessing",
+        "perk_kokkoros_blessing"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_gourmet_guild.name",
       "description": "combination.aegis_ascension.soul_gourmet_guild.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_gourmet_guild.png",
@@ -227,7 +298,10 @@
     },
     {
       "id": "soul_misty_lake",
-      "required_perks": ["perk_cirno", "perk_great_fairy"],
+      "required_perks": [
+        "perk_cirno",
+        "perk_great_fairy"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_misty_lake.name",
       "description": "combination.aegis_ascension.soul_misty_lake.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_misty_lake.png",
@@ -240,17 +314,27 @@
     },
     {
       "id": "soul_shrine_maiden_team",
-      "required_perks": ["perk_barrage_control_magic", "perk_shrine_maiden_dance"],
+      "required_perks": [
+        "perk_barrage_control_magic",
+        "perk_shrine_maiden_dance"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_shrine_maiden_team.name",
       "description": "combination.aegis_ascension.soul_shrine_maiden_team.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_shrine_maiden_team.png",
-      "bonus_stats": {"random_aegis_count": 1},
+      "bonus_stats": {
+        "random_aegis_count": 1
+      },
       "enabled": true,
       "source_row": 0
     },
     {
       "id": "soul_make_up_work_club",
-      "required_perks": ["perk_collector", "perk_koharus_blessing", "perk_hanakos_blessing", "perk_et_omnia_vanitas"],
+      "required_perks": [
+        "perk_collector",
+        "perk_koharus_blessing",
+        "perk_hanakos_blessing",
+        "perk_et_omnia_vanitas"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_make_up_work_club.name",
       "description": "combination.aegis_ascension.soul_make_up_work_club.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_make_up_work_club.png",
@@ -268,7 +352,10 @@
     },
     {
       "id": "soul_madoka_with_homura",
-      "required_perks": ["perk_law_of_the_cycle", "perk_homuras_blessing"],
+      "required_perks": [
+        "perk_law_of_the_cycle",
+        "perk_homuras_blessing"
+      ],
       "synergy_name": "combination.aegis_ascension.soul_madoka_with_homura.name",
       "description": "combination.aegis_ascension.soul_madoka_with_homura.description",
       "icon": "aegis_ascension:textures/gui/soul_links/soul_madoka_with_homura.png",

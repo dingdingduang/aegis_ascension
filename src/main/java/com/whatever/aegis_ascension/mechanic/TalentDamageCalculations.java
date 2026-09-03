@@ -209,6 +209,7 @@ final class TalentDamageCalculations {
                 > stat(PERK_FIREFLY_FLAME, LUCKY_STRIKE_THRESHOLD)) {
             bonus += stat(PERK_FIREFLY_FLAME, FINAL_DAMAGE_ABOVE_THRESHOLD);
         }
+        bonus += hikariFinalDamage(data, luckyStrike(player, data));
         if (data.isAegisEnabled(AegisConstants.HARMONY)) {
             bonus += aegisStat(AegisConstants.HARMONY, FINAL_DAMAGE)
                     * harmonyScalingFactor(data);

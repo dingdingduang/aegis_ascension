@@ -9,7 +9,6 @@ import static com.whatever.aegis_ascension.perk.TalentConstants.PRIMARY_FLAT;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.mechanic.TalentEffects;
-import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.util.GeneralIronSpellSupportMethods;
 import net.minecraft.server.level.ServerPlayer;
@@ -85,8 +84,11 @@ public final class BarrageControlMagic {
             return false;
         }
         data.addCustomStat(PRIMARY_FLAT, amount);
+        // Republishes the gain onto the player's attributes. No packet: this rolls on
+        // every volley and never caps, so a full sync here would carry the whole quest
+        // catalogue for a change the client already learns from vanilla's attribute
+        // sync and the Custom Stats tab's own polling.
         TalentEffects.recalculateAttributes(player, data);
-        ModNetworking.syncTo(player);
         return true;
     }
 

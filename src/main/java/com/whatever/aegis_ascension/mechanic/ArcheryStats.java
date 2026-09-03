@@ -1,6 +1,7 @@
-package com.whatever.aegis_ascension.perk.talents;
+package com.whatever.aegis_ascension.mechanic;
 
 import static com.whatever.aegis_ascension.perk.TalentConstants.ARROW_DAMAGE;
+import static com.whatever.aegis_ascension.perk.TalentConstants.INDEPENDENT_ARROW_DAMAGE;
 import static com.whatever.aegis_ascension.perk.TalentConstants.ARROW_VELOCITY;
 import static com.whatever.aegis_ascension.perk.TalentConstants.DRAW_SPEED;
 
@@ -34,15 +35,34 @@ public final class ArcheryStats {
     private ArcheryStats() {
     }
 
-    /** Multiplier for a hit this player's own arrow is delivering. */
+    /**
+     * Multiplier for a hit this player's own arrow is delivering.
+     *
+     * <p>Independent Arrow Damage is a separate multiplier rather than another entry in
+     * the Arrow Damage bucket, so it multiplies whatever that bucket already grants. It
+     * is this mod's own stat and is never published to Apothic, so - unlike Arrow Damage
+     * itself - it keeps applying when that mod owns the attribute.</p>
+     */
     public static double arrowDamageMultiplier(ServerPlayer attacker, PlayerPerkData data,
                                                DamageSource source) {
-        if (ApothicAttributesCompat.handlesMappedAttribute(attacker, ARROW_DAMAGE)
-                || !(source.getDirectEntity() instanceof AbstractArrow arrow)
+        if (!(source.getDirectEntity() instanceof AbstractArrow arrow)
                 || arrow.getOwner() != attacker) {
             return 1.0D;
         }
-        return 1.0D + Math.max(-1.0D, data.getCustomStat(ARROW_DAMAGE));
+        double multiplier = 1.0D + Math.max(-1.0D, independentArrowDamage(data));
+        if (!ApothicAttributesCompat.handlesMappedAttribute(attacker, ARROW_DAMAGE)) {
+            multiplier *= 1.0D + Math.max(-1.0D, data.getCustomStat(ARROW_DAMAGE));
+        }
+        return multiplier;
+    }
+
+    /** Independent Arrow Damage from talents, Soul Links, and accumulated stats. */
+    public static double independentArrowDamage(PlayerPerkData data) {
+        return data.getCustomStat(INDEPENDENT_ARROW_DAMAGE)
+                + TalentStatService.sumOwnedStat(data, INDEPENDENT_ARROW_DAMAGE)
+                + data.getActiveSoulLinks().stream()
+                .mapToDouble(link -> link.bonusStat(INDEPENDENT_ARROW_DAMAGE))
+                .sum();
     }
 
     /**

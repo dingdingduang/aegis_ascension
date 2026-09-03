@@ -29,6 +29,14 @@ public final class ClientSettings {
         INVENTORY_AND_CRAFTING
     }
 
+    /** How the Player Custom Stat tab draws its stats. */
+    public enum CustomStatView {
+        /** The icon-and-breakdown card grid. */
+        CARDS,
+        /** The dense icon + name + value rows from a classic RPG status panel. */
+        LIST
+    }
+
     /** Screen corner a HUD element anchors to before its offset is applied. */
     public enum HudAnchor {
         TOP_LEFT,
@@ -84,6 +92,12 @@ public final class ClientSettings {
      * drag-reorder as one continuous list.
      */
     public java.util.List<String> scrollModeTabs = new java.util.ArrayList<>();
+    /**
+     * How the Player Custom Stat tab presents its stats. Kept here rather than in
+     * {@code custom_stat_setting.json} because that file is hand-edited and never written
+     * back, while this one is exactly the place a button-toggled preference is saved.
+     */
+    public CustomStatView customStatView = CustomStatView.CARDS;
     /**
      * Inventory sort order, by {@code PlayerStorage.SortMode} name. Client-side because
      * ordering is presentation only — the server addresses rows by identity, so it has no
@@ -203,6 +217,9 @@ public final class ClientSettings {
         }
         if (inventoryMode == null) {
             inventoryMode = InventoryMode.ORIGINAL;
+        }
+        if (customStatView == null) {
+            customStatView = CustomStatView.CARDS;
         }
     }
 }

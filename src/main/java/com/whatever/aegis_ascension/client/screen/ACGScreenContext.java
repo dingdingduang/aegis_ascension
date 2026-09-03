@@ -61,6 +61,14 @@ final class ACGScreenContext {
                 minCardWidth, maxCardWidth, cardHeight, maxColumns, leftAlign);
     }
 
+    ACGPerkSelectionScreen.GridLayout computeGrid(
+            int itemCount, int areaX, int areaWidth, int top, int bottom,
+            int minCardWidth, int maxCardWidth, int cardHeight, int maxColumns,
+            boolean leftAlign, int gap) {
+        return screen.computeGrid(itemCount, areaX, areaWidth, top, bottom,
+                minCardWidth, maxCardWidth, cardHeight, maxColumns, leftAlign, gap);
+    }
+
     void addPaginationButtons(int centerX, int y, boolean includeViewToggle) {
         screen.addPaginationButtons(centerX, y, includeViewToggle);
     }

@@ -11,6 +11,12 @@ import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraft.world.item.EnchantedBookItem;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -149,8 +155,15 @@ public final class ShopGenerator {
             if (item == null) {
                 continue;
             }
-            offers.add(new ShopOffer(new ItemStack(item, rollCount(picked, item, random)),
-                    rollPrice(picked.experienceCost, config.priceVariance, random),
+            ItemStack stack = new ItemStack(item, rollCount(picked, item, random));
+            // Enchanting raises the price, so it is applied before the variance roll.
+            int basePrice = picked.experienceCost;
+            if (picked.randomEnchantment) {
+                basePrice = enchantRandomly(stack, basePrice, config.enchantmentRolls,
+                        random);
+            }
+            offers.add(new ShopOffer(stack,
+                    rollPrice(basePrice, config.priceVariance, random),
                     GeneralConstants.rarityColor(picked.tier)));
         }
         return offers;
@@ -420,6 +433,57 @@ public final class ShopGenerator {
      * so the price a player is shown is the price the server charges, and a cheap roll
      * rewards checking the shop rather than being a client-side illusion.
      */
+    /**
+     * Puts one random enchantment on a stack and returns what it should now cost.
+     *
+     * <p>An enchanted book stores its enchantment differently from an enchanted tool -
+     * on the book it is inert data describing what it can confer, on the tool it is
+     * active - so the two are written differently even though both end up as stack NBT.
+     * Levels are drawn across the enchantment's whole range rather than always maxed, so
+     * a shop that stocks Sharpness is not always stocking Sharpness V.</p>
+     *
+     * @return the adjusted base price, unchanged when nothing could be rolled
+     */
+    private static int enchantRandomly(ItemStack stack, int basePrice,
+                                       ShopConfig.EnchantmentRolls settings,
+                                       RandomSource random) {
+        List<Enchantment> candidates = new ArrayList<>();
+        for (Enchantment enchantment : BuiltInRegistries.ENCHANTMENT) {
+            if (enchantment == null) continue;
+            if (enchantment.isCurse() && !settings.allowCurses) continue;
+            if (enchantment.isTreasureOnly() && !settings.allowTreasure) continue;
+            ResourceLocation id = BuiltInRegistries.ENCHANTMENT.getKey(enchantment);
+            if (id != null && settings.excluded != null
+                    && settings.excluded.contains(id.toString())) {
+                continue;
+            }
+            boolean book = stack.is(Items.ENCHANTED_BOOK) || stack.is(Items.BOOK);
+            if (!book && !enchantment.canEnchant(stack)) continue;
+            candidates.add(enchantment);
+        }
+        if (candidates.isEmpty()) return basePrice;
+
+        Enchantment chosen = candidates.get(random.nextInt(candidates.size()));
+        int maxLevel = Math.max(1, chosen.getMaxLevel());
+        int level = 1 + random.nextInt(maxLevel);
+        if (stack.is(Items.BOOK) || stack.is(Items.ENCHANTED_BOOK)) {
+            // A plain book becomes an enchanted one; writing the enchantment onto a
+            // plain book would leave an item that displays nothing.
+            stack.setCount(1);
+            if (stack.is(Items.BOOK)) {
+                ItemStack book = new ItemStack(Items.ENCHANTED_BOOK);
+                book.setTag(stack.getTag());
+                stack = book;
+            }
+            EnchantedBookItem.addEnchantment(stack, new EnchantmentInstance(chosen, level));
+        } else {
+            stack.enchant(chosen, level);
+        }
+        double multiplier = 1.0D + Math.max(0.0D, settings.costPerLevel) * level;
+        return (int) Math.max(1L, Math.min(Integer.MAX_VALUE,
+                Math.round(basePrice * multiplier)));
+    }
+
     private static int rollPrice(int basePrice, double variance, RandomSource random) {
         if (basePrice <= 0 || !(variance > 0.0D) || !Double.isFinite(variance)) {
             return Math.max(0, basePrice);

@@ -11,7 +11,10 @@
     "minecraft:bedrock",
     "minecraft:command_block",
     "minecraft:barrier",
-    "minecraft:air"
+    "minecraft:air",
+    "*_spawn_egg",
+    "minecraft:spawn_egg",
+    "minecraft:dragon_egg"
   ],
   "guaranteedItems": [
     {
@@ -237,6 +240,16 @@
       "minCount": 1,
       "maxCount": 1,
       "experienceCost": 6000
+    },
+    {
+      "tier": "SR",
+      "item": "minecraft:enchanted_book",
+      "virtualId": "",
+      "weight": 10,
+      "minCount": 1,
+      "maxCount": 1,
+      "experienceCost": 600,
+      "randomEnchantment": true
     }
   ],
   "rarityWeights": {
@@ -291,7 +304,10 @@
       "minecraft:knowledge_book",
       "minecraft:spawner",
       "minecraft:end_portal_frame",
-      "#forge:technical_items"
+      "#forge:technical_items",
+      "*_spawn_egg",
+      "minecraft:spawn_egg",
+      "minecraft:dragon_egg"
     ],
     "rules": [
       {
@@ -311,5 +327,11 @@
     ],
     "priceVariance": 0.15
   },
-  "priceVariance": 0.15
+  "priceVariance": 0.15,
+  "enchantmentRolls": {
+    "costPerLevel": 0.6,
+    "allowCurses": false,
+    "allowTreasure": true,
+    "excluded": []
+  }
 }

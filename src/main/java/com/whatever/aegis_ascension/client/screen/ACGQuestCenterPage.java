@@ -368,7 +368,8 @@ final class ACGQuestCenterPage implements ACGPage {
         }
         if (quest.type() == QuestType.SIDE && !info(quest).story.isBlank()) {
             lineY = drawWrapped(context, graphics,
-                    GeneralTextMethods.getTranslatableString(info(quest).story),
+                    GeneralTextMethods.getTranslatableString(info(quest).story,
+                            professionName(quest)),
                     x, lineY, width, ACGTheme.TEXT_SECONDARY, 5);
             lineY += 4;
         }
@@ -1078,6 +1079,20 @@ final class ACGQuestCenterPage implements ACGPage {
         return ClientQuestCatalog.get(completion.questId());
     }
 
+    /**
+     * The villager's name, supplied to every quest string as an argument. Authored
+     * quests ignore it, because their text names the villager already; the composed
+     * quests use it, which is what lets one set of strings serve all thirteen
+     * professions instead of one set each.
+     */
+    private static Component professionName(QuestView quest) {
+        String profession = info(quest).profession;
+        return profession == null || profession.isBlank()
+                ? GeneralTextMethods.getEmpty()
+                : GeneralTextMethods.getTranslatableString(
+                        "entity.minecraft.villager." + profession.toLowerCase());
+    }
+
     /** The title of the stage this quest waits on, resolved through the catalog. */
     private static String prerequisiteTitle(QuestView quest) {
         String prerequisiteId = info(quest).prerequisiteId;
@@ -1091,7 +1106,8 @@ final class ACGQuestCenterPage implements ACGPage {
         String titleKey = info(quest).title;
         Component title = titleKey == null || titleKey.isBlank()
                 ? GeneralTextMethods.getLiteralString(quest.objective().name())
-                : GeneralTextMethods.getTranslatableString(titleKey);
+                : GeneralTextMethods.getTranslatableString(titleKey,
+                        professionName(quest));
         return quest.repeatable()
                 ? title.copy().append(GeneralTextMethods.getTranslatableString(
                 "screen.aegis_ascension.acg.quest.repeat_cycle", quest.cycle()))
@@ -1114,7 +1130,8 @@ final class ACGQuestCenterPage implements ACGPage {
         String descriptionKey = info(quest).description;
         Component text = descriptionKey == null || descriptionKey.isBlank()
                 ? GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.no_description")
-                : GeneralTextMethods.getTranslatableString(descriptionKey);
+                : GeneralTextMethods.getTranslatableString(descriptionKey,
+                        professionName(quest));
         if (!isRepeatableOffer(quest)) return text;
         return text.copy().append(GeneralTextMethods.getLiteralString(" ")).append(
                 GeneralTextMethods.getTranslatableString(

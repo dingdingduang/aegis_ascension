@@ -7,6 +7,7 @@ import com.whatever.aegis_ascension.network.NetworkLimits;
 import com.whatever.aegis_ascension.mechanic.AegisExperienceSystem;
 import com.whatever.aegis_ascension.mechanic.GoldCurrency;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.shop.ShopConfig;
 import com.whatever.aegis_ascension.shop.ShopGenerator;
 import com.whatever.aegis_ascension.shop.ShopType;
 import com.whatever.aegis_ascension.storage.PlayerStorage;
@@ -672,14 +673,15 @@ public final class QuestManager {
                 }
                 if (id.isBlank()) {
                     id = pickLegacyReward(QuestConfig.get().rewardPools.commonItems,
-                            player, data, reservedUniqueItems, unique);
+                            player, data, reservedUniqueItems, unique,
+                            fromDiscovery ? ShopType.DISCOVERY : ShopType.COMMON);
                 }
             } else if ("random_unique".equals(kind)) {
                 id = pickShopReward(player, data, reservedUniqueItems,
                         ShopType.DISCOVERY, GeneralConstants.TIER_SSR, true);
                 if (id.isBlank()) {
                     id = pickLegacyReward(QuestConfig.get().rewardPools.uniqueItems,
-                            player, data, reservedUniqueItems, true);
+                            player, data, reservedUniqueItems, true, ShopType.DISCOVERY);
                 }
             } else if ("shop_item".equals(kind)) {
                 ShopType source = "discovery".equalsIgnoreCase(spec.source)
@@ -692,7 +694,7 @@ public final class QuestManager {
                 }
             } else if ("random_curio".equals(kind)) {
                 id = pickLegacyReward(QuestConfig.get().rewardPools.curioItems,
-                        player, data, reservedUniqueItems, unique);
+                        player, data, reservedUniqueItems, unique, ShopType.COMMON);
             }
             if (id.isBlank()) continue;
             // fallbackId is a guaranteed consolation item rather than another unique
@@ -931,16 +933,24 @@ public final class QuestManager {
                 .orElse("");
     }
 
+    /**
+     * Draws from a legacy reward pool, standing in for a shop draw that came back empty.
+     *
+     * <p>Filtered by the shop it substitutes for. Without that, a blacklisted item slips
+     * through precisely when the shop pool is thin, which is the moment nobody is
+     * watching for it.</p>
+     */
     private static String pickLegacyReward(List<String> values, ServerPlayer player,
                                            PlayerPerkData data,
                                            Set<String> reservedUniqueItems,
-                                           boolean unique) {
+                                           boolean unique, ShopType source) {
         if (values == null || values.isEmpty()) return "";
+        ShopConfig shopConfig = ShopConfig.get();
         List<String> eligible = new ArrayList<>();
         for (String value : values) {
             ResourceLocation location = ResourceLocation.tryParse(value);
             Item item = location == null ? null : GeneralServerMethods.resolveItem(location);
-            if (item == null || (unique
+            if (item == null || !shopConfig.isItemAllowed(source, item) || (unique
                     && !isUniqueItemAvailable(data, reservedUniqueItems, item))) {
                 continue;
             }

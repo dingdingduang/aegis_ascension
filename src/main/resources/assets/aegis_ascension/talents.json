@@ -1,5 +1,5 @@
 {
-  "schema_version": 36,
+  "schema_version": 38,
   "source": "Illusion Poem",
   "value_conventions": {
     "moved_tables": "apothic_attribute_mappings and nearby_spawn_buffs now live in their own files of the same name, next to this one."
@@ -223,6 +223,7 @@
         "talent_option_bonus_if_below": 2,
         "kill_trigger_chance": 0.01,
         "draw_speed_per_trigger": 0.01,
+        "draw_speed_max_trigger_count": 1000,
         "nearby_spawn_radius": 8.0,
         "spawned_mob_max_health_multiplier": 0.5
       },
@@ -505,11 +506,9 @@
       "description": "perk.aegis_ascension.perk_momo.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_momo.png",
       "stats": {
-        "lucky_strike_threshold": 1.5,
-        "lucky_strike_overflow_step": 0.1,
-        "final_damage_per_step": 0.01,
         "kill_trigger_chance": 0.025,
         "arrow_damage_per_trigger": 0.025,
+        "arrow_damage_max_trigger_count": 2000,
         "nearby_spawn_radius": 8.0,
         "spawned_mob_max_health_multiplier": 0.25
       },
@@ -524,16 +523,44 @@
       "description": "perk.aegis_ascension.perk_midori.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_midori.png",
       "stats": {
-        "final_damage_step": 0.1,
-        "lucky_strike_per_step": 0.02,
         "kill_trigger_chance": 0.025,
         "arrow_velocity_per_trigger": 0.01,
+        "arrow_velocity_max_trigger_count": 500,
         "nearby_spawn_radius": 16.0,
         "spawned_mob_max_health_multiplier": 0.5
       },
       "maxRank": 1,
       "manualToggle": false,
       "source_row": 45
+    },
+    {
+      "id": "perk_hikari",
+      "tier": "R",
+      "name": "perk.aegis_ascension.perk_hikari.name",
+      "description": "perk.aegis_ascension.perk_hikari.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_hikari.png",
+      "stats": {
+        "lucky_strike_threshold": 1.5,
+        "lucky_strike_overflow_step": 0.1,
+        "final_damage_per_step": 0.01
+      },
+      "maxRank": 1,
+      "manualToggle": false,
+      "source_row": 0
+    },
+    {
+      "id": "perk_nozomi",
+      "tier": "R",
+      "name": "perk.aegis_ascension.perk_nozomi.name",
+      "description": "perk.aegis_ascension.perk_nozomi.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_nozomi.png",
+      "stats": {
+        "final_damage_step": 0.1,
+        "lucky_strike_per_step": 0.02
+      },
+      "maxRank": 1,
+      "manualToggle": false,
+      "source_row": 0
     },
     {
       "id": "perk_congyu_ciallo",

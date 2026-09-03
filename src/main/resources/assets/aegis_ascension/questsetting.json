@@ -39,6 +39,7 @@
   "challengeSecurityDepositExperience": 250,
   "challengeDiscoveryChoiceChance": 0.5,
   "chainDiscoveryChoiceChance": 1.0,
+  "generateRandomSideQuests": true,
   "challengeDiscoveryChoiceCount": 3,
   "challengeDiscoveryChoiceTier": "",
   "challengeDiscoveryChoiceMinimumTier": "R",

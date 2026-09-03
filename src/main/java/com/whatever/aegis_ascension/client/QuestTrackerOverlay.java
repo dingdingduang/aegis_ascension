@@ -612,7 +612,8 @@ public final class QuestTrackerOverlay {
         String titleKey = ClientQuestCatalog.get(quest.id()).title;
         Component title = titleKey == null || titleKey.isBlank()
                 ? GeneralTextMethods.getLiteralString(quest.objective().name())
-                : GeneralTextMethods.getTranslatableString(titleKey);
+                : GeneralTextMethods.getTranslatableString(titleKey,
+                        professionName(quest));
         return quest.repeatable()
                 ? title.copy().append(GeneralTextMethods.getTranslatableString(
                 "screen.aegis_ascension.acg.quest.repeat_cycle", quest.cycle()))
@@ -623,7 +624,8 @@ public final class QuestTrackerOverlay {
         String descriptionKey = ClientQuestCatalog.get(quest.id()).description;
         return descriptionKey == null || descriptionKey.isBlank()
                 ? GeneralTextMethods.getTranslatableString("screen.aegis_ascension.acg.quest.no_description")
-                : GeneralTextMethods.getTranslatableString(descriptionKey);
+                : GeneralTextMethods.getTranslatableString(descriptionKey,
+                        professionName(quest));
     }
 
     private static String progressText(QuestView quest) {
@@ -649,6 +651,15 @@ public final class QuestTrackerOverlay {
         };
         ResourceLocation fallback = GeneralClientMethods.fromNamespaceAndPath(AegisAscensionMod.MOD_ID, "textures/gui/quest_ui/" + name);
         return GeneralClientMethods.resourceExists(fallback) ? fallback : null;
+    }
+
+    /** The villager's name, used by the composed quests' parameterised strings. */
+    private static Component professionName(QuestView quest) {
+        String profession = ClientQuestCatalog.get(quest.id()).profession;
+        return profession == null || profession.isBlank()
+                ? GeneralTextMethods.getEmpty()
+                : GeneralTextMethods.getTranslatableString(
+                        "entity.minecraft.villager." + profession.toLowerCase());
     }
 
     /** Default objective art used when a server template omits its optional icon field. */

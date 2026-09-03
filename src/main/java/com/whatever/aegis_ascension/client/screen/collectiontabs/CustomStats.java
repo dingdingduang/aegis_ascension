@@ -4,6 +4,7 @@ import static com.whatever.aegis_ascension.perk.TalentConstants.*;
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getLiteralString;
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
+import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.aegis.AegisConstants;
 import com.whatever.aegis_ascension.client.ClientPerkState;
@@ -17,7 +18,9 @@ import net.minecraft.resources.ResourceLocation;
 import java.util.ArrayList;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Data model for the Talent Collection's Custom Stats tab.
@@ -67,6 +70,12 @@ public final class CustomStats {
             stat(SHIELD_GAIN, PERK_KOHARU_SPRITE, Format.PERCENT),
             stat(REVIVES_REMAINING, PERK_BOUNDARY_OF_LIFE_AND_DEATH, Format.INTEGER),
             stat(TALENT_OPTION_BONUS, PERK_FLOWER_FAIRY, Format.INTEGER),
+            stat(ARROW_DAMAGE, PERK_LUCKY_ARROW, Format.PERCENT),
+            stat(INDEPENDENT_ARROW_DAMAGE, PERK_METEOR_SPARKLE, Format.PERCENT),
+            stat(ARROW_VELOCITY, PERK_SHIROKO, Format.PERCENT),
+            // Ticks shaved off a draw, not a percentage of one.
+            stat(DRAW_SPEED, PERK_FOCUSED_SHOT, Format.NUMBER),
+            stat(GOLD_REWARD_GAINED, PERK_ROLLING_IN_WEALTH, Format.PERCENT),
             aegisStat(AegisConstants.BARRAGE_MISSILE_SPEED,
                     AegisConstants.ARCANE, Format.PERCENT),
             aegisStat(AegisConstants.BARRAGE_DAMAGE,
@@ -75,7 +84,11 @@ public final class CustomStats {
                     AegisConstants.ARCANE, Format.PERCENT)
     );
 
+    /** Edge length the tab's built-in icons are authored at. */
+    private static final int CARD_ICON_SIZE = 28;
+
     private static volatile List<Definition> resolved;
+    private static volatile List<ListGroup> listGroups;
 
     private CustomStats() {
     }
@@ -146,7 +159,7 @@ public final class CustomStats {
                     : value < -1.0E-9D ? 0xFFE07A7A : 0xFFAAAAAA;
             return new TalentCollectionCard(
                     definition.icon(),
-                    28,
+                    CARD_ICON_SIZE,
                     getTranslatableString(definition.translationKey()),
                     getTranslatableString(definition.descriptionKey()),
                     valueText,
@@ -160,6 +173,72 @@ public final class CustomStats {
                     definition.key()
             );
         }).toList();
+    }
+
+    /**
+     * The list view's rows, in the order and grouping {@code custom_stat_setting.json}
+     * asks for. Resolved once per session alongside {@link #definitions()}, which also
+     * keeps a mistyped stat id in that file down to one log line rather than one per
+     * layout pass.
+     */
+    public static List<ListGroup> listGroups() {
+        List<ListGroup> current = listGroups;
+        if (current == null) {
+            current = buildListGroups();
+            listGroups = current;
+        }
+        return current;
+    }
+
+    private static List<ListGroup> buildListGroups() {
+        CustomStatSettings settings = CustomStatSettings.get();
+        List<ListGroup> groups = new ArrayList<>();
+        Set<String> placed = new LinkedHashSet<>();
+        for (CustomStatSettings.Group group : settings.listView().groups) {
+            if (group == null || group.stats == null) {
+                continue;
+            }
+            List<ListRow> rows = new ArrayList<>();
+            for (String key : group.stats) {
+                Definition definition = definition(key);
+                if (definition == null) {
+                    AegisAscensionMod.getLogger().warn(
+                            "Ignoring unknown stat id in custom_stat_setting.json "
+                                    + "list_view: {}", key);
+                    continue;
+                }
+                // A stat listed twice would be drawn twice and would still leave the
+                // leftovers pass thinking it was covered; first mention wins.
+                if (placed.add(key)) {
+                    rows.add(row(definition));
+                }
+            }
+            if (!rows.isEmpty()) {
+                groups.add(new ListGroup(group.titleKey, List.copyOf(rows)));
+            }
+        }
+        // Whatever the file didn't mention — every stat when it has no list_view block at
+        // all, or just the ones a mod update added since it was written.
+        List<ListRow> leftovers = definitions().stream()
+                .filter(definition -> !placed.contains(definition.key()))
+                .map(CustomStats::row)
+                .toList();
+        if (!leftovers.isEmpty()) {
+            groups.add(new ListGroup(
+                    groups.isEmpty() ? null : "screen.aegis_ascension.collection.stat.group.other",
+                    leftovers));
+        }
+        return List.copyOf(groups);
+    }
+
+    private static ListRow row(Definition definition) {
+        CustomStatSettings.ListIcon icon = CustomStatSettings.get()
+                .listIcon(definition.key())
+                // No list icon configured: the card's own icon still reads at row size,
+                // just as the portrait it is. CARD_ICON_SIZE is what cards() draws it at.
+                .orElseGet(() -> new CustomStatSettings.ListIcon(
+                        definition.icon(), CARD_ICON_SIZE));
+        return new ListRow(definition, icon.texture(), icon.textureSize());
     }
 
     public static Definition definition(String key) {
@@ -294,6 +373,14 @@ public final class CustomStats {
         }
     }
 
+    /** One stat as the list view draws it: its definition and the icon to put beside it. */
+    public record ListRow(Definition definition, ResourceLocation icon, int iconTextureSize) {
+    }
+
+    /** A titled run of list rows. A {@code null} title draws no heading. */
+    public record ListGroup(String titleKey, List<ListRow> rows) {
+    }
+
     /**
      * @param attributeBacked whether a live Minecraft attribute backs this stat, so
      *                        equipment, potions, or other mods can feed it alongside
@@ -339,6 +426,11 @@ public final class CustomStats {
 
         public String finalText(Definition definition) {
             return definition.format().format(finalValue);
+        }
+
+        /** Whether this mod currently contributes anything to the stat. */
+        public boolean hasModSources() {
+            return Math.abs(flat) > 1.0E-9D || Math.abs(percentage) > 1.0E-9D;
         }
 
         /** Whether anything outside this mod currently feeds the stat. */

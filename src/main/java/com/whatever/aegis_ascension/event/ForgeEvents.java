@@ -1,6 +1,6 @@
 package com.whatever.aegis_ascension.event;
 
-import com.whatever.aegis_ascension.perk.talents.ArcheryStats;
+import com.whatever.aegis_ascension.mechanic.ArcheryStats;
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.aegis.AngelsAegis;
 import com.whatever.aegis_ascension.lifecycle.PlayerDataLifecycle;

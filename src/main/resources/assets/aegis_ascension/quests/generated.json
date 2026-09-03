@@ -1,0 +1,377 @@
+{
+  "enabled": true,
+  "weight": 4,
+  "archetypes": [
+    {
+      "id": "gather",
+      "objective": "BREAK_BLOCK",
+      "targetMin": 32,
+      "targetMax": 96,
+      "experience": 300,
+      "goldRewardMin": 50,
+      "goldRewardMax": 140,
+      "minimumRank": 0,
+      "tiers": [
+        "R",
+        "SR"
+      ],
+      "storyVariants": 3,
+      "rewards": [
+        {
+          "kind": "random_common",
+          "countMin": 2,
+          "countMax": 5,
+          "tier": "R"
+        }
+      ]
+    },
+    {
+      "id": "hunt",
+      "objective": "KILL",
+      "targetMin": 8,
+      "targetMax": 22,
+      "experience": 340,
+      "goldRewardMin": 60,
+      "goldRewardMax": 160,
+      "minimumRank": 0,
+      "tiers": [
+        "R",
+        "SR"
+      ],
+      "storyVariants": 3,
+      "rewards": [
+        {
+          "kind": "random_common",
+          "countMin": 2,
+          "countMax": 5,
+          "tier": "R"
+        }
+      ]
+    },
+    {
+      "id": "deliver",
+      "objective": "GIVE_MATERIAL",
+      "targetMin": 12,
+      "targetMax": 32,
+      "experience": 320,
+      "goldRewardMin": 50,
+      "goldRewardMax": 150,
+      "minimumRank": 0,
+      "tiers": [
+        "R",
+        "SR"
+      ],
+      "storyVariants": 3,
+      "rewards": [
+        {
+          "kind": "random_common",
+          "countMin": 2,
+          "countMax": 5,
+          "tier": "R"
+        }
+      ]
+    },
+    {
+      "id": "craft",
+      "objective": "CRAFT_ITEM",
+      "targetMin": 3,
+      "targetMax": 9,
+      "experience": 380,
+      "goldRewardMin": 70,
+      "goldRewardMax": 180,
+      "minimumRank": 4,
+      "tiers": [
+        "R",
+        "SR"
+      ],
+      "storyVariants": 3,
+      "rewards": [
+        {
+          "kind": "random_common",
+          "countMin": 3,
+          "countMax": 6,
+          "tier": "R"
+        }
+      ]
+    },
+    {
+      "id": "supply",
+      "objective": "TRADE_ITEM",
+      "targetMin": 14,
+      "targetMax": 36,
+      "experience": 310,
+      "goldRewardMin": 50,
+      "goldRewardMax": 150,
+      "minimumRank": 0,
+      "tiers": [
+        "R",
+        "SR"
+      ],
+      "storyVariants": 3,
+      "rewards": [
+        {
+          "kind": "random_common",
+          "countMin": 2,
+          "countMax": 5,
+          "tier": "R"
+        }
+      ]
+    }
+  ],
+  "professions": [
+    {
+      "profession": "mason",
+      "icon": "minecraft:textures/item/stone_pickaxe.png",
+      "subjects": {
+        "gather": [
+          "minecraft:stone",
+          "minecraft:deepslate",
+          "minecraft:tuff",
+          "minecraft:andesite"
+        ],
+        "deliver": [
+          "minecraft:cobblestone",
+          "minecraft:gravel",
+          "minecraft:clay_ball"
+        ],
+        "craft": [
+          "minecraft:stone_bricks",
+          "minecraft:smooth_stone",
+          "minecraft:stone_slab"
+        ]
+      }
+    },
+    {
+      "profession": "armorer",
+      "icon": "minecraft:textures/item/iron_chestplate.png",
+      "subjects": {
+        "deliver": [
+          "minecraft:iron_ingot",
+          "minecraft:copper_ingot",
+          "minecraft:coal"
+        ],
+        "craft": [
+          "minecraft:iron_helmet",
+          "minecraft:iron_boots",
+          "minecraft:shield"
+        ],
+        "gather": [
+          "minecraft:iron_ore",
+          "minecraft:deepslate_iron_ore",
+          "minecraft:copper_ore"
+        ]
+      }
+    },
+    {
+      "profession": "weaponsmith",
+      "icon": "minecraft:textures/item/iron_sword.png",
+      "subjects": {
+        "hunt": [
+          "minecraft:zombie",
+          "minecraft:skeleton",
+          "minecraft:spider",
+          "minecraft:creeper"
+        ],
+        "craft": [
+          "minecraft:iron_sword",
+          "minecraft:iron_axe",
+          "minecraft:arrow"
+        ],
+        "gather": [
+          "minecraft:gold_ore",
+          "minecraft:deepslate_gold_ore"
+        ]
+      }
+    },
+    {
+      "profession": "toolsmith",
+      "icon": "minecraft:textures/item/iron_pickaxe.png",
+      "subjects": {
+        "craft": [
+          "minecraft:iron_pickaxe",
+          "minecraft:iron_shovel",
+          "minecraft:iron_hoe"
+        ],
+        "deliver": [
+          "minecraft:iron_ingot",
+          "minecraft:stick",
+          "minecraft:flint"
+        ]
+      }
+    },
+    {
+      "profession": "fletcher",
+      "icon": "minecraft:textures/item/bow.png",
+      "subjects": {
+        "deliver": [
+          "minecraft:feather",
+          "minecraft:flint",
+          "minecraft:string"
+        ],
+        "craft": [
+          "minecraft:arrow",
+          "minecraft:bow",
+          "minecraft:crossbow"
+        ],
+        "hunt": [
+          "minecraft:chicken",
+          "minecraft:skeleton"
+        ]
+      }
+    },
+    {
+      "profession": "farmer",
+      "icon": "minecraft:textures/item/wheat.png",
+      "subjects": {
+        "supply": [
+          "minecraft:wheat",
+          "minecraft:carrot",
+          "minecraft:potato",
+          "minecraft:beetroot"
+        ],
+        "deliver": [
+          "minecraft:bread",
+          "minecraft:pumpkin",
+          "minecraft:melon_slice"
+        ],
+        "gather": [
+          "minecraft:hay_block",
+          "minecraft:dirt"
+        ]
+      }
+    },
+    {
+      "profession": "shepherd",
+      "icon": "minecraft:textures/item/white_wool.png",
+      "subjects": {
+        "supply": [
+          "minecraft:white_wool",
+          "minecraft:brown_wool",
+          "minecraft:black_wool"
+        ],
+        "hunt": [
+          "minecraft:wolf",
+          "minecraft:fox"
+        ],
+        "deliver": [
+          "minecraft:shears",
+          "minecraft:string"
+        ]
+      }
+    },
+    {
+      "profession": "butcher",
+      "icon": "minecraft:textures/item/cooked_beef.png",
+      "subjects": {
+        "hunt": [
+          "minecraft:cow",
+          "minecraft:pig",
+          "minecraft:chicken",
+          "minecraft:sheep"
+        ],
+        "supply": [
+          "minecraft:beef",
+          "minecraft:porkchop",
+          "minecraft:mutton"
+        ]
+      }
+    },
+    {
+      "profession": "leatherworker",
+      "icon": "minecraft:textures/item/leather.png",
+      "subjects": {
+        "supply": [
+          "minecraft:leather",
+          "minecraft:rabbit_hide"
+        ],
+        "hunt": [
+          "minecraft:cow",
+          "minecraft:rabbit"
+        ],
+        "craft": [
+          "minecraft:leather_boots",
+          "minecraft:leather_helmet",
+          "minecraft:saddle"
+        ]
+      }
+    },
+    {
+      "profession": "fisherman",
+      "icon": "minecraft:textures/item/cod.png",
+      "subjects": {
+        "supply": [
+          "minecraft:cod",
+          "minecraft:salmon",
+          "minecraft:tropical_fish"
+        ],
+        "deliver": [
+          "minecraft:string",
+          "minecraft:kelp"
+        ],
+        "gather": [
+          "minecraft:kelp_plant",
+          "minecraft:seagrass"
+        ]
+      }
+    },
+    {
+      "profession": "librarian",
+      "icon": "minecraft:textures/item/book.png",
+      "subjects": {
+        "deliver": [
+          "minecraft:paper",
+          "minecraft:book",
+          "minecraft:ink_sac"
+        ],
+        "supply": [
+          "minecraft:lapis_lazuli",
+          "minecraft:sugar_cane"
+        ],
+        "craft": [
+          "minecraft:book",
+          "minecraft:bookshelf"
+        ]
+      }
+    },
+    {
+      "profession": "cartographer",
+      "icon": "minecraft:textures/item/map.png",
+      "subjects": {
+        "deliver": [
+          "minecraft:paper",
+          "minecraft:compass",
+          "minecraft:glass_pane"
+        ],
+        "gather": [
+          "minecraft:sand",
+          "minecraft:gravel"
+        ],
+        "supply": [
+          "minecraft:emerald",
+          "minecraft:paper"
+        ]
+      }
+    },
+    {
+      "profession": "cleric",
+      "icon": "minecraft:textures/item/brewing_stand.png",
+      "subjects": {
+        "deliver": [
+          "minecraft:spider_eye",
+          "minecraft:glowstone_dust",
+          "minecraft:redstone"
+        ],
+        "hunt": [
+          "minecraft:zombie",
+          "minecraft:husk",
+          "minecraft:drowned",
+          "minecraft:witch"
+        ],
+        "gather": [
+          "minecraft:redstone_ore",
+          "minecraft:deepslate_redstone_ore"
+        ]
+      }
+    }
+  ]
+}

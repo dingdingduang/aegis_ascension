@@ -21,6 +21,8 @@ public final class SoulLinkConstants {
     public static final String SOUL_PLUM_BLOSSOM_GARDEN = "soul_plum_blossom_garden";
     public static final String SOUL_GAME_DEVELOPMENT_CLUB =
             "soul_game_development_club";
+    public static final String SOUL_CENTRAL_CONTROL_CENTER =
+            "soul_central_control_center";
     public static final String SOUL_YUZUSOFT_FAN_LEVEL = "soul_yuzusoft_fan_level";
     public static final String SOUL_MARIPATCHY_GROUP = "soul_maripatchy_group";
 

@@ -13,7 +13,6 @@ import com.whatever.aegis_ascension.compat.ManaCompat;
 import com.whatever.aegis_ascension.compat.SummonCompat;
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.perk.Perk;
-import com.whatever.aegis_ascension.perk.talents.ArcheryStats;
 import com.whatever.aegis_ascension.perk.talents.FocusedShot;
 import com.whatever.aegis_ascension.perk.talents.DominusLapidis;
 import com.whatever.aegis_ascension.perk.talents.PerfectAndElegantServant;
@@ -349,7 +348,8 @@ public final class TalentCombatEffects {
      * would be handed out in full the moment the talent is taken, on top of everything
      * the kills have already earned.</p>
      */
-    private static void grantKillTriggerStats(ServerPlayer killer, PlayerPerkData data) {
+    private static boolean grantKillTriggerStats(ServerPlayer killer, PlayerPerkData data) {
+        boolean granted = false;
         for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
             Perk perk = entry.getKey();
             if (!perk.stats().containsKey(KILL_TRIGGER_CHANCE)
@@ -361,23 +361,50 @@ public final class TalentCombatEffects {
                 if (killer.getRandom().nextDouble() >= chance) {
                     continue;
                 }
-                grantIfDeclared(data, perk, ARROW_DAMAGE_PER_TRIGGER, ARROW_DAMAGE);
-                grantIfDeclared(data, perk, ARROW_VELOCITY_PER_TRIGGER, ARROW_VELOCITY);
-                grantIfDeclared(data, perk, DRAW_SPEED_PER_TRIGGER, DRAW_SPEED);
+                granted |= grantIfDeclared(
+                        data, perk, ARROW_DAMAGE_PER_TRIGGER, ARROW_DAMAGE);
+                granted |= grantIfDeclared(
+                        data, perk, ARROW_VELOCITY_PER_TRIGGER, ARROW_VELOCITY);
+                granted |= grantIfDeclared(
+                        data, perk, DRAW_SPEED_PER_TRIGGER, DRAW_SPEED);
             }
         }
+        return granted;
     }
 
-    private static void grantIfDeclared(PlayerPerkData data, Perk perk,
-                                        String perTriggerKey, String customStatKey) {
+    /**
+     * Banks one trigger's worth of a stat, if the talent declares it and has triggers
+     * left.
+     *
+     * <p>A talent caps the stat by declaring {@code <stat>_max_trigger_count}; the
+     * triggers spent are counted under {@code <stat>_trigger_count}. Counting triggers
+     * rather than clamping the total keeps the cap honest when the amount per trigger
+     * varies - the Game Development Club raises it - and a talent that declares no
+     * maximum accumulates without limit as before.</p>
+     *
+     * @return whether anything was actually banked.
+     */
+    private static boolean grantIfDeclared(PlayerPerkData data, Perk perk,
+                                           String perTriggerKey, String customStatKey) {
         if (!perk.stats().containsKey(perTriggerKey)) {
-            return;
+            return false;
+        }
+        String maximumKey = customStatKey + MAX_TRIGGER_COUNT_SUFFIX;
+        String counterKey = customStatKey + TRIGGER_COUNT_SUFFIX;
+        if (perk.stats().containsKey(maximumKey)) {
+            int maximum = Math.max(0, (int) Math.round(perk.stat(maximumKey)));
+            if (Math.max(0, Mth.floor(data.getCustomStat(counterKey))) >= maximum) {
+                return false;
+            }
         }
         double amount = perk.stat(perTriggerKey)
                 * GameDevelopmentClub.memberGainMultiplier(data, perk);
-        if (Double.isFinite(amount) && amount != 0.0D) {
-            data.addAttributedCustomStat(perk.id(), customStatKey, amount);
+        if (!Double.isFinite(amount) || amount == 0.0D) {
+            return false;
         }
+        data.addAttributedCustomStat(perk.id(), customStatKey, amount);
+        data.addCustomStat(counterKey, 1.0D);
+        return true;
     }
 
     /** Returns whether an externally initiated heal should be canceled. */
@@ -646,7 +673,12 @@ public final class TalentCombatEffects {
                             PHYSICAL_DAMAGE_AMPLIFICATION_PER_TRIGGER
                     ));
                 }
-                grantKillTriggerStats(killer, data);
+                if (grantKillTriggerStats(killer, data)) {
+                    // Republishes the banked stats onto Apothic's attributes. No packet:
+                    // the attribute rides vanilla's own sync, and the Custom Stats tab
+                    // polls for display values while it is open.
+                    recalculateAttributes(killer, data);
+                }
                 if (data.owns(PERK_I_SHALL_INTERPRET_THE_RADIANCE)) {
                     Perk radiance = requiredPerk(PERK_I_SHALL_INTERPRET_THE_RADIANCE);
                     double damagePerTrigger = radiance.stat(DAMAGE_BONUS_PER_KILL);

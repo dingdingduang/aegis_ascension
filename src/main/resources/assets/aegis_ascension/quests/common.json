@@ -261,5 +261,102 @@
         "tier": "R"
       }
     ]
+  },
+  {
+    "id": "common_arrow_25",
+    "objective": "SHOOT_ARROW",
+    "target": 25,
+    "icon": "minecraft:textures/item/arrow.png",
+    "title": "quest.aegis_ascension.common.arrow_25.title",
+    "description": "quest.aegis_ascension.common.arrow_25.description",
+    "experience": 100,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 4,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "common_arrow_100",
+    "prerequisiteId": "common_arrow_25",
+    "objective": "SHOOT_ARROW",
+    "target": 100,
+    "icon": "minecraft:textures/item/bow.png",
+    "title": "quest.aegis_ascension.common.arrow_100.title",
+    "description": "quest.aegis_ascension.common.arrow_100.description",
+    "experience": 250,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 5,
+        "tier": "R"
+      }
+    ]
+  },
+  {
+    "id": "common_arrow_400",
+    "prerequisiteId": "common_arrow_100",
+    "objective": "SHOOT_ARROW",
+    "target": 400,
+    "icon": "minecraft:textures/item/crossbow.png",
+    "title": "quest.aegis_ascension.common.arrow_400.title",
+    "description": "quest.aegis_ascension.common.arrow_400.description",
+    "experience": 600,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 3,
+        "countMax": 6,
+        "tier": "SR"
+      }
+    ]
+  },
+  {
+    "id": "common_arrow_1000",
+    "prerequisiteId": "common_arrow_400",
+    "objective": "SHOOT_ARROW",
+    "target": 1000,
+    "icon": "minecraft:textures/item/spectral_arrow.png",
+    "title": "quest.aegis_ascension.common.arrow_1000.title",
+    "description": "quest.aegis_ascension.common.arrow_1000.description",
+    "experience": 1200,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 4,
+        "countMax": 7,
+        "tier": "SR"
+      }
+    ]
+  },
+  {
+    "id": "common_marksman_endless",
+    "prerequisiteId": "common_arrow_1000",
+    "objective": "SHOOT_ARROW",
+    "target": 250,
+    "icon": "minecraft:textures/item/tipped_arrow.png",
+    "title": "quest.aegis_ascension.common.marksman_endless.title",
+    "description": "quest.aegis_ascension.common.marksman_endless.description",
+    "experience": 150,
+    "rewards": [
+      {
+        "kind": "random_common",
+        "countMin": 2,
+        "countMax": 4,
+        "tier": "R"
+      }
+    ],
+    "repeatable": true,
+    "targetIncreaseEvery": 5,
+    "targetIncreaseAmount": 100,
+    "maximumTarget": 2000,
+    "rewardIncreaseEvery": 10,
+    "rewardMultiplierIncrease": 0.5,
+    "maximumRewardMultiplier": 3.0,
+    "minimumRewardIntervalMinutes": 5
   }
 ]

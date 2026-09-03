@@ -44,6 +44,8 @@ public final class TalentConstants {
     public static final String PERK_BARRAGE_CONTROL_MAGIC = "perk_barrage_control_magic";
     public static final String PERK_MOMO = "perk_momo";
     public static final String PERK_MIDORI = "perk_midori";
+    public static final String PERK_HIKARI = "perk_hikari";
+    public static final String PERK_NOZOMI = "perk_nozomi";
     public static final String PERK_CONGYU_CIALLO = "perk_congyu_ciallo";
     public static final String PERK_YOSHINO_CIALLO = "perk_yoshino_ciallo";
     public static final String PERK_SHIZURU_CIALLO = "perk_shizuru_ciallo";
@@ -144,6 +146,8 @@ public final class TalentConstants {
             com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_PLUM_BLOSSOM_GARDEN;
     public static final String SOUL_GAME_DEVELOPMENT_CLUB =
             com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_GAME_DEVELOPMENT_CLUB;
+    public static final String SOUL_CENTRAL_CONTROL_CENTER =
+            com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_CENTRAL_CONTROL_CENTER;
     public static final String SOUL_YUZUSOFT_FAN_LEVEL =
             com.whatever.aegis_ascension.perk.soullink.SoulLinkConstants.SOUL_YUZUSOFT_FAN_LEVEL;
     public static final String SOUL_MARIPATCHY_GROUP =
@@ -364,6 +368,7 @@ public final class TalentConstants {
     public static final String IGNORE_NEGATIVE_EFFECTS = "ignore_negative_effects";
     public static final String IMMEDIATE_LEVEL_GAIN = "immediate_level_gain";
     public static final String INDEPENDENT_DAMAGE_AMPLIFICATION = "independent_damage_amplification";
+    public static final String INDEPENDENT_ARROW_DAMAGE = "independent_arrow_damage";
     public static final String INNATE_DAMAGE = "innate_damage";
     public static final String INNATE_DAMAGE_TRIGGER_COUNT = "innate_damage_trigger_count";
     public static final String INNATE_SKILL_DAMAGE = "innate_skill_damage";
@@ -427,6 +432,10 @@ public final class TalentConstants {
     public static final String MAX_MANA_FLAT_PER_DAMAGE = "max_mana_flat_per_damage";
     public static final String MAX_MANA_RESTORE_PER_ATTACK = "max_mana_restore_per_attack";
     public static final String MAX_TRIGGER_COUNT = "max_trigger_count";
+    /** Appended to a custom stat to name the talent stat capping its trigger count. */
+    public static final String MAX_TRIGGER_COUNT_SUFFIX = "_max_trigger_count";
+    /** Appended to a custom stat to name the counter tracking triggers spent. */
+    public static final String TRIGGER_COUNT_SUFFIX = "_trigger_count";
     public static final String MINING_SPEED = "mining_speed";
     public static final String MISSING_HEALTH_RESTORE = "missing_health_restore";
     public static final String MYSTERIOUS_DOLL_REWARD_SOURCE_PREFIX = "mysterious_doll_reward.";

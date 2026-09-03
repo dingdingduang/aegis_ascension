@@ -1,4 +1,4 @@
-package com.whatever.aegis_ascension.perk.talents;
+package com.whatever.aegis_ascension.mechanic;
 
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 

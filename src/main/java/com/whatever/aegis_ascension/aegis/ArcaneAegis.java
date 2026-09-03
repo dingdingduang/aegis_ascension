@@ -7,7 +7,6 @@ import static com.whatever.aegis_ascension.perk.TalentConstants.PRIMARY_FLAT;
 
 import com.whatever.aegis_ascension.data.PerkData;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
-import com.whatever.aegis_ascension.network.ModNetworking;
 import com.whatever.aegis_ascension.mechanic.TalentEffects;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
@@ -172,8 +171,9 @@ public final class ArcaneAegis {
         }
         data.addCustomStat(barrage.triggerCountStat, 1.0D);
         data.addCustomStat(barrage.bonusStat, bonus);
+        // As with the other per-volley grants, the recalculation is what the client
+        // needs; a full sync per barrage would carry the quest catalogue with it.
         TalentEffects.recalculateAttributes(player, data);
-        ModNetworking.syncTo(player);
         return true;
     }
 

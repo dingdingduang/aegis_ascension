@@ -686,7 +686,13 @@ public final class ACGPerkSelectionScreen extends Screen {
 
     @Override
     public boolean mouseScrolled(double mouseX, double mouseY, double delta) {
-        if (hoveredStatKey != null && Math.abs(delta) > 1.0E-9D) {
+        // Only when the panel actually has rows the player cannot see yet. It used to
+        // capture on any hovered stat, which made the grid behind it unscrollable
+        // wherever a card sat — barely noticeable across a card grid's 8px gaps, and
+        // close to total in the Player Custom Stat list, whose rows are 2px apart.
+        if (hoveredStatKey != null && Math.abs(delta) > 1.0E-9D
+                && ACGStatSourceBreakdown.isScrollable(
+                        ACGStatSourceBreakdown.sources(hoveredStatKey).size(), height)) {
             statSourceScroll = ACGStatSourceBreakdown.adjustScroll(statSourceScroll, delta);
             return true;
         }
@@ -833,17 +839,31 @@ public final class ACGPerkSelectionScreen extends Screen {
     GridLayout computeGrid(int itemCount, int areaX, int areaWidth, int top, int bottom,
                            int minCardWidth, int maxCardWidth, int cardHeight, int maxColumns,
                            boolean leftAlign) {
-        int columns = Math.max(1, Math.min(maxColumns, Math.max(1, areaWidth / (minCardWidth + CARD_GAP))));
+        return computeGrid(itemCount, areaX, areaWidth, top, bottom, minCardWidth,
+                maxCardWidth, cardHeight, maxColumns, leftAlign, CARD_GAP);
+    }
+
+    /**
+     * @param gap pixels between neighbouring cells, both ways. Every card grid uses
+     *            {@link #CARD_GAP}; the Player Custom Stat list view passes a smaller one,
+     *            since a row list only reads as a list when the rows sit close together.
+     *            The caller must lay its cells out on the same gap it passes here, or the
+     *            page/scroll arithmetic below will disagree with what's on screen.
+     */
+    GridLayout computeGrid(int itemCount, int areaX, int areaWidth, int top, int bottom,
+                           int minCardWidth, int maxCardWidth, int cardHeight, int maxColumns,
+                           boolean leftAlign, int gap) {
+        int columns = Math.max(1, Math.min(maxColumns, Math.max(1, areaWidth / (minCardWidth + gap))));
         columns = Math.max(1, Math.min(columns, Math.max(1, itemCount)));
-        int rows = Math.max(1, (bottom - top) / (cardHeight + CARD_GAP));
+        int rows = Math.max(1, (bottom - top) / (cardHeight + gap));
         int pageSizeLocal = Math.max(1, columns * rows);
         int pageCountLocal = Math.max(1, (itemCount + pageSizeLocal - 1) / pageSizeLocal);
         page = Math.max(0, Math.min(page, pageCountLocal - 1));
         pageCount = pageCountLocal;
         pageSize = pageSizeLocal;
-        int availableWidth = Math.max(minCardWidth, areaWidth - CARD_GAP * (columns - 1));
+        int availableWidth = Math.max(minCardWidth, areaWidth - gap * (columns - 1));
         int cw = Math.max(minCardWidth, Math.min(maxCardWidth, availableWidth / columns));
-        int gridWidth = cw * columns + CARD_GAP * (columns - 1);
+        int gridWidth = cw * columns + gap * (columns - 1);
         int startX = leftAlign ? areaX : areaX + Math.max(0, (areaWidth - gridWidth) / 2);
 
         // Scroll mode is handled here rather than in each mode's init, so every grid in the
@@ -854,7 +874,7 @@ public final class ACGPerkSelectionScreen extends Screen {
         gridViewportTop = top;
         gridViewportBottom = bottom;
         if (isGridScrollMode()) {
-            int step = cardHeight + CARD_GAP;
+            int step = cardHeight + gap;
             int gridRows = (Math.max(0, itemCount) + columns - 1) / columns;
             // True viewport height, not floored: partial rows are allowed to render, so
             // the last row still needs to be scrollable all the way into a short pane.

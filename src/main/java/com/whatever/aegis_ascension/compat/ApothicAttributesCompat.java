@@ -87,6 +87,27 @@ public final class ApothicAttributesCompat {
         return GeneralServerMethods.getAttributeValue(player, DODGE_CHANCE_ATTRIBUTE, fallback);
     }
 
+    /**
+     * Total value of the Apothic attribute a stat is published to, or {@code fallback}
+     * when no enabled mapping for it is live. The general form of {@link #dodgeChance},
+     * for mapped stats that have no bespoke getter of their own.
+     */
+    public static double mappedAttributeValue(Player player, String customStat,
+                                              double fallback) {
+        if (!isLoaded()) {
+            return fallback;
+        }
+        for (ApothicAttributeMapping mapping : Perk.apothicAttributeMappings()) {
+            if (mapping.enabled()
+                    && mapping.customStat().equals(customStat)
+                    && getInstance(player, mapping.attribute()) != null) {
+                return GeneralServerMethods.getAttributeValue(
+                        player, mapping.attribute(), fallback);
+            }
+        }
+        return fallback;
+    }
+
     public static double criticalChance(Player player, double fallback) {
         if (!isLoaded() || getInstance(player, CRIT_CHANCE_ATTRIBUTE) == null) {
             return fallback;

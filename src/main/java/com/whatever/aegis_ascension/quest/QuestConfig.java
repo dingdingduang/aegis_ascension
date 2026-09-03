@@ -24,6 +24,7 @@ public final class QuestConfig {
     /** Templates live one file per quest type beside the settings file. */
     private static final Path QUEST_DIRECTORY = FILE.getParent().resolve("quests");
     private static final Map<QuestType, String> TEMPLATE_FILES = templateFileNames();
+    private static final String GENERATED_FILE = "generated.json";
 
     private static Map<QuestType, String> templateFileNames() {
         Map<QuestType, String> names = new LinkedHashMap<>();
@@ -79,6 +80,12 @@ public final class QuestConfig {
      * rarity, whatever challengeDiscoveryChoiceTier is set to.
      */
     public double chainDiscoveryChoiceChance = 1.0D;
+    /**
+     * Whether the procedurally composed side quests in quests/generated.json are added
+     * to the catalogue. False leaves only the hand-authored templates, and takes effect
+     * on the next /aegis_ascension quest reload.
+     */
+    public boolean generateRandomSideQuests = true;
     /**
      * Lowest rarity a Challenge must have rolled at to be offered the pick at all.
      * At R every Challenge is eligible; raise it to restrict the pick to rarer ones.
@@ -635,6 +642,37 @@ public final class QuestConfig {
         }
     }
 
+    /**
+     * Adds the composed side quests to the catalogue, after the authored ones so a
+     * hand-written template always wins an id collision.
+     */
+    private void expandGeneratedSideQuests() {
+        if (!generateRandomSideQuests) return;
+        Path path = QUEST_DIRECTORY.resolve(GENERATED_FILE);
+        GeneratedQuests recipe;
+        try (var reader = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
+            recipe = GSON.fromJson(reader, GeneratedQuests.class);
+        } catch (Exception exception) {
+            AegisAscensionMod.getLogger().error(
+                    "Failed to read generated side quests from {}; only the authored "
+                    + "templates will be offered", path, exception);
+            return;
+        }
+        if (recipe == null) return;
+        Set<String> authored = new java.util.LinkedHashSet<>();
+        for (Template template : sideTemplates) {
+            if (template != null && template.id != null) authored.add(template.id);
+        }
+        int added = 0;
+        for (Template generated : recipe.expand()) {
+            if (authored.contains(generated.id)) continue;
+            sideTemplates.add(generated);
+            added++;
+        }
+        AegisAscensionMod.getLogger().info(
+                "Composed {} generated side quest(s) from {}", added, GENERATED_FILE);
+    }
+
     /** Copies any default file the config directory does not already have. */
     private static void copyDefaultsIfAbsent() throws Exception {
         Files.createDirectories(FILE.getParent());
@@ -644,6 +682,8 @@ public final class QuestConfig {
             copyResourceIfAbsent("/assets/aegis_ascension/quests/" + name,
                     QUEST_DIRECTORY.resolve(name));
         }
+        copyResourceIfAbsent("/assets/aegis_ascension/quests/" + GENERATED_FILE,
+                QUEST_DIRECTORY.resolve(GENERATED_FILE));
     }
 
     private static void copyResourceIfAbsent(String resource, Path destination)
@@ -671,6 +711,7 @@ public final class QuestConfig {
                     if (config.questTiers == null || config.questTiers.isEmpty()) {
                         config.questTiers = defaultQuestTiers();
                     }
+                    config.expandGeneratedSideQuests();
                     config.validate();
                     return config;
                 }

@@ -63,6 +63,8 @@ public final class ShopConfig {
      * stands and waiting for a refresh is a real choice. Zero disables the variation.
      */
     public double priceVariance = 0.15D;
+    /** How a rolled enchantment changes an entry's price and what may be rolled. */
+    public EnchantmentRolls enchantmentRolls = new EnchantmentRolls();
     public int minimumSlots = 3;
     /** Hard ceiling on total slots, including the guaranteed ones. */
     public int maximumSlots = 16;
@@ -91,6 +93,22 @@ public final class ShopConfig {
 
     /** Always-stocked entries; each is offered at its exact {@code count}, never randomized. */
     public List<FixedEntry> guaranteedItems = new ArrayList<>();
+    /** Settings for entries that roll a random enchantment. */
+    public static final class EnchantmentRolls {
+        /**
+         * Added to the price multiplier per enchantment level, so a level 4 roll at 0.6
+         * costs 3.4 times the listed price. Rolling something powerful should not be
+         * priced the same as rolling Feather Falling I.
+         */
+        public double costPerLevel = 0.6D;
+        /** Curses are a penalty; selling one at a premium reads as a bug. */
+        public boolean allowCurses = false;
+        /** Treasure enchantments such as Mending are not obtainable from a table. */
+        public boolean allowTreasure = true;
+        /** Exact enchantment ids never rolled, whatever the flags above allow. */
+        public List<String> excluded = new ArrayList<>();
+    }
+
     /** Weighted pool for the unlockable slots; stackable entries get a randomized count. */
     public List<RandomEntry> randomItems = new ArrayList<>();
     /**
@@ -150,6 +168,12 @@ public final class ShopConfig {
         public int minCount = 1;
         public int maxCount = 1;
         public int experienceCost = 10;
+        /**
+         * Rolls a random enchantment onto whatever this entry stocks. Intended for
+         * enchanted books, but works on any enchantable item. The listed price is the
+         * unenchanted one; the roll raises it with the level it lands on.
+         */
+        public boolean randomEnchantment = false;
     }
 
     /** Settings for the registry-backed Discovery Shop. */
@@ -576,8 +600,45 @@ public final class ShopConfig {
         if (trimmed.startsWith("@")) {
             return actualId != null && actualId.getNamespace().equals(trimmed.substring(1));
         }
+        if (trimmed.indexOf('*') >= 0) {
+            // Matched against the bare path as well as the full id, so "*_spawn_egg"
+            // covers every namespace without having to be written per mod.
+            return actualId != null
+                    && (globMatches(trimmed, actualId.toString())
+                    || globMatches(trimmed, actualId.getPath()));
+        }
         ResourceLocation itemId = PlatformServices.resources().tryParse(trimmed);
         return itemId != null && itemId.equals(actualId);
+    }
+
+    /**
+     * Wildcard match where {@code *} stands for any run of characters. Item families are
+     * named by convention rather than tagged - there is no vanilla tag covering spawn
+     * eggs, for instance - so excluding a whole family otherwise means listing every
+     * member and revisiting the list whenever a mod adds one.
+     */
+    private static boolean globMatches(String pattern, String value) {
+        String[] parts = pattern.split("\\*", -1);
+        if (parts.length == 1) return value.equals(pattern);
+        if (!value.startsWith(parts[0])) return false;
+        String last = parts[parts.length - 1];
+        if (!value.endsWith(last)) return false;
+        int cursor = parts[0].length();
+        int limit = value.length() - last.length();
+        if (limit < cursor) return false;
+        for (int index = 1; index < parts.length - 1; index++) {
+            if (parts[index].isEmpty()) continue;
+            int found = value.indexOf(parts[index], cursor);
+            if (found < 0 || found + parts[index].length() > limit) return false;
+            cursor = found + parts[index].length();
+        }
+        return true;
+    }
+
+    /** Whether one shop's own filter admits this item. */
+    public boolean isItemAllowed(ShopType shopType, Item item) {
+        return shopType == ShopType.DISCOVERY
+                ? discoveryShop.isItemAllowed(item) : isItemAllowed(item);
     }
 
     public boolean isEnabled(ShopType shopType) {

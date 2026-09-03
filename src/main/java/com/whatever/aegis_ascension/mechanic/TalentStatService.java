@@ -20,6 +20,7 @@ import com.whatever.aegis_ascension.perk.talents.Arona;
 import com.whatever.aegis_ascension.perk.talents.FairTrade;
 import com.whatever.aegis_ascension.perk.talents.PerfectAndElegantServant;
 import com.whatever.aegis_ascension.perk.talents.TeamStar;
+import com.whatever.aegis_ascension.perk.soullink.CentralControlCenter;
 import com.whatever.aegis_ascension.perk.soullink.MadokaWithHomura;
 import com.whatever.aegis_ascension.perk.soullink.MakeUpWorkClub;
 import com.whatever.aegis_ascension.perk.soullink.MistyLake;
@@ -770,6 +771,7 @@ public final class TalentStatService {
                 > stat(PERK_FIREFLY_FLAME, LUCKY_STRIKE_THRESHOLD)) {
             finalDamage += stat(PERK_FIREFLY_FLAME, FINAL_DAMAGE_ABOVE_THRESHOLD);
         }
+        finalDamage += hikariFinalDamage(data, luckyStrike);
         if (data.isAegisEnabled(AegisConstants.HARMONY)) {
             finalDamage += aegisStat(AegisConstants.HARMONY, FINAL_DAMAGE)
                     * harmonyScalingFactor(data);
@@ -882,6 +884,25 @@ public final class TalentStatService {
                 player, 1.5D + talentCriticalDamage
         ));
         stats.put(LUCKY_STRIKE, luckyStrike);
+        // Archery stats read the same place ArcheryStats does: Apothic owns each of these
+        // once its attribute is live, and the mod's own accumulated stat stands down. A
+        // card reading getCustomStat alone would keep reporting a number nothing applies.
+        stats.put(ARROW_DAMAGE, ApothicAttributesCompat.mappedAttributeValue(
+                player, ARROW_DAMAGE, data.getCustomStat(ARROW_DAMAGE)
+        ));
+        stats.put(ARROW_VELOCITY, ApothicAttributesCompat.mappedAttributeValue(
+                player, ARROW_VELOCITY, data.getCustomStat(ARROW_VELOCITY)
+        ));
+        stats.put(DRAW_SPEED, ApothicAttributesCompat.mappedAttributeValue(
+                player, DRAW_SPEED, data.getCustomStat(DRAW_SPEED)
+        ));
+        // No Apothic reading for this one: it is never published there, so the mod's own
+        // total is the whole story whether or not that mod is installed. Read straight
+        // from ArcheryStats so the card cannot drift from the multiplier it reports.
+        stats.put(INDEPENDENT_ARROW_DAMAGE, ArcheryStats.independentArrowDamage(data));
+        // Zero whenever the Gold economy is off, which is what goldRewardBonus itself
+        // returns — the card then honestly reports a bonus that pays out nothing.
+        stats.put(GOLD_REWARD_GAINED, goldRewardBonus(data));
         putAttributeDisplayStats(stats, LUCK, player, Attributes.LUCK);
         stats.put(ALL_SKILL_ENHANCEMENT_ATTRIBUTE,
                 allSkillEnhancementAttribute(data));
@@ -1174,6 +1195,7 @@ public final class TalentStatService {
                 + data.getActiveSoulLinks().stream()
                 .mapToDouble(link -> link.bonusStat(LUCKY_STRIKE))
                 .sum();
+        value += nozomiLuckyStrike(data);
         boolean uncapped = data.isAegisEnabled(AegisConstants.STELLAR)
                 && aegisStat(AegisConstants.STELLAR, AegisConstants.UNCAPPED_LUCKY_STRIKE)
                 > 0.0D;
@@ -1190,6 +1212,65 @@ public final class TalentStatService {
                 .map(aegis -> Math.max(0.0D, aegis.stat(AegisConstants.LUCKY_STRIKE_CAP)))
                 .orElse(3.0D);
         return uncapped ? value : Math.min(cap, value);
+    }
+
+    /**
+     * Whole {@code step}s in {@code amount}, each worth {@code perStep}. A partial step
+     * pays nothing, so a conversion only moves when a step is actually completed.
+     */
+    static double stepConversion(double amount, double step, double perStep) {
+        if (!Double.isFinite(amount) || amount <= 0.0D
+                || !Double.isFinite(step) || step <= 0.0D
+                || !Double.isFinite(perStep)) {
+            return 0.0D;
+        }
+        double converted = Math.floor(amount / step + 1.0E-9D) * perStep;
+        return Double.isFinite(converted) ? converted : 0.0D;
+    }
+
+    /**
+     * Final Damage that does not itself depend on Lucky Strike, which is what Nozomi
+     * converts.
+     *
+     * <p>Hikari converts Lucky Strike into Final Damage and Nozomi converts Final Damage
+     * back into Lucky Strike, so the two would amplify each other without end if Nozomi
+     * read the complete total. The loop is broken here rather than by an iteration limit:
+     * Nozomi reads the additive sources both damage paths agree on, and never Hikari's
+     * contribution or any situational bonus.</p>
+     */
+    static double convertibleFinalDamage(PlayerPerkData data) {
+        return data.getCustomStat(FINAL_DAMAGE)
+                + data.getCustomStat(BLAZING_BREAKTHROUGH_DAMAGE)
+                + data.getCustomStat(CIALLO_FINAL_DAMAGE) * yuzusoftFanMultiplier(data)
+                + sumOwnedStat(data, FINAL_DAMAGE)
+                + PerfectAndElegantServant.finalDamage(data)
+                + TeamRadiance.finalDamageBonus(data)
+                + VirtualItems.statBonus(data, VirtualItems.FINAL_DAMAGE);
+    }
+
+    /** Lucky Strike Nozomi converts out of Final Damage. */
+    static double nozomiLuckyStrike(PlayerPerkData data) {
+        if (!data.owns(PERK_NOZOMI)) {
+            return 0.0D;
+        }
+        return stepConversion(
+                convertibleFinalDamage(data),
+                stat(PERK_NOZOMI, FINAL_DAMAGE_STEP),
+                stat(PERK_NOZOMI, LUCKY_STRIKE_PER_STEP)
+        ) * CentralControlCenter.conversionMultiplier(data);
+    }
+
+    /** Final Damage Hikari converts out of Lucky Strike above her threshold. */
+    static double hikariFinalDamage(PlayerPerkData data, double luckyStrike) {
+        if (!data.owns(PERK_HIKARI)) {
+            return 0.0D;
+        }
+        double overflow = luckyStrike - stat(PERK_HIKARI, LUCKY_STRIKE_THRESHOLD);
+        return stepConversion(
+                overflow,
+                stat(PERK_HIKARI, LUCKY_STRIKE_OVERFLOW_STEP),
+                stat(PERK_HIKARI, FINAL_DAMAGE_PER_STEP)
+        ) * CentralControlCenter.conversionMultiplier(data);
     }
 
     public static double luckyStrikeMultiplier(Player player, PlayerPerkData data) {

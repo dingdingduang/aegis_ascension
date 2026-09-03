@@ -1084,9 +1084,8 @@ public final class ACGStatSourceBreakdown {
                                   int mouseX, int mouseY, int screenWidth, int screenHeight,
                                   int scroll) {
         int panelWidth = Math.min(300, Math.max(190, screenWidth - 24));
-        int maximumVisible = Math.max(1, Math.min(9, (screenHeight - 58) / 22));
-        int visibleCount = Math.min(maximumVisible, Math.max(1, sources.size()));
-        int maximumScroll = Math.max(0, sources.size() - visibleCount);
+        int visibleCount = visibleCount(sources.size(), screenHeight);
+        int maximumScroll = maximumScroll(sources.size(), screenHeight);
         int clampedScroll = Math.max(0, Math.min(scroll, maximumScroll));
         int footerHeight = maximumScroll > 0 ? 15 : 5;
         int panelHeight = 28 + visibleCount * 22 + footerHeight;
@@ -1187,5 +1186,29 @@ public final class ACGStatSourceBreakdown {
     /** Mouse-wheel step for the panel: one row per notch, clamped to non-negative. */
     public static int adjustScroll(int scroll, double wheelDelta) {
         return Math.max(0, scroll + (wheelDelta < 0.0D ? 1 : -1));
+    }
+
+    /**
+     * Whether this many sources need scrolling to be read at this screen height.
+     *
+     * <p>The screen asks before it swallows a scroll event on a hovered stat: a panel that
+     * already shows everything has nothing to scroll, and eating the wheel there would
+     * leave the grid behind it unscrollable for no gain.</p>
+     */
+    public static boolean isScrollable(int sourceCount, int screenHeight) {
+        return maximumScroll(sourceCount, screenHeight) > 0;
+    }
+
+    /** Rows the panel can show at this screen height, ignoring how many it has. */
+    private static int maximumVisible(int screenHeight) {
+        return Math.max(1, Math.min(9, (screenHeight - 58) / 22));
+    }
+
+    private static int visibleCount(int sourceCount, int screenHeight) {
+        return Math.min(maximumVisible(screenHeight), Math.max(1, sourceCount));
+    }
+
+    private static int maximumScroll(int sourceCount, int screenHeight) {
+        return Math.max(0, sourceCount - visibleCount(sourceCount, screenHeight));
     }
 }

@@ -11,6 +11,7 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatab
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
+import com.whatever.aegis_ascension.mechanic.OutcomeAnnouncement;
 import com.whatever.aegis_ascension.perk.soullink.MadokaWithHomura;
 import com.whatever.aegis_ascension.platform.PlatformServices;
 import com.whatever.aegis_ascension.util.GeneralServerMethods;

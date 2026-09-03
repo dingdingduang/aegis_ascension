@@ -4,7 +4,7 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatab
 
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.perk.SoulLink;
-import com.whatever.aegis_ascension.perk.talents.OutcomeAnnouncement;
+import com.whatever.aegis_ascension.mechanic.OutcomeAnnouncement;
 import net.minecraft.server.level.ServerPlayer;
 
 /**
