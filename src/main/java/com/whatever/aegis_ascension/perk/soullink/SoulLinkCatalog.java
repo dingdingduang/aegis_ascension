@@ -6,6 +6,7 @@ import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.perk.SoulLink;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.util.CatalogPresentation;
 import net.minecraft.resources.ResourceLocation;
 
 import java.nio.charset.StandardCharsets;
@@ -55,7 +56,7 @@ public final class SoulLinkCatalog {
                     "Cannot register Soul Links for a mod that is not loaded: " + namespace
             );
         }
-        String resourcePath = "assets/" + namespace + "/soul_links.json";
+        String resourcePath = "assets/" + namespace + "/soul_links_serverside.json";
         Path file = PlatformServices.mods()
                 .findModResource(namespace, resourcePath)
                 .orElseThrow(() -> new IllegalStateException(
@@ -86,6 +87,14 @@ public final class SoulLinkCatalog {
         if (localActive) {
             activeValues = rebuilt;
         }
+
+        // Import Addon
+        PlatformServices.mods()
+                .findModResource(namespace,
+                        "assets/" + namespace + "/soul_links_clientside.json")
+                .ifPresent(presentation -> CatalogPresentation.mergeAddon(
+                        "soul_links_clientside.json", presentation));
+
         return soulLinks.size();
     }
 
@@ -117,15 +126,15 @@ public final class SoulLinkCatalog {
     private static Catalog loadCatalog() {
         Path configPath = PlatformServices.paths()
                 .modConfigDirectory(AegisAscensionMod.MOD_ID)
-                .resolve("soul_links.json");
+                .resolve("soul_links_serverside.json");
         try {
             Files.createDirectories(configPath.getParent());
             if (Files.notExists(configPath)) {
                 try (var stream = SoulLinkCatalog.class.getResourceAsStream(
-                        "/assets/aegis_ascension/soul_links.json")) {
+                        "/assets/aegis_ascension/soul_links_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/soul_links.json"
+                                "Missing default assets/aegis_ascension/soul_links_serverside.json"
                         );
                     }
                     Files.copy(stream, configPath);
@@ -183,9 +192,6 @@ public final class SoulLinkCatalog {
             );
         }
         requireAddonId(namespace, entry.id);
-        requireText(entry.synergyName, entry.id + " synergy_name");
-        requireText(entry.description, entry.id + " description");
-        requireLocation(entry.icon, entry.id);
         return entry;
     }
 
@@ -250,9 +256,6 @@ public final class SoulLinkCatalog {
             String id = requireWireId(entry.id, "Soul Link id");
             SoulLink link = new SoulLink(
                     id,
-                    requireText(entry.synergyName, id + " synergy_name"),
-                    requireText(entry.description, id + " description"),
-                    requireLocation(entry.icon, id),
                     validateIds(entry.requiredPerks, id + " required_perks"),
                     validateIds(entry.rankPerks, id + " rank_perks"),
                     entry.bonusStats == null ? Map.of() : entry.bonusStats,
@@ -336,10 +339,6 @@ public final class SoulLinkCatalog {
         private List<String> requiredPerks = List.of();
         @SerializedName("rank_perks")
         private List<String> rankPerks = List.of();
-        @SerializedName("synergy_name")
-        private String synergyName;
-        private String description;
-        private String icon;
         @SerializedName("bonus_stats")
         private Map<String, Double> bonusStats = Map.of();
         private boolean enabled;

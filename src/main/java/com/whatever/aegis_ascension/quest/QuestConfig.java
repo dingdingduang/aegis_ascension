@@ -20,7 +20,7 @@ import java.util.Map;
 public final class QuestConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = PlatformServices.paths().modConfigDirectory(AegisAscensionMod.MOD_ID)
-            .resolve("questsetting.json");
+            .resolve("quest_serverside.json");
     /** Templates live one file per quest type beside the settings file. */
     private static final Path QUEST_DIRECTORY = FILE.getParent().resolve("quests");
     private static final Map<QuestType, String> TEMPLATE_FILES = templateFileNames();
@@ -373,11 +373,11 @@ public final class QuestConfig {
             StringBuilder keys = new StringBuilder();
             if (failOnDeath) keys.append("death");
             if (failOnDamageTaken) {
-                if (keys.length() > 0) keys.append(',');
+                if (!keys.isEmpty()) keys.append(',');
                 keys.append("damage");
             }
             if (failOnArmorWorn) {
-                if (keys.length() > 0) keys.append(',');
+                if (!keys.isEmpty()) keys.append(',');
                 keys.append("armor");
             }
             return keys.toString();
@@ -446,8 +446,8 @@ public final class QuestConfig {
      *
      * <p>Nothing here rejects the file. A catalogue with one bad template should still
      * load the other thirty-eight.</p>
-     */
-    /**
+     *
+     *
      * Display data for the login catalog snapshot. Everything here is fixed by the
      * template rather than rolled, so the client can hold one copy instead of being sent
      * it again on every quest sync. It travels from the server for the same reason the
@@ -487,15 +487,19 @@ public final class QuestConfig {
         public CatalogEntry() {
         }
 
+        private static String blankToNull(String value) {
+            return value == null || value.isBlank() ? null : value;
+        }
+
         CatalogEntry(Template template, QuestType questType) {
             objective = template.objective == null ? QuestObjective.KILL : template.objective;
             type = questType;
             id = template.id;
-            title = template.title == null ? "" : template.title;
-            description = template.description == null ? "" : template.description;
-            story = template.story == null ? "" : template.story;
+            title = blankToNull(template.title);
+            description = blankToNull(template.description);
+            story = blankToNull(template.story);
             profession = template.profession == null ? "" : template.profession;
-            icon = template.icon == null ? "" : template.icon;
+            icon = blankToNull(template.icon);
             prerequisiteId = template.prerequisiteId == null ? "" : template.prerequisiteId;
             constraints = template.constraintKeys();
             oncePerPlayer = template.oncePerPlayer;
@@ -676,7 +680,7 @@ public final class QuestConfig {
     /** Copies any default file the config directory does not already have. */
     private static void copyDefaultsIfAbsent() throws Exception {
         Files.createDirectories(FILE.getParent());
-        copyResourceIfAbsent("/assets/aegis_ascension/questsetting.json", FILE);
+        copyResourceIfAbsent("/assets/aegis_ascension/quest_serverside.json", FILE);
         Files.createDirectories(QUEST_DIRECTORY);
         for (String name : TEMPLATE_FILES.values()) {
             copyResourceIfAbsent("/assets/aegis_ascension/quests/" + name,

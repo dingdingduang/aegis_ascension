@@ -4,11 +4,11 @@ import static com.whatever.aegis_ascension.util.GeneralClientMethods.blitScaledR
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
 import com.whatever.aegis_ascension.client.ClientSettings;
+import com.whatever.aegis_ascension.client.screen.acg.ACGSectionHeader;
 import com.whatever.aegis_ascension.client.screen.acg.ACGTheme;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractButton;
-import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.network.chat.Component;
 
@@ -72,9 +72,9 @@ final class ACGDrawer {
     private int maxScroll;
     private int viewportTop;
     private int viewportBottom;
-    private HeaderButton selectionHeader;
-    private HeaderButton collectionHeader;
-    private HeaderButton miscellaneousHeader;
+    private ACGSectionHeader selectionHeader;
+    private ACGSectionHeader collectionHeader;
+    private ACGSectionHeader miscellaneousHeader;
     private final List<NavButton> selectionItems = new ArrayList<>();
     private final List<NavButton> collectionItems = new ArrayList<>();
     private final List<NavButton> miscellaneousItems = new ArrayList<>();
@@ -135,7 +135,7 @@ final class ACGDrawer {
         miscellaneousItems.clear();
         int y = ACGPerkSelectionScreen.TOP_BAR_HEIGHT + 10;
 
-        selectionHeader = new HeaderButton(8, y, WIDTH - 16, ROW_HEIGHT,
+        selectionHeader = new ACGSectionHeader(8, y, WIDTH - 16, ROW_HEIGHT,
                 getTranslatableString(
                         "screen.aegis_ascension.acg.nav.selection_group"),
                 () -> selectionExpanded, this::toggleSelection);
@@ -150,7 +150,7 @@ final class ACGDrawer {
                 "screen.aegis_ascension.acg.nav.skill_enhancement",
                 Destination.SKILL_ENHANCEMENT);
 
-        collectionHeader = new HeaderButton(8, y, WIDTH - 16, ROW_HEIGHT,
+        collectionHeader = new ACGSectionHeader(8, y, WIDTH - 16, ROW_HEIGHT,
                 getTranslatableString(
                         "screen.aegis_ascension.acg.nav.collection_group"),
                 () -> collectionExpanded, this::toggleCollection);
@@ -173,7 +173,7 @@ final class ACGDrawer {
                 "screen.aegis_ascension.acg.nav.custom_stat",
                 Destination.PLAYER_CUSTOM_STAT);
 
-        miscellaneousHeader = new HeaderButton(8, y, WIDTH - 16, ROW_HEIGHT,
+        miscellaneousHeader = new ACGSectionHeader(8, y, WIDTH - 16, ROW_HEIGHT,
                 getTranslatableString(
                         "screen.aegis_ascension.acg.nav.miscellaneous_group"),
                 () -> miscellaneousExpanded, this::toggleMiscellaneous);
@@ -258,7 +258,7 @@ final class ACGDrawer {
         layoutItems(miscellaneousItems, miscellaneousY, step, miscellaneousAnim);
     }
 
-    private void placeHeader(HeaderButton button, int naturalY, float animation) {
+    private void placeHeader(ACGSectionHeader button, int naturalY, float animation) {
         if (button == null) {
             return;
         }
@@ -267,7 +267,7 @@ final class ACGDrawer {
         boolean fits = y >= viewportTop && y + ROW_HEIGHT <= viewportBottom;
         button.visible = fits;
         button.active = fits;
-        button.chevronProgress = animation;
+        button.chevronProgress(animation);
     }
 
     private void layoutItems(List<NavButton> items, int headerY,
@@ -395,62 +395,6 @@ final class ACGDrawer {
         @Override
         protected void updateWidgetNarration(NarrationElementOutput narration) {
             defaultButtonNarrationText(narration);
-        }
-    }
-
-    private static final class HeaderButton extends AbstractButton {
-        private final BooleanSupplier expanded;
-        private final Runnable toggle;
-        private float chevronProgress = 1.0F;
-
-        private HeaderButton(int x, int y, int width, int height,
-                             Component label, BooleanSupplier expanded,
-                             Runnable toggle) {
-            super(x, y, width, height, label);
-            this.expanded = expanded;
-            this.toggle = toggle;
-        }
-
-        @Override
-        public void onPress() {
-            toggle.run();
-        }
-
-        @Override
-        protected void renderWidget(GuiGraphics graphics, int mouseX,
-                                    int mouseY, float partialTick) {
-            boolean hovered = isHoveredOrFocused();
-            int fill = hovered
-                    ? ACGTheme.DRAWER_HOVER_FILL : ACGTheme.PANEL_FILL_RAISED;
-            graphics.fill(getX(), getY(), getX() + width, getY() + height, fill);
-            graphics.fill(getX(), getY(), getX() + width, getY() + 1,
-                    ACGTheme.GOLD_DIM);
-            graphics.fill(getX(), getY() + height - 1,
-                    getX() + width, getY() + height, ACGTheme.GOLD_DIM);
-            var font = Minecraft.getInstance().font;
-            int textColor = hovered ? ACGTheme.GOLD_BRIGHT : ACGTheme.GOLD;
-            graphics.drawString(font, getMessage(), getX() + 22,
-                    getY() + (height - 8) / 2, textColor, false);
-
-            float angle = chevronProgress * 90.0F;
-            int cx = getX() + 12;
-            int cy = getY() + height / 2;
-            graphics.pose().pushPose();
-            graphics.pose().translate(cx, cy, 0.0F);
-            graphics.pose().mulPose(
-                    com.mojang.math.Axis.ZP.rotationDegrees(angle));
-            graphics.pose().translate(-cx, -cy, 0.0F);
-            graphics.drawString(font, ">", cx - 3, cy - 4, textColor, false);
-            graphics.pose().popPose();
-        }
-
-        @Override
-        protected void updateWidgetNarration(NarrationElementOutput narration) {
-            narration.add(NarratedElementType.TITLE, getMessage());
-            narration.add(NarratedElementType.USAGE, getTranslatableString(
-                    expanded.getAsBoolean()
-                            ? "screen.aegis_ascension.acg.nav.group_expanded"
-                            : "screen.aegis_ascension.acg.nav.group_collapsed"));
         }
     }
 }

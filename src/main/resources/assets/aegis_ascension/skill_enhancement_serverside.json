@@ -1,0 +1,64 @@
+{
+  "schema_version": 6,
+  "enhancements": [
+    {
+      "id": "armor",
+      "attribute": "minecraft:generic.armor",
+      "amount": 1.0,
+      "operation": "addition",
+      "affected_by_all_skill_enhancement_attribute": true
+    },
+    {
+      "id": "attack_speed",
+      "attribute": "minecraft:generic.attack_speed",
+      "amount": 0.02,
+      "operation": "multiply_total",
+      "affected_by_all_skill_enhancement_attribute": false
+    },
+    {
+      "id": "attack_damage",
+      "attribute": "minecraft:generic.attack_damage",
+      "amount": 1.0,
+      "operation": "addition",
+      "affected_by_all_skill_enhancement_attribute": true
+    },
+    {
+      "id": "max_health",
+      "attribute": "minecraft:generic.max_health",
+      "amount": 2.0,
+      "operation": "addition",
+      "affected_by_all_skill_enhancement_attribute": true
+    },
+    {
+      "id": "movement_speed",
+      "attribute": "minecraft:generic.movement_speed",
+      "amount": 0.02,
+      "operation": "multiply_total",
+      "affected_by_all_skill_enhancement_attribute": false
+    },
+    {
+      "id": "skill_damage",
+      "custom_stat": "skill_damage",
+      "amount": 0.02,
+      "affected_by_all_skill_enhancement_attribute": true
+    },
+    {
+      "id": "critical_chance",
+      "custom_stat": "critical_chance",
+      "amount": 0.01,
+      "affected_by_all_skill_enhancement_attribute": false
+    },
+    {
+      "id": "critical_damage",
+      "custom_stat": "critical_damage",
+      "amount": 0.02,
+      "affected_by_all_skill_enhancement_attribute": false
+    },
+    {
+      "id": "arrow_damage",
+      "custom_stat": "arrow_damage",
+      "amount": 0.02,
+      "affected_by_all_skill_enhancement_attribute": true
+    }
+  ]
+}

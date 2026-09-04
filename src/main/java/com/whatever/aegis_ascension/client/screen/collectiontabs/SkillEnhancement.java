@@ -1,5 +1,6 @@
 package com.whatever.aegis_ascension.client.screen.collectiontabs;
 
+import com.whatever.aegis_ascension.client.SkillEnhancementClientSettings;
 import com.whatever.aegis_ascension.client.ClientPerkState;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
@@ -33,9 +34,9 @@ public final class SkillEnhancement {
                     Component status = getTranslatableString(selected
                             ? "screen.aegis_ascension.collection.primary.selected"
                             : "screen.aegis_ascension.collection.primary.select");
-                    Component tooltip = enhancement.title().copy()
+                    Component tooltip = SkillEnhancementClientSettings.title(enhancement).copy()
                             .append("\n\n")
-                            .append(enhancement.description())
+                            .append(SkillEnhancementClientSettings.description(enhancement))
                             .append("\n\n")
                             .append(allSkillEnhancementAttributeStatus(enhancement))
                             .append("\n\n")
@@ -43,10 +44,10 @@ public final class SkillEnhancement {
                                     "screen.aegis_ascension.collection.primary.select_hint"
                             ));
                     return new TalentCollectionCard(
-                            enhancement.iconTexture(),
-                            enhancement.iconTextureSize(),
-                            enhancement.title(),
-                            enhancement.description(),
+                            SkillEnhancementClientSettings.icon(enhancement),
+                            SkillEnhancementClientSettings.iconSize(enhancement),
+                            SkillEnhancementClientSettings.title(enhancement),
+                            SkillEnhancementClientSettings.description(enhancement),
                             status,
                             tooltip,
                             selected ? 0xFFFFD36A : 0xFF72E39A,
@@ -66,9 +67,9 @@ public final class SkillEnhancement {
         return ClientPerkState.getSkillEnhancementOffers().stream()
                 .map(enhancement -> {
                     int currentRank = ClientPerkState.getSkillEnhancementRank(enhancement);
-                    Component tooltip = enhancement.title().copy()
+                    Component tooltip = SkillEnhancementClientSettings.title(enhancement).copy()
                             .append("\n\n")
-                            .append(enhancement.description())
+                            .append(SkillEnhancementClientSettings.description(enhancement))
                             .append("\n\n")
                             .append(allSkillEnhancementAttributeStatus(enhancement))
                             .append("\n\n")
@@ -81,10 +82,10 @@ public final class SkillEnhancement {
                                     "screen.aegis_ascension.collection.skill_enhancement.select_hint"
                             ));
                     return new TalentCollectionCard(
-                            enhancement.iconTexture(),
-                            enhancement.iconTextureSize(),
-                            enhancement.title(),
-                            enhancement.description(),
+                            SkillEnhancementClientSettings.icon(enhancement),
+                            SkillEnhancementClientSettings.iconSize(enhancement),
+                            SkillEnhancementClientSettings.title(enhancement),
+                            SkillEnhancementClientSettings.description(enhancement),
                             getTranslatableString(
                                     "screen.aegis_ascension.collection.skill_enhancement.next_rank",
                                     currentRank + 1

@@ -286,7 +286,7 @@ public final class TalentCombatEffects {
      *
      * <p>The talents handled just above are skipped: they apply under a damage-category
      * condition an attribute cannot express, which is exactly why the mapping in
-     * talents.json excludes them. Reading that list rather than naming ids here keeps
+     * talents_serverside.json excludes them. Reading that list rather than naming ids here keeps
      * this sum and the published attribute describing the same split.</p>
      */
     private static double unconditionalArmorPenetration(PlayerPerkData data) {

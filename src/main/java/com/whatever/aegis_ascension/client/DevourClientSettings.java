@@ -19,8 +19,8 @@ import java.nio.file.Path;
  * carried, not a property the server stores or acts on — nothing here changes what an item
  * grants, so it never needs to agree with the server or with another player's file.</p>
  *
- * <p>Persisted at {@code config/aegis_ascension/devour_client_setting.json}, seeded on first run
- * from the bundled {@code assets/aegis_ascension/devour_client_setting.json} exactly like
+ * <p>Persisted at {@code config/aegis_ascension/devour_clientside.json}, seeded on first run
+ * from the bundled {@code assets/aegis_ascension/devour_clientside.json} exactly like
  * {@link com.whatever.aegis_ascension.aegis.Aegis}'s catalog and {@link ClientSettings}. The
  * shipped asset — not the field defaults below — is what a fresh install actually gets, so
  * the two are kept in step.</p>
@@ -29,7 +29,7 @@ public final class DevourClientSettings {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = PlatformServices.paths()
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
-            .resolve("devour_client_setting.json");
+            .resolve("devour_clientside.json");
 
     private static DevourClientSettings instance;
 
@@ -68,10 +68,10 @@ public final class DevourClientSettings {
             Files.createDirectories(FILE.getParent());
             if (Files.notExists(FILE)) {
                 try (var stream = DevourClientSettings.class.getResourceAsStream(
-                        "/assets/aegis_ascension/devour_client_setting.json")) {
+                        "/assets/aegis_ascension/devour_clientside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/devour_client_setting.json");
+                                "Missing default assets/aegis_ascension/devour_clientside.json");
                     }
                     Files.copy(stream, FILE);
                 }

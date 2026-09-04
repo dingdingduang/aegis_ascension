@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-/** Server-authoritative weighted reward loaded from mysterious_doll.json. */
+/** Server-authoritative weighted reward loaded from mysterious_doll_serverside.json. */
 public final class MysteriousDoll {
     public static final String CUSTOM_STAT = "custom_stat";
     public static final String RANDOM_AEGIS = "random_aegis";
@@ -319,15 +319,15 @@ public final class MysteriousDoll {
     private static Catalog loadCatalog() {
         Path configPath = PlatformServices.paths()
                 .modConfigDirectory(AegisAscensionMod.MOD_ID)
-                .resolve("mysterious_doll.json");
+                .resolve("mysterious_doll_serverside.json");
         try {
             Files.createDirectories(configPath.getParent());
             if (Files.notExists(configPath)) {
                 try (var stream = MysteriousDoll.class.getResourceAsStream(
-                        "/assets/aegis_ascension/mysterious_doll.json")) {
+                        "/assets/aegis_ascension/mysterious_doll_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/mysterious_doll.json"
+                                "Missing default assets/aegis_ascension/mysterious_doll_serverside.json"
                         );
                     }
                     Files.copy(stream, configPath);

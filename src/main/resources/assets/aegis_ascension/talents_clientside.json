@@ -1,0 +1,555 @@
+{
+  "schema_version": 1,
+  "entries": {
+    "perk_healing_magic": {
+      "name": "perk.aegis_ascension.perk_healing_magic.name",
+      "description": "perk.aegis_ascension.perk_healing_magic.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_healing_magic.png"
+    },
+    "perk_mundane_stroll": {
+      "name": "perk.aegis_ascension.perk_mundane_stroll.name",
+      "description": "perk.aegis_ascension.perk_mundane_stroll.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_mundane_stroll.png"
+    },
+    "perk_lucky_arrow": {
+      "name": "perk.aegis_ascension.perk_lucky_arrow.name",
+      "description": "perk.aegis_ascension.perk_lucky_arrow.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_lucky_arrow.png"
+    },
+    "perk_ink_dyed_sakura": {
+      "name": "perk.aegis_ascension.perk_ink_dyed_sakura.name",
+      "description": "perk.aegis_ascension.perk_ink_dyed_sakura.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_ink_dyed_sakura.png"
+    },
+    "perk_half_human_half_phantom_gardener": {
+      "name": "perk.aegis_ascension.perk_half_human_half_phantom_gardener.name",
+      "description": "perk.aegis_ascension.perk_half_human_half_phantom_gardener.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_half_human_half_phantom_gardener.png"
+    },
+    "perk_crimson_young_moon": {
+      "name": "perk.aegis_ascension.perk_crimson_young_moon.name",
+      "description": "perk.aegis_ascension.perk_crimson_young_moon.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_crimson_young_moon.png"
+    },
+    "perk_laevatein": {
+      "name": "perk.aegis_ascension.perk_laevatein.name",
+      "description": "perk.aegis_ascension.perk_laevatein.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_laevatein.png"
+    },
+    "perk_cirno": {
+      "name": "perk.aegis_ascension.perk_cirno.name",
+      "description": "perk.aegis_ascension.perk_cirno.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_cirno.png"
+    },
+    "perk_nagisa_leisure_time": {
+      "name": "perk.aegis_ascension.perk_nagisa_leisure_time.name",
+      "description": "perk.aegis_ascension.perk_nagisa_leisure_time.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_nagisa_leisure_time.png"
+    },
+    "perk_lunar_goddesss_blessing": {
+      "name": "perk.aegis_ascension.perk_lunar_goddesss_blessing.name",
+      "description": "perk.aegis_ascension.perk_lunar_goddesss_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_lunar_goddesss_blessing.png"
+    },
+    "perk_alya": {
+      "name": "perk.aegis_ascension.perk_alya.name",
+      "description": "perk.aegis_ascension.perk_alya.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_alya.png"
+    },
+    "perk_boundary_of_life_and_death": {
+      "name": "perk.aegis_ascension.perk_boundary_of_life_and_death.name",
+      "description": "perk.aegis_ascension.perk_boundary_of_life_and_death.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_boundary_of_life_and_death.png"
+    },
+    "perk_flickering_light": {
+      "name": "perk.aegis_ascension.perk_flickering_light.name",
+      "description": "perk.aegis_ascension.perk_flickering_light.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_flickering_light.png"
+    },
+    "perk_white_star_obsidian": {
+      "name": "perk.aegis_ascension.perk_white_star_obsidian.name",
+      "description": "perk.aegis_ascension.perk_white_star_obsidian.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_white_star_obsidian.png"
+    },
+    "perk_alice": {
+      "name": "perk.aegis_ascension.perk_alice.name",
+      "description": "perk.aegis_ascension.perk_alice.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_alice.png"
+    },
+    "perk_shiroko": {
+      "name": "perk.aegis_ascension.perk_shiroko.name",
+      "description": "perk.aegis_ascension.perk_shiroko.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_shiroko.png"
+    },
+    "perk_hayase_yuka": {
+      "name": "perk.aegis_ascension.perk_hayase_yuka.name",
+      "description": "perk.aegis_ascension.perk_hayase_yuka.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_hayase_yuka.png"
+    },
+    "perk_otogi_noah": {
+      "name": "perk.aegis_ascension.perk_otogi_noah.name",
+      "description": "perk.aegis_ascension.perk_otogi_noah.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_otogi_noah.png"
+    },
+    "perk_skill_damage_conversion": {
+      "name": "perk.aegis_ascension.perk_skill_damage_conversion.name",
+      "description": "perk.aegis_ascension.perk_skill_damage_conversion.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_skill_damage_conversion.png"
+    },
+    "perk_cashback": {
+      "name": "perk.aegis_ascension.perk_cashback.name",
+      "description": "perk.aegis_ascension.perk_cashback.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_cashback.png"
+    },
+    "perk_silent_dawn": {
+      "name": "perk.aegis_ascension.perk_silent_dawn.name",
+      "description": "perk.aegis_ascension.perk_silent_dawn.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_silent_dawn.png"
+    },
+    "perk_tsukiyuki_miyako": {
+      "name": "perk.aegis_ascension.perk_tsukiyuki_miyako.name",
+      "description": "perk.aegis_ascension.perk_tsukiyuki_miyako.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_tsukiyuki_miyako.png"
+    },
+    "perk_told_you_its_magic": {
+      "name": "perk.aegis_ascension.perk_told_you_its_magic.name",
+      "description": "perk.aegis_ascension.perk_told_you_its_magic.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_told_you_its_magic.png"
+    },
+    "perk_noelle": {
+      "name": "perk.aegis_ascension.perk_noelle.name",
+      "description": "perk.aegis_ascension.perk_noelle.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_noelle.png"
+    },
+    "perk_arona": {
+      "name": "perk.aegis_ascension.perk_arona.name",
+      "description": "perk.aegis_ascension.perk_arona.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_arona.png"
+    },
+    "perk_matter_to_magic_conversion": {
+      "name": "perk.aegis_ascension.perk_matter_to_magic_conversion.name",
+      "description": "perk.aegis_ascension.perk_matter_to_magic_conversion.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_matter_to_magic_conversion.png"
+    },
+    "perk_mysterious_doll": {
+      "name": "perk.aegis_ascension.perk_mysterious_doll.name",
+      "description": "perk.aegis_ascension.perk_mysterious_doll.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_mysterious_doll.png"
+    },
+    "perk_clear_mind_state": {
+      "name": "perk.aegis_ascension.perk_clear_mind_state.name",
+      "description": "perk.aegis_ascension.perk_clear_mind_state.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_clear_mind_state.png"
+    },
+    "perk_magic_conversion": {
+      "name": "perk.aegis_ascension.perk_magic_conversion.name",
+      "description": "perk.aegis_ascension.perk_magic_conversion.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_magic_conversion.png"
+    },
+    "perk_kokona": {
+      "name": "perk.aegis_ascension.perk_kokona.name",
+      "description": "perk.aegis_ascension.perk_kokona.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_kokona.png"
+    },
+    "perk_sunohara_shun": {
+      "name": "perk.aegis_ascension.perk_sunohara_shun.name",
+      "description": "perk.aegis_ascension.perk_sunohara_shun.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_sunohara_shun.png"
+    },
+    "perk_magic_blade": {
+      "name": "perk.aegis_ascension.perk_magic_blade.name",
+      "description": "perk.aegis_ascension.perk_magic_blade.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_magic_blade.png"
+    },
+    "perk_barrage_control_magic": {
+      "name": "perk.aegis_ascension.perk_barrage_control_magic.name",
+      "description": "perk.aegis_ascension.perk_barrage_control_magic.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_barrage_control_magic.png"
+    },
+    "perk_momo": {
+      "name": "perk.aegis_ascension.perk_momo.name",
+      "description": "perk.aegis_ascension.perk_momo.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_momo.png"
+    },
+    "perk_midori": {
+      "name": "perk.aegis_ascension.perk_midori.name",
+      "description": "perk.aegis_ascension.perk_midori.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_midori.png"
+    },
+    "perk_hikari": {
+      "name": "perk.aegis_ascension.perk_hikari.name",
+      "description": "perk.aegis_ascension.perk_hikari.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_hikari.png"
+    },
+    "perk_nozomi": {
+      "name": "perk.aegis_ascension.perk_nozomi.name",
+      "description": "perk.aegis_ascension.perk_nozomi.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_nozomi.png"
+    },
+    "perk_congyu_ciallo": {
+      "name": "perk.aegis_ascension.perk_congyu_ciallo.name",
+      "description": "perk.aegis_ascension.perk_congyu_ciallo.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_congyu_ciallo.png"
+    },
+    "perk_yoshino_ciallo": {
+      "name": "perk.aegis_ascension.perk_yoshino_ciallo.name",
+      "description": "perk.aegis_ascension.perk_yoshino_ciallo.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_yoshino_ciallo.png"
+    },
+    "perk_shizuru_ciallo": {
+      "name": "perk.aegis_ascension.perk_shizuru_ciallo.name",
+      "description": "perk.aegis_ascension.perk_shizuru_ciallo.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_shizuru_ciallo.png"
+    },
+    "perk_ningning_ciallo": {
+      "name": "perk.aegis_ascension.perk_ningning_ciallo.name",
+      "description": "perk.aegis_ascension.perk_ningning_ciallo.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_ningning_ciallo.png"
+    },
+    "perk_nanami_ciallo": {
+      "name": "perk.aegis_ascension.perk_nanami_ciallo.name",
+      "description": "perk.aegis_ascension.perk_nanami_ciallo.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_nanami_ciallo.png"
+    },
+    "perk_rolling_in_wealth": {
+      "name": "perk.aegis_ascension.perk_rolling_in_wealth.name",
+      "description": "perk.aegis_ascension.perk_rolling_in_wealth.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_rolling_in_wealth.png"
+    },
+    "perk_enigma": {
+      "name": "perk.aegis_ascension.perk_enigma.name",
+      "description": "perk.aegis_ascension.perk_enigma.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_enigma.png"
+    },
+    "perk_master_spark": {
+      "name": "perk.aegis_ascension.perk_master_spark.name",
+      "description": "perk.aegis_ascension.perk_master_spark.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_master_spark.png"
+    },
+    "perk_focused_shot": {
+      "name": "perk.aegis_ascension.perk_focused_shot.name",
+      "description": "perk.aegis_ascension.perk_focused_shot.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_focused_shot.png"
+    },
+    "perk_meteor_sparkle": {
+      "name": "perk.aegis_ascension.perk_meteor_sparkle.name",
+      "description": "perk.aegis_ascension.perk_meteor_sparkle.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_meteor_sparkle.png"
+    },
+    "perk_beater": {
+      "name": "perk.aegis_ascension.perk_beater.name",
+      "description": "perk.aegis_ascension.perk_beater.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_beater.png"
+    },
+    "perk_yurizono_seia": {
+      "name": "perk.aegis_ascension.perk_yurizono_seia.name",
+      "description": "perk.aegis_ascension.perk_yurizono_seia.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_yurizono_seia.png"
+    },
+    "perk_frieren": {
+      "name": "perk.aegis_ascension.perk_frieren.name",
+      "description": "perk.aegis_ascension.perk_frieren.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_frieren.png"
+    },
+    "perk_fern": {
+      "name": "perk.aegis_ascension.perk_fern.name",
+      "description": "perk.aegis_ascension.perk_fern.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_fern.png"
+    },
+    "perk_wind_arrow": {
+      "name": "perk.aegis_ascension.perk_wind_arrow.name",
+      "description": "perk.aegis_ascension.perk_wind_arrow.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_wind_arrow.png"
+    },
+    "perk_princess_of_egret": {
+      "name": "perk.aegis_ascension.perk_princess_of_egret.name",
+      "description": "perk.aegis_ascension.perk_princess_of_egret.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_princess_of_egret.png"
+    },
+    "perk_i_shall_interpret_the_radiance": {
+      "name": "perk.aegis_ascension.perk_i_shall_interpret_the_radiance.name",
+      "description": "perk.aegis_ascension.perk_i_shall_interpret_the_radiance.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_i_shall_interpret_the_radiance.png"
+    },
+    "perk_righteous_knight": {
+      "name": "perk.aegis_ascension.perk_righteous_knight.name",
+      "description": "perk.aegis_ascension.perk_righteous_knight.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_righteous_knight.png"
+    },
+    "perk_blazing_feather_starweaver": {
+      "name": "perk.aegis_ascension.perk_blazing_feather_starweaver.name",
+      "description": "perk.aegis_ascension.perk_blazing_feather_starweaver.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_blazing_feather_starweaver.png"
+    },
+    "perk_necromancer": {
+      "name": "perk.aegis_ascension.perk_necromancer.name",
+      "description": "perk.aegis_ascension.perk_necromancer.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_necromancer.png"
+    },
+    "perk_grim_reapers_contract": {
+      "name": "perk.aegis_ascension.perk_grim_reapers_contract.name",
+      "description": "perk.aegis_ascension.perk_grim_reapers_contract.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_grim_reapers_contract.png"
+    },
+    "perk_koharu_sprite": {
+      "name": "perk.aegis_ascension.perk_koharu_sprite.name",
+      "description": "perk.aegis_ascension.perk_koharu_sprite.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_koharu_sprite.png"
+    },
+    "perk_mika": {
+      "name": "perk.aegis_ascension.perk_mika.name",
+      "description": "perk.aegis_ascension.perk_mika.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_mika.png"
+    },
+    "perk_fair_trade": {
+      "name": "perk.aegis_ascension.perk_fair_trade.name",
+      "description": "perk.aegis_ascension.perk_fair_trade.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_fair_trade.png"
+    },
+    "perk_glass_cannon": {
+      "name": "perk.aegis_ascension.perk_glass_cannon.name",
+      "description": "perk.aegis_ascension.perk_glass_cannon.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_glass_cannon.png"
+    },
+    "perk_collector": {
+      "name": "perk.aegis_ascension.perk_collector.name",
+      "description": "perk.aegis_ascension.perk_collector.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_collector.png"
+    },
+    "perk_flower_fairy": {
+      "name": "perk.aegis_ascension.perk_flower_fairy.name",
+      "description": "perk.aegis_ascension.perk_flower_fairy.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_flower_fairy.png"
+    },
+    "perk_shared_fortune": {
+      "name": "perk.aegis_ascension.perk_shared_fortune.name",
+      "description": "perk.aegis_ascension.perk_shared_fortune.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_shared_fortune.png"
+    },
+    "perk_great_fairy": {
+      "name": "perk.aegis_ascension.perk_great_fairy.name",
+      "description": "perk.aegis_ascension.perk_great_fairy.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_great_fairy.png"
+    },
+    "perk_sacred_elf": {
+      "name": "perk.aegis_ascension.perk_sacred_elf.name",
+      "description": "perk.aegis_ascension.perk_sacred_elf.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_sacred_elf.png"
+    },
+    "perk_butterflys_gentle_touch": {
+      "name": "perk.aegis_ascension.perk_butterflys_gentle_touch.name",
+      "description": "perk.aegis_ascension.perk_butterflys_gentle_touch.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_butterflys_gentle_touch.png"
+    },
+    "perk_ripples_of_the_past": {
+      "name": "perk.aegis_ascension.perk_ripples_of_the_past.name",
+      "description": "perk.aegis_ascension.perk_ripples_of_the_past.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_ripples_of_the_past.png"
+    },
+    "perk_commander": {
+      "name": "perk.aegis_ascension.perk_commander.name",
+      "description": "perk.aegis_ascension.perk_commander.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_commander.png"
+    },
+    "perk_plana": {
+      "name": "perk.aegis_ascension.perk_plana.name",
+      "description": "perk.aegis_ascension.perk_plana.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_plana.png"
+    },
+    "perk_zephyrs_care": {
+      "name": "perk.aegis_ascension.perk_zephyrs_care.name",
+      "description": "perk.aegis_ascension.perk_zephyrs_care.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_zephyrs_care.png"
+    },
+    "perk_illusion_bubble": {
+      "name": "perk.aegis_ascension.perk_illusion_bubble.name",
+      "description": "perk.aegis_ascension.perk_illusion_bubble.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_illusion_bubble.png"
+    },
+    "perk_twin_magic_mirror": {
+      "name": "perk.aegis_ascension.perk_twin_magic_mirror.name",
+      "description": "perk.aegis_ascension.perk_twin_magic_mirror.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_twin_magic_mirror.png"
+    },
+    "perk_swiss_roll_moment": {
+      "name": "perk.aegis_ascension.perk_swiss_roll_moment.name",
+      "description": "perk.aegis_ascension.perk_swiss_roll_moment.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_swiss_roll_moment.png"
+    },
+    "perk_innate_dream": {
+      "name": "perk.aegis_ascension.perk_innate_dream.name",
+      "description": "perk.aegis_ascension.perk_innate_dream.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_innate_dream.png"
+    },
+    "perk_seven_colored_magician": {
+      "name": "perk.aegis_ascension.perk_seven_colored_magician.name",
+      "description": "perk.aegis_ascension.perk_seven_colored_magician.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_seven_colored_magician.png"
+    },
+    "perk_firefly_flame": {
+      "name": "perk.aegis_ascension.perk_firefly_flame.name",
+      "description": "perk.aegis_ascension.perk_firefly_flame.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_firefly_flame.png"
+    },
+    "perk_peerless_calculation": {
+      "name": "perk.aegis_ascension.perk_peerless_calculation.name",
+      "description": "perk.aegis_ascension.perk_peerless_calculation.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_peerless_calculation.png"
+    },
+    "perk_starlight_intertwined_benediction": {
+      "name": "perk.aegis_ascension.perk_starlight_intertwined_benediction.name",
+      "description": "perk.aegis_ascension.perk_starlight_intertwined_benediction.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_starlight_intertwined_benediction.png"
+    },
+    "perk_law_of_the_cycle": {
+      "name": "perk.aegis_ascension.perk_law_of_the_cycle.name",
+      "description": "perk.aegis_ascension.perk_law_of_the_cycle.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_law_of_the_cycle.png"
+    },
+    "perk_because_you_exist_as_i_write": {
+      "name": "perk.aegis_ascension.perk_because_you_exist_as_i_write.name",
+      "description": "perk.aegis_ascension.perk_because_you_exist_as_i_write.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_because_you_exist_as_i_write.png"
+    },
+    "perk_longhua_feixiao": {
+      "name": "perk.aegis_ascension.perk_longhua_feixiao.name",
+      "description": "perk.aegis_ascension.perk_longhua_feixiao.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_longhua_feixiao.png"
+    },
+    "perk_top_player": {
+      "name": "perk.aegis_ascension.perk_top_player.name",
+      "description": "perk.aegis_ascension.perk_top_player.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_top_player.png"
+    },
+    "perk_blessing_of_the_world_tree": {
+      "name": "perk.aegis_ascension.perk_blessing_of_the_world_tree.name",
+      "description": "perk.aegis_ascension.perk_blessing_of_the_world_tree.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_blessing_of_the_world_tree.png"
+    },
+    "perk_plateau_witch": {
+      "name": "perk.aegis_ascension.perk_plateau_witch.name",
+      "description": "perk.aegis_ascension.perk_plateau_witch.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_plateau_witch.png"
+    },
+    "perk_teacher_fox": {
+      "name": "perk.aegis_ascension.perk_teacher_fox.name",
+      "description": "perk.aegis_ascension.perk_teacher_fox.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_teacher_fox.png"
+    },
+    "perk_world_is_mine": {
+      "name": "perk.aegis_ascension.perk_world_is_mine.name",
+      "description": "perk.aegis_ascension.perk_world_is_mine.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_world_is_mine.png"
+    },
+    "perk_reinhardt": {
+      "name": "perk.aegis_ascension.perk_reinhardt.name",
+      "description": "perk.aegis_ascension.perk_reinhardt.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_reinhardt.png"
+    },
+    "perk_divine_sakura_power": {
+      "name": "perk.aegis_ascension.perk_divine_sakura_power.name",
+      "description": "perk.aegis_ascension.perk_divine_sakura_power.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_divine_sakura_power.png"
+    },
+    "perk_aquas_blessing": {
+      "name": "perk.aegis_ascension.perk_aquas_blessing.name",
+      "description": "perk.aegis_ascension.perk_aquas_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_aquas_blessing.png"
+    },
+    "perk_golden_rule": {
+      "name": "perk.aegis_ascension.perk_golden_rule.name",
+      "description": "perk.aegis_ascension.perk_golden_rule.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_golden_rule.png"
+    },
+    "perk_est": {
+      "name": "perk.aegis_ascension.perk_est.name",
+      "description": "perk.aegis_ascension.perk_est.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_est.png"
+    },
+    "perk_et_omnia_vanitas": {
+      "name": "perk.aegis_ascension.perk_et_omnia_vanitas.name",
+      "description": "perk.aegis_ascension.perk_et_omnia_vanitas.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_et_omnia_vanitas.png"
+    },
+    "perk_shrine_maiden_dance": {
+      "name": "perk.aegis_ascension.perk_shrine_maiden_dance.name",
+      "description": "perk.aegis_ascension.perk_shrine_maiden_dance.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_shrine_maiden_dance.png"
+    },
+    "perk_frenzy": {
+      "name": "perk.aegis_ascension.perk_frenzy.name",
+      "description": "perk.aegis_ascension.perk_frenzy.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_frenzy.png"
+    },
+    "perk_ganyus_blessing": {
+      "name": "perk.aegis_ascension.perk_ganyus_blessing.name",
+      "description": "perk.aegis_ascension.perk_ganyus_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_ganyus_blessing.png"
+    },
+    "perk_hanakos_blessing": {
+      "name": "perk.aegis_ascension.perk_hanakos_blessing.name",
+      "description": "perk.aegis_ascension.perk_hanakos_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_hanakos_blessing.png"
+    },
+    "perk_homuras_blessing": {
+      "name": "perk.aegis_ascension.perk_homuras_blessing.name",
+      "description": "perk.aegis_ascension.perk_homuras_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_homuras_blessing.png"
+    },
+    "perk_karyls_blessing": {
+      "name": "perk.aegis_ascension.perk_karyls_blessing.name",
+      "description": "perk.aegis_ascension.perk_karyls_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_karyls_blessing.png"
+    },
+    "perk_kisakis_blessing": {
+      "name": "perk.aegis_ascension.perk_kisakis_blessing.name",
+      "description": "perk.aegis_ascension.perk_kisakis_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_kisakis_blessing.png"
+    },
+    "perk_koharus_blessing": {
+      "name": "perk.aegis_ascension.perk_koharus_blessing.name",
+      "description": "perk.aegis_ascension.perk_koharus_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_koharus_blessing.png"
+    },
+    "perk_kokkoros_blessing": {
+      "name": "perk.aegis_ascension.perk_kokkoros_blessing.name",
+      "description": "perk.aegis_ascension.perk_kokkoros_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_kokkoros_blessing.png"
+    },
+    "perk_konatas_blessing": {
+      "name": "perk.aegis_ascension.perk_konatas_blessing.name",
+      "description": "perk.aegis_ascension.perk_konatas_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_konatas_blessing.png"
+    },
+    "perk_murasames_blessing": {
+      "name": "perk.aegis_ascension.perk_murasames_blessing.name",
+      "description": "perk.aegis_ascension.perk_murasames_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_murasames_blessing.png"
+    },
+    "perk_pecorines_blessing": {
+      "name": "perk.aegis_ascension.perk_pecorines_blessing.name",
+      "description": "perk.aegis_ascension.perk_pecorines_blessing.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_pecorines_blessing.png"
+    },
+    "perk_perfect_and_elegant_servant": {
+      "name": "perk.aegis_ascension.perk_perfect_and_elegant_servant.name",
+      "description": "perk.aegis_ascension.perk_perfect_and_elegant_servant.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_perfect_and_elegant_servant.png"
+    },
+    "perk_dominus_lapidis": {
+      "name": "perk.aegis_ascension.perk_dominus_lapidis.name",
+      "description": "perk.aegis_ascension.perk_dominus_lapidis.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_dominus_lapidis.png"
+    },
+    "perk_suspension_of_disbelief": {
+      "name": "perk.aegis_ascension.perk_suspension_of_disbelief.name",
+      "description": "perk.aegis_ascension.perk_suspension_of_disbelief.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_suspension_of_disbelief.png"
+    },
+    "perk_team_star": {
+      "name": "perk.aegis_ascension.perk_team_star.name",
+      "description": "perk.aegis_ascension.perk_team_star.description",
+      "icon": "aegis_ascension:textures/gui/talents/perk_team_star.png"
+    }
+  }
+}

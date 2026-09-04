@@ -16,9 +16,16 @@ import java.util.Map;
  * stake requirements are fixed by the template rather than rolled, so they are sent once
  * with the login catalog snapshot instead of repeated inside every quest on every sync.
  *
- * <p>They come from the server rather than the client's own files on purpose. A client's
- * catalogue may be stale or edited, and a screen that showed a requirement the server
- * does not enforce would read as the server being broken.</p>
+ * <p>The gameplay half - profession, constraints, reputation and stake requirements -
+ * comes from the server on purpose. A client's catalogue may be stale or edited, and a
+ * screen that showed a requirement the server does not enforce would read as the server
+ * being broken.</p>
+ *
+ * <p>Title, description, story and icon do not: they decide nothing the server enforces,
+ * so they are read from this client's own {@code quest_clientside.json} and never sent,
+ * which keeps roughly half the catalogue off the wire. Quests generated at runtime are
+ * the exception - their ids do not exist until the server builds them, so those carry
+ * their own keys and are left alone.</p>
  */
 public final class ClientQuestCatalog {
     private static final Gson GSON = new Gson();
@@ -44,6 +51,7 @@ public final class ClientQuestCatalog {
                     installed.putIfAbsent(entry.id, entry);
                 }
             }
+            QuestPresentation.overlay(installed);
             entries = Map.copyOf(installed);
         } catch (Exception exception) {
             // A quest whose presentation cannot be read still has to be playable, so the

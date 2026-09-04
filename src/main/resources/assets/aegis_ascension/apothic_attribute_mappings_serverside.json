@@ -1,10 +1,9 @@
 {
   "schema_version": 1,
-  "value_conventions": {
+  "_comments": {
     "custom_stat": "The persisted stat this mod publishes onto the attribute below. A talent contributes by declaring a stat of this name.",
     "attribute": "The Apothic Attributes (attributeslib) attribute the stat is published to. Ignored entirely when that mod is absent.",
     "operation": "addition, multiply_base, or multiply_total.",
-    "scale": "Multiplies the published amount, for when this mod's unit and the attribute's differ.",
     "enabled": "false stops publishing that stat without deleting the row; this mod then applies the stat itself where it can.",
     "excluded_perks": "Talents listed on a mapping contribute to that custom stat under their own in-code condition instead of being published as an unconditional attribute."
   },

@@ -51,7 +51,8 @@ public final class ArcheryStats {
         }
         double multiplier = 1.0D + Math.max(-1.0D, independentArrowDamage(data));
         if (!ApothicAttributesCompat.handlesMappedAttribute(attacker, ARROW_DAMAGE)) {
-            multiplier *= 1.0D + Math.max(-1.0D, data.getCustomStat(ARROW_DAMAGE));
+            multiplier *= 1.0D + Math.max(-1.0D, data.getCustomStat(ARROW_DAMAGE)
+                    + TalentStatService.skillEnhancementBonus(data, ARROW_DAMAGE));
         }
         return multiplier;
     }

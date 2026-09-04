@@ -16,7 +16,7 @@ import java.util.Locale;
 /**
  * Arcane Aegis: the barrage aegis.
  *
- * <p>This is the whole implementation of the aegis's {@code aegises.json} entry, and the
+ * <p>This is the whole implementation of the aegis's {@code aegises_serverside.json} entry, and the
  * public facade the barrage addon calls. Nothing here links against the addon directly:
  * barrages are identified by string id so the optional integration remains loader-safe.</p>
  *

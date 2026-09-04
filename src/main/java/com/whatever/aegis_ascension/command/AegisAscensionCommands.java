@@ -343,7 +343,7 @@ public final class AegisAscensionCommands {
         return 1;
     }
 
-    /** Rereads questsetting.json without a restart, so catalogue edits can be tried live. */
+    /** Rereads quest_serverside.json without a restart, so catalogue edits can be tried live. */
     private static int reloadQuests(CommandSourceStack source) {
         int synced;
         try {

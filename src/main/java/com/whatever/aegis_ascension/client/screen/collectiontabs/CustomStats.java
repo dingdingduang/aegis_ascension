@@ -7,6 +7,7 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatab
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.aegis.AegisConstants;
+import com.whatever.aegis_ascension.client.SkillEnhancementClientSettings;
 import com.whatever.aegis_ascension.client.ClientPerkState;
 import com.whatever.aegis_ascension.client.CustomStatSettings;
 import com.whatever.aegis_ascension.perk.Perk;
@@ -176,7 +177,7 @@ public final class CustomStats {
     }
 
     /**
-     * The list view's rows, in the order and grouping {@code custom_stat_setting.json}
+     * The list view's rows, in the order and grouping {@code custom_stat_clientside.json}
      * asks for. Resolved once per session alongside {@link #definitions()}, which also
      * keeps a mistyped stat id in that file down to one log line rather than one per
      * layout pass.
@@ -203,7 +204,7 @@ public final class CustomStats {
                 Definition definition = definition(key);
                 if (definition == null) {
                     AegisAscensionMod.getLogger().warn(
-                            "Ignoring unknown stat id in custom_stat_setting.json "
+                            "Ignoring unknown stat id in custom_stat_clientside.json "
                                     + "list_view: {}", key);
                     continue;
                 }
@@ -269,7 +270,7 @@ public final class CustomStats {
                     finalValue
             );
         }
-        // Stats fed only by talents.json and aegises.json: nothing outside the mod can
+        // Stats fed only by talents_serverside.json and aegises_serverside.json: nothing outside the mod can
         // reach them, so the whole value is ours and both "other" halves are zero.
         if (definition.format().percentageBased()) {
             return new Breakdown(0.0D, finalValue, 0.0D, 0.0D, finalValue);
@@ -299,7 +300,7 @@ public final class CustomStats {
     private static Definition skillAttributeStat(String key, String enhancementId,
                                                  Format format) {
         ResourceLocation icon = SkillEnhancement.byId(enhancementId)
-                .map(SkillEnhancement::iconTexture)
+                .map(SkillEnhancementClientSettings::icon)
                 .orElseThrow(() -> new IllegalStateException(
                         "Missing stat icon enhancement: " + enhancementId
                 ));

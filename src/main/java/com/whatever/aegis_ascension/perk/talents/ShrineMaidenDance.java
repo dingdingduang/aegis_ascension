@@ -459,12 +459,12 @@ public final class ShrineMaidenDance {
     private static Catalog loadCatalog() {
         Path configPath = PlatformServices.paths()
                 .modConfigDirectory(AegisAscensionMod.MOD_ID)
-                .resolve("shrine_maiden_dance.json");
+                .resolve("shrine_maiden_dance_serverside.json");
         try {
             Files.createDirectories(configPath.getParent());
             if (Files.notExists(configPath)) {
                 try (var stream = ShrineMaidenDance.class.getResourceAsStream(
-                        "/assets/aegis_ascension/shrine_maiden_dance.json")) {
+                        "/assets/aegis_ascension/shrine_maiden_dance_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
                                 "Missing default Shrine Maiden Dance JSON"

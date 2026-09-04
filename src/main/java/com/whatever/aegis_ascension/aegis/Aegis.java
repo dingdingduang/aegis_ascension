@@ -9,6 +9,7 @@ import com.google.gson.JsonParser;
 import com.google.gson.annotations.SerializedName;
 import com.whatever.aegis_ascension.AegisAscensionMod;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.util.CatalogPresentation;
 import com.whatever.aegis_ascension.util.ConfigDescription;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -32,12 +33,14 @@ public final class Aegis {
     private static final int MAX_CATALOG_ENTRIES = 128;
     private static final int MAX_WIRE_ID_LENGTH = 128;
     /** Aegises contributed by dependent mods, by owning mod id, in registration order. */
-    private static final Map<String, List<AegisJson>> REGISTERED_AEGISES =
-            new LinkedHashMap<>();
+    private static final Map<String, List<AegisJson>> REGISTERED_AEGISES = new LinkedHashMap<>();
     private static final Catalog LOCAL_CATALOG = loadCatalog();
     private static volatile Catalog effectiveCatalog = buildEffectiveCatalog();
     private static volatile CatalogSnapshot localSnapshot = buildSnapshot(effectiveCatalog);
     private static volatile CatalogSnapshot activeSnapshot = localSnapshot;
+
+    //clientside only
+    private static final CatalogPresentation PRESENTATION = CatalogPresentation.of("aegises_clientside.json");
 
     private static CatalogSnapshot buildSnapshot(Catalog catalog) {
         return buildSnapshot(catalog, false);
@@ -56,9 +59,6 @@ public final class Aegis {
             Map<String, Double> stats = validateStats(definition.stats, id + " stats");
             Aegis aegis = new Aegis(
                     id,
-                    requireText(definition.name, id + " name"),
-                    requireText(definition.description, id + " description"),
-                    requireLocation(requireText(definition.icon, id + " icon")),
                     stats,
                     definition.primaryStatMultipliers == null
                             ? Map.of()
@@ -89,9 +89,6 @@ public final class Aegis {
     }
 
     private final String id;
-    private final String nameKey;
-    private final String descriptionKey;
-    private final ResourceLocation iconTexture;
     private final Map<String, Double> stats;
     private final Map<String, Double> primaryStatMultipliers;
     private final Set<ResourceLocation> extraCastExcludedSpells;
@@ -101,17 +98,13 @@ public final class Aegis {
     private final boolean authorityAvailable;
     private final boolean manuallyToggleable;
 
-    private Aegis(String id, String nameKey, String descriptionKey,
-                  ResourceLocation iconTexture, Map<String, Double> stats,
+    private Aegis(String id, Map<String, Double> stats,
                   Map<String, Double> primaryStatMultipliers,
                   List<String> extraCastExcludedSpells,
                   boolean enabled, boolean initialSelectionAllowed, List<String> requiredMods,
                   boolean authorityAvailable,
                   boolean manuallyToggleable) {
         this.id = id;
-        this.nameKey = nameKey;
-        this.descriptionKey = descriptionKey;
-        this.iconTexture = iconTexture;
         Map<String, Double> effectiveStats = new LinkedHashMap<>(stats);
         if (id.equals(AegisConstants.STELLAR)) {
             effectiveStats.putIfAbsent(AegisConstants.LUCKY_STRIKE_CAP, 3.0D);
@@ -161,7 +154,7 @@ public final class Aegis {
     }
 
     public Component title() {
-        return getTranslatableString(nameKey);
+        return getTranslatableString(PRESENTATION.name(id));
     }
 
     public Component description() {
@@ -172,11 +165,12 @@ public final class Aegis {
                         multiplier
                 )
         );
-        return ConfigDescription.render(descriptionKey, descriptionStats);
+        return ConfigDescription.render(PRESENTATION.description(id),
+                descriptionStats);
     }
 
     public ResourceLocation iconTexture() {
-        return iconTexture;
+        return PRESENTATION.icon(id);
     }
 
     public Map<String, Double> stats() {
@@ -189,7 +183,7 @@ public final class Aegis {
 
     /**
      * Returns this Aegis's multiplier for a chosen Primary Skill Enhancement.
-     * Entries are keyed by the enhancement id used in skill_enhancements.json.
+     * Entries are keyed by the enhancement id used in skill_enhancement_serverside.json.
      */
     public double primaryStatMultiplier(String primaryStatId) {
         Double specific = primaryStatMultipliers.get(primaryStatId);
@@ -252,7 +246,7 @@ public final class Aegis {
                     "Cannot register Aegises for a mod that is not loaded: " + namespace
             );
         }
-        String resourcePath = "assets/" + namespace + "/aegises.json";
+        String resourcePath = "assets/" + namespace + "/aegises_serverside.json";
         Path file = PlatformServices.mods()
                 .findModResource(namespace, resourcePath)
                 .orElseThrow(() -> new IllegalStateException(
@@ -282,6 +276,14 @@ public final class Aegis {
         if (localActive) {
             activeSnapshot = rebuilt;
         }
+
+        // Import Addon
+        PlatformServices.mods()
+                .findModResource(namespace,
+                        "assets/" + namespace + "/aegises_clientside.json")
+                .ifPresent(presentation -> CatalogPresentation.mergeAddon(
+                        "aegises_clientside.json", presentation));
+
         return aegises.size();
     }
 
@@ -344,12 +346,12 @@ public final class Aegis {
     private static Catalog loadCatalog() {
         Path configPath = PlatformServices.paths()
                 .modConfigDirectory(AegisAscensionMod.MOD_ID)
-                .resolve("aegises.json");
+                .resolve("aegises_serverside.json");
         try {
             Files.createDirectories(configPath.getParent());
             if (Files.notExists(configPath)) {
                 try (var stream = Aegis.class.getResourceAsStream(
-                        "/assets/aegis_ascension/aegises.json")) {
+                        "/assets/aegis_ascension/aegises_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
                                 "Missing default assets/aegis_ascension/aegises.json"
@@ -411,10 +413,6 @@ public final class Aegis {
             );
         }
         requireAddonId(namespace, definition.id, "Aegis");
-        requireAddonField(namespace, definition.id, "name", definition.name);
-        requireAddonField(namespace, definition.id, "description", definition.description);
-        requireAddonField(namespace, definition.id, "icon", definition.icon);
-
         List<String> requiredMods = new ArrayList<>(requiredMods(definition));
         requiredMods.add(namespace);
         definition.requiresMod = "";
@@ -534,9 +532,6 @@ public final class Aegis {
 
     private static final class AegisJson {
         private String id;
-        private String name;
-        private String description;
-        private String icon;
         private Map<String, Double> stats = Map.of();
         @SerializedName("primary_stat_multipliers")
         private Map<String, Double> primaryStatMultipliers = Map.of();

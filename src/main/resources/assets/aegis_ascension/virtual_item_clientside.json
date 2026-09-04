@@ -1,0 +1,55 @@
+{
+  "schema_version": 1,
+  "entries": {
+    "hp_stat_book": {
+      "name": "virtual_item.aegis_ascension.hp_stat_book.name",
+      "description": "virtual_item.aegis_ascension.hp_stat_book.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_book_0.png"
+    },
+    "primary_stat_book": {
+      "name": "virtual_item.aegis_ascension.primary_stat_book.name",
+      "description": "virtual_item.aegis_ascension.primary_stat_book.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_book_1.png"
+    },
+    "atk_stat_book": {
+      "name": "virtual_item.aegis_ascension.atk_stat_book.name",
+      "description": "virtual_item.aegis_ascension.atk_stat_book.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_book_2.png"
+    },
+    "expand_inventory_book": {
+      "name": "virtual_item.aegis_ascension.expand_inventory_book.name",
+      "description": "virtual_item.aegis_ascension.expand_inventory_book.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_expand_inventory_0.png"
+    },
+    "swiss_roll": {
+      "name": "virtual_item.aegis_ascension.swiss_roll.name",
+      "description": "virtual_item.aegis_ascension.swiss_roll.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_swiss_roll.png"
+    },
+    "devour_aegis_core_i": {
+      "name": "virtual_item.aegis_ascension.devour_aegis_core_i.name",
+      "description": "virtual_item.aegis_ascension.devour_aegis_core_i.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_core_i.png"
+    },
+    "devour_aegis_core_ii": {
+      "name": "virtual_item.aegis_ascension.devour_aegis_core_ii.name",
+      "description": "virtual_item.aegis_ascension.devour_aegis_core_ii.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_core_ii.png"
+    },
+    "devour_aegis_core_iii": {
+      "name": "virtual_item.aegis_ascension.devour_aegis_core_iii.name",
+      "description": "virtual_item.aegis_ascension.devour_aegis_core_iii.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_core_iii.png"
+    },
+    "devour_reset_book": {
+      "name": "virtual_item.aegis_ascension.devour_reset_book.name",
+      "description": "virtual_item.aegis_ascension.devour_reset_book.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_devour_aegis_reset.png"
+    },
+    "lethes_river_water": {
+      "name": "virtual_item.aegis_ascension.lethes_river_water.name",
+      "description": "virtual_item.aegis_ascension.lethes_river_water.description",
+      "icon": "aegis_ascension:textures/gui/virtual_item/virtual_item_lethes_river_water.png"
+    }
+  }
+}

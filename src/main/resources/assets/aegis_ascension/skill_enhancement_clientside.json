@@ -1,98 +1,68 @@
 {
-  "schema_version": 3,
-  "enhancements": [
-    {
-      "id": "armor",
+  "schema_version": 2,
+  "entries": {
+    "armor": {
       "name": "skill_enhancement.aegis_ascension.armor.name",
       "description": "skill_enhancement.aegis_ascension.armor.description",
       "icon": "minecraft:textures/item/iron_chestplate.png",
       "icon_texture_size": 16,
-      "attribute": "minecraft:generic.armor",
-      "amount": 1.0,
-      "operation": "addition",
-      "affected_by_all_skill_enhancement_attribute": true,
       "display_format": "number"
     },
-    {
-      "id": "attack_speed",
+    "attack_speed": {
       "name": "skill_enhancement.aegis_ascension.attack_speed.name",
       "description": "skill_enhancement.aegis_ascension.attack_speed.description",
       "icon": "minecraft:textures/item/stone_sword.png",
       "icon_texture_size": 16,
-      "attribute": "minecraft:generic.attack_speed",
-      "amount": 0.02,
-      "operation": "multiply_total",
-      "affected_by_all_skill_enhancement_attribute": false,
       "display_format": "percent"
     },
-    {
-      "id": "attack_damage",
+    "attack_damage": {
       "name": "skill_enhancement.aegis_ascension.attack_damage.name",
       "description": "skill_enhancement.aegis_ascension.attack_damage.description",
       "icon": "minecraft:textures/item/diamond_sword.png",
       "icon_texture_size": 16,
-      "attribute": "minecraft:generic.attack_damage",
-      "amount": 1.0,
-      "operation": "addition",
-      "affected_by_all_skill_enhancement_attribute": true,
       "display_format": "number"
     },
-    {
-      "id": "max_health",
+    "max_health": {
       "name": "skill_enhancement.aegis_ascension.max_health.name",
       "description": "skill_enhancement.aegis_ascension.max_health.description",
       "icon": "minecraft:textures/item/golden_apple.png",
       "icon_texture_size": 16,
-      "attribute": "minecraft:generic.max_health",
-      "amount": 2.0,
-      "operation": "addition",
-      "affected_by_all_skill_enhancement_attribute": true,
       "display_format": "number"
     },
-    {
-      "id": "movement_speed",
+    "movement_speed": {
       "name": "skill_enhancement.aegis_ascension.movement_speed.name",
       "description": "skill_enhancement.aegis_ascension.movement_speed.description",
       "icon": "minecraft:textures/item/sugar.png",
       "icon_texture_size": 16,
-      "attribute": "minecraft:generic.movement_speed",
-      "amount": 0.02,
-      "operation": "multiply_total",
-      "affected_by_all_skill_enhancement_attribute": false,
       "display_format": "percent"
     },
-    {
-      "id": "skill_damage",
+    "skill_damage": {
       "name": "skill_enhancement.aegis_ascension.skill_damage.name",
       "description": "skill_enhancement.aegis_ascension.skill_damage.description",
       "icon": "minecraft:textures/item/enchanted_book.png",
       "icon_texture_size": 16,
-      "custom_stat": "skill_damage",
-      "amount": 0.02,
-      "affected_by_all_skill_enhancement_attribute": true,
       "display_format": "percent"
     },
-    {
-      "id": "critical_chance",
+    "critical_chance": {
       "name": "skill_enhancement.aegis_ascension.critical_chance.name",
       "description": "skill_enhancement.aegis_ascension.critical_chance.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_ink_dyed_sakura.png",
       "icon_texture_size": 64,
-      "custom_stat": "critical_chance",
-      "amount": 0.01,
-      "affected_by_all_skill_enhancement_attribute": false,
       "display_format": "percent"
     },
-    {
-      "id": "critical_damage",
+    "critical_damage": {
       "name": "skill_enhancement.aegis_ascension.critical_damage.name",
       "description": "skill_enhancement.aegis_ascension.critical_damage.description",
       "icon": "aegis_ascension:textures/gui/talents/perk_half_human_half_phantom_gardener.png",
       "icon_texture_size": 64,
-      "custom_stat": "critical_damage",
-      "amount": 0.02,
-      "affected_by_all_skill_enhancement_attribute": false,
+      "display_format": "percent"
+    },
+    "arrow_damage": {
+      "name": "skill_enhancement.aegis_ascension.arrow_damage.name",
+      "description": "skill_enhancement.aegis_ascension.arrow_damage.description",
+      "icon": "minecraft:textures/item/arrow.png",
+      "icon_texture_size": 16,
       "display_format": "percent"
     }
-  ]
+  }
 }

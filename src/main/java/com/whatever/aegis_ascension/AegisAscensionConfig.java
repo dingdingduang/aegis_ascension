@@ -59,7 +59,7 @@ public final class AegisAscensionConfig {
                     "all_skill_enhancement_attribute, cooldown_reduction,",
                     "random_ssr, negative_damage_reduction, primary_stat_flat.",
                     "An outcome can also be disabled with enabled=false in",
-                    "config/aegis_ascension/mysterious_doll.json.",
+                    "config/aegis_ascension/mysterious_doll_serverside.json.",
                     "The remaining positive JSON weights are automatically normalized."
             )
             .defineListAllowEmpty(

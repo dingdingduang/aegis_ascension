@@ -19,7 +19,7 @@ import java.util.Set;
 /**
  * Local-only, non-gameplay preferences that belong to a player's presentation rather
  * than the server protocol. Stored at
- * {@code config/aegis_ascension/client/misc_local_setting.json}, separately from the
+ * {@code config/aegis_ascension/client/misc_clientside.json}, separately from the
  * main Client Settings drawer file.
  */
 public final class MiscLocalSettings {
@@ -28,7 +28,7 @@ public final class MiscLocalSettings {
     private static final Path FILE = PlatformServices.paths()
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
             .resolve("client")
-            .resolve("misc_local_setting.json");
+            .resolve("misc_clientside.json");
 
     private static MiscLocalSettings instance;
 

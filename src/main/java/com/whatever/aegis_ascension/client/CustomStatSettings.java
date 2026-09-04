@@ -30,7 +30,7 @@ import java.util.Optional;
  * Nothing here changes a value, so this file never has to agree with the server or with
  * another player's copy.</p>
  *
- * <p>Persisted at {@code config/aegis_ascension/custom_stat_setting.json}, seeded on first
+ * <p>Persisted at {@code config/aegis_ascension/custom_stat_clientside.json}, seeded on first
  * run from the bundled asset of the same name. Only listed stats change; everything else
  * keeps the icon built into the tab.</p>
  *
@@ -43,7 +43,7 @@ public final class CustomStatSettings {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = PlatformServices.paths()
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
-            .resolve("custom_stat_setting.json");
+            .resolve("custom_stat_clientside.json");
 
     private static CustomStatSettings instance;
 
@@ -94,7 +94,7 @@ public final class CustomStatSettings {
                 .or(() -> Aegis.byId(override.source).map(Aegis::iconTexture))
                 .or(() -> Perk.soulLinkById(override.source).map(SoulLink::iconTexture))
                 .or(() -> SkillEnhancement.byId(override.source)
-                        .map(SkillEnhancement::iconTexture));
+                        .map(SkillEnhancementClientSettings::icon));
         if (fromSource.isEmpty()) {
             warn(statKey, "no talent, Aegis, Soul Link, or Skill Enhancement with id "
                     + override.source);
@@ -146,7 +146,7 @@ public final class CustomStatSettings {
             Files.createDirectories(FILE.getParent());
             if (Files.notExists(FILE)) {
                 try (var stream = CustomStatSettings.class.getResourceAsStream(
-                        "/assets/aegis_ascension/custom_stat_setting.json")) {
+                        "/assets/aegis_ascension/custom_stat_clientside.json")) {
                     if (stream != null) {
                         Files.copy(stream, FILE);
                     }

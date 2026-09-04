@@ -14,10 +14,10 @@ import java.util.Map;
 
 /**
  * General server-authoritative gameplay settings loaded from
- * {@code config/aegis_ascension/serversetting.json}.
+ * {@code config/aegis_ascension/general_serverside.json}.
  *
  * <p>The bundled JSON is copied on first run and becomes the editable source of truth,
- * following the same copy-then-read pattern as {@code aegises.json}. This class is the
+ * following the same copy-then-read pattern as {@code aegises_serverside.json}. This class is the
  * home for settings that apply across mechanics rather than belonging to one talent or
  * Aegis.</p>
  */
@@ -25,7 +25,7 @@ public final class ServerSettings {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = PlatformServices.paths()
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
-            .resolve("serversetting.json");
+            .resolve("general_serverside.json");
 
     private static ServerSettings instance;
 
@@ -215,10 +215,10 @@ public final class ServerSettings {
             Files.createDirectories(FILE.getParent());
             if (Files.notExists(FILE)) {
                 try (var stream = ServerSettings.class.getResourceAsStream(
-                        "/assets/aegis_ascension/serversetting.json")) {
+                        "/assets/aegis_ascension/general_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/serversetting.json"
+                                "Missing default assets/aegis_ascension/general_serverside.json"
                         );
                     }
                     Files.copy(stream, FILE);

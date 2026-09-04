@@ -133,6 +133,7 @@ public final class ACGPerkSelectionScreen extends Screen {
     private double lastMouseY = Double.NaN;
 
     private final ACGScreenContext pageContext = new ACGScreenContext(this);
+    final ACGCollapsedSections collapsedSections = new ACGCollapsedSections();
     private final ACGDrawer drawer = new ACGDrawer();
     private final ACGPage storagePage = new ACGStoragePage();
     private final ACGPage devouredPage = new ACGDevouredPage();

@@ -3,6 +3,7 @@ package com.whatever.aegis_ascension.compat;
 import static com.whatever.aegis_ascension.perk.TalentConstants.*;
 
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
+import com.whatever.aegis_ascension.mechanic.TalentStatService;
 import com.whatever.aegis_ascension.perk.ApothicAttributeMapping;
 import com.whatever.aegis_ascension.perk.Perk;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
@@ -241,7 +242,8 @@ public final class ApothicAttributesCompat {
                 && mapping.customStat().equals(CRITICAL_DAMAGE)) {
             return criticalDamageBonus;
         }
-        double amount = data.getCustomStat(mapping.customStat());
+
+        double amount = data.getCustomStat(mapping.customStat()) + TalentStatService.skillEnhancementBonus(data, mapping.customStat());
         for (Map.Entry<Perk, Integer> entry : data.getPerkRanks().entrySet()) {
             Perk perk = entry.getKey();
             if (mapping.excludedPerks().contains(perk.id())) {

@@ -1,14 +1,5 @@
 {
   "schema_version": 2,
-  "value_conventions": {
-    "overrides": "Stat id to icon override. Every stat ships with its built-in source listed, so this file is the full editable table.",
-    "source": "A talent, Aegis, or Soul Link id whose icon this stat borrows. Ids are the ones used in talents.json, aegises.json, and soul_links.json.",
-    "icon": "A texture path such as aegis_ascension:textures/gui/talents/perk_frieren.png. Used when present and valid; an unparsable path falls back to source.",
-    "list_icon": "The texture drawn beside this stat in the list view. The bundled set lives in textures/gui/customstat/ as icon_000.png through icon_695.png; the numbers are the ones printed under each icon on the contact sheets in docs/customstat-icons/, so swapping an icon is a matter of reading a number off a sheet. Any other texture path works too. Avoid animated textures (vanilla clock, compass): their files are a vertical strip of frames and would be squashed into the row whole.",
-    "list_icon_size": "Edge length of the list_icon file, so it is scaled down whole rather than cropped. The bundled icons are 16, which is exactly the size a row draws them at, so they blit without resampling. 16 when omitted, which is also every vanilla item texture.",
-    "list_view": "Layout of the tab's list view: columns (1-4), row_height (12-32), show_group_headers, and the ordered groups. A stat left out of every group is appended under its own heading, so nothing disappears from a hand-edited file.",
-    "errors": "An unknown id or an unparsable path is logged and ignored, leaving that stat's built-in icon in place."
-  },
   "list_view": {
     "columns": 2,
     "row_height": 18,

@@ -28,7 +28,7 @@ import net.minecraft.server.level.ServerPlayer;
  * {@code shield_primary_multiplier}, plus Spring Blossom's configured fraction per
  * experience level. The shield uses the shared model.
  * The cadence reads {@code interval_seconds} from the perk when present, otherwise
- * {@link #DEFAULT_INTERVAL_SECONDS}, so it stays tunable from talents.json.</p>
+ * {@link #DEFAULT_INTERVAL_SECONDS}, so it stays tunable from talents_serverside.json.</p>
  */
 public final class KoharuShield {
     /** Fallback cadence when the perk defines no {@code interval_seconds} stat. */

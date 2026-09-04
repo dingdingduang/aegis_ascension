@@ -21,7 +21,7 @@ import java.util.UUID;
  * Strengthens mobs that spawn near a player whose talents declare it.
  *
  * <p>Which stat moves which attribute is declared by the {@code nearby_spawn_buffs} table
- * in talents.json, and a talent joins in by declaring one of those stats alongside a
+ * in talents_serverside.json, and a talent joins in by declaring one of those stats alongside a
  * {@code nearby_spawn_radius} - no talent and no attribute is named here. A new kind of
  * buff is therefore a row in that table plus a stat on a talent.</p>
  *

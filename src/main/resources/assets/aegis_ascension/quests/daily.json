@@ -6,9 +6,6 @@
     "targetMin": 8,
     "targetMax": 15,
     "weight": 10,
-    "icon": "minecraft:textures/item/golden_sword.png",
-    "title": "quest.aegis_ascension.daily.kill.title",
-    "description": "quest.aegis_ascension.daily.kill.description",
     "experience": 100,
     "rewards": [
       {
@@ -26,9 +23,6 @@
     "targetMin": 8,
     "targetMax": 16,
     "weight": 10,
-    "icon": "minecraft:textures/item/wheat_seeds.png",
-    "title": "quest.aegis_ascension.daily.plant.title",
-    "description": "quest.aegis_ascension.daily.plant.description",
     "experience": 100,
     "rewards": [
       {
@@ -46,9 +40,6 @@
     "targetMin": 400,
     "targetMax": 900,
     "weight": 10,
-    "icon": "minecraft:textures/mob_effect/speed.png",
-    "title": "quest.aegis_ascension.daily.walk.title",
-    "description": "quest.aegis_ascension.daily.walk.description",
     "experience": 100,
     "rewards": [
       {
@@ -66,9 +57,6 @@
     "targetMin": 2,
     "targetMax": 4,
     "weight": 7,
-    "icon": "minecraft:textures/entity/chest/normal.png",
-    "title": "quest.aegis_ascension.daily.chest.title",
-    "description": "quest.aegis_ascension.daily.chest.description",
     "experience": 125,
     "rewards": [
       {
@@ -86,9 +74,6 @@
     "targetMin": 1,
     "targetMax": 3,
     "weight": 7,
-    "icon": "minecraft:textures/block/oak_sapling.png",
-    "title": "quest.aegis_ascension.daily.biome.title",
-    "description": "quest.aegis_ascension.daily.biome.description",
     "experience": 125,
     "rewards": [
       {
@@ -113,9 +98,6 @@
     "targetMin": 10,
     "targetMax": 20,
     "weight": 8,
-    "icon": "minecraft:textures/item/bone.png",
-    "title": "quest.aegis_ascension.daily.hunt_undead.title",
-    "description": "quest.aegis_ascension.daily.hunt_undead.description",
     "experience": 140,
     "rewards": [
       {
@@ -139,9 +121,6 @@
     "targetMin": 8,
     "targetMax": 24,
     "weight": 6,
-    "icon": "minecraft:textures/item/emerald.png",
-    "title": "quest.aegis_ascension.daily.trade.title",
-    "description": "quest.aegis_ascension.daily.trade.description",
     "experience": 150,
     "rewards": [
       {
@@ -165,9 +144,6 @@
     "targetMin": 12,
     "targetMax": 32,
     "weight": 6,
-    "icon": "minecraft:textures/item/iron_ingot.png",
-    "title": "quest.aegis_ascension.daily.deliver.title",
-    "description": "quest.aegis_ascension.daily.deliver.description",
     "experience": 150,
     "rewards": [
       {
@@ -185,9 +161,6 @@
     "targetMin": 24,
     "targetMax": 64,
     "weight": 10,
-    "icon": "aegis_ascension:textures/gui/quest_ui/quest_unknown.png",
-    "title": "quest.aegis_ascension.daily.craft_any.title",
-    "description": "quest.aegis_ascension.daily.craft_any.description",
     "experience": 110,
     "rewards": [
       {
@@ -213,9 +186,6 @@
     "targetMin": 2,
     "targetMax": 5,
     "weight": 5,
-    "icon": "aegis_ascension:textures/gui/quest_ui/quest_unknown.png",
-    "title": "quest.aegis_ascension.daily.craft_gear.title",
-    "description": "quest.aegis_ascension.daily.craft_gear.description",
     "experience": 160,
     "rewards": [
       {
@@ -241,9 +211,6 @@
     "targetMin": 64,
     "targetMax": 160,
     "weight": 10,
-    "icon": "minecraft:textures/item/iron_pickaxe.png",
-    "title": "quest.aegis_ascension.daily.mine_stone.title",
-    "description": "quest.aegis_ascension.daily.mine_stone.description",
     "experience": 100,
     "rewards": [
       {
@@ -270,9 +237,6 @@
     "targetMin": 8,
     "targetMax": 20,
     "weight": 5,
-    "icon": "minecraft:textures/item/raw_iron.png",
-    "title": "quest.aegis_ascension.daily.mine_ore.title",
-    "description": "quest.aegis_ascension.daily.mine_ore.description",
     "experience": 170,
     "rewards": [
       {
@@ -298,9 +262,6 @@
     "targetMin": 24,
     "targetMax": 64,
     "weight": 9,
-    "icon": "minecraft:textures/item/wooden_axe.png",
-    "title": "quest.aegis_ascension.daily.chop_log.title",
-    "description": "quest.aegis_ascension.daily.chop_log.description",
     "experience": 100,
     "rewards": [
       {
@@ -318,9 +279,6 @@
     "targetMin": 20,
     "targetMax": 50,
     "weight": 9,
-    "icon": "minecraft:textures/item/arrow.png",
-    "title": "quest.aegis_ascension.daily.shoot_arrow.title",
-    "description": "quest.aegis_ascension.daily.shoot_arrow.description",
     "experience": 110,
     "rewards": [
       {
@@ -338,9 +296,6 @@
     "targetMin": 10,
     "targetMax": 25,
     "weight": 4,
-    "icon": "minecraft:textures/item/spectral_arrow.png",
-    "title": "quest.aegis_ascension.daily.snipe.title",
-    "description": "quest.aegis_ascension.daily.snipe.description",
     "experience": 180,
     "goldRewardMin": 40,
     "goldRewardMax": 120,

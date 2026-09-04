@@ -4,6 +4,7 @@ import static com.whatever.aegis_ascension.perk.TalentConstants.PERK_MATTER_TO_M
 import static com.whatever.aegis_ascension.util.GeneralClientMethods.drawCenteredString;
 import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatableString;
 
+import com.whatever.aegis_ascension.client.SkillEnhancementClientSettings;
 import com.whatever.aegis_ascension.client.ClientPerkState;
 import com.whatever.aegis_ascension.client.ClientRefreshRequestLimiter;
 import com.whatever.aegis_ascension.client.screen.acg.ACGButton;
@@ -54,7 +55,8 @@ final class ACGSkillEnhancementPage implements ACGAwaitingPage {
                     : getTranslatableString(conversionUnlocked
                                     ? "screen.aegis_ascension.collection.primary.button"
                                     : "screen.aegis_ascension.collection.primary.locked",
-                            ClientPerkState.getPrimarySkillEnhancement().title());
+                            SkillEnhancementClientSettings.title(
+                                    ClientPerkState.getPrimarySkillEnhancement()));
             int controlsWidth = Math.min(364,
                     Math.max(220, context.contentWidth() - 16));
             int refreshWidth = Math.min(140, Math.max(92, controlsWidth / 3));

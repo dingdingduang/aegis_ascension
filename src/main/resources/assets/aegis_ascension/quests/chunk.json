@@ -10,9 +10,6 @@
       "R",
       "SR"
     ],
-    "icon": "minecraft:textures/item/map.png",
-    "title": "quest.aegis_ascension.chunk.biome.title",
-    "description": "quest.aegis_ascension.chunk.biome.description",
     "experience": 120,
     "goldRewardMin": 20,
     "goldRewardMax": 60,
@@ -36,9 +33,6 @@
       "R",
       "SR"
     ],
-    "icon": "minecraft:textures/entity/chest/normal.png",
-    "title": "quest.aegis_ascension.chunk.chest.title",
-    "description": "quest.aegis_ascension.chunk.chest.description",
     "experience": 140,
     "goldRewardMin": 20,
     "goldRewardMax": 70,
@@ -62,9 +56,6 @@
       "R",
       "SR"
     ],
-    "icon": "minecraft:textures/item/leather_boots.png",
-    "title": "quest.aegis_ascension.chunk.walk.title",
-    "description": "quest.aegis_ascension.chunk.walk.description",
     "experience": 110,
     "goldRewardMin": 20,
     "goldRewardMax": 60,
@@ -88,9 +79,6 @@
       "R",
       "SR"
     ],
-    "icon": "minecraft:textures/item/stone_sword.png",
-    "title": "quest.aegis_ascension.chunk.kill.title",
-    "description": "quest.aegis_ascension.chunk.kill.description",
     "experience": 130,
     "goldRewardMin": 20,
     "goldRewardMax": 60,
@@ -114,9 +102,6 @@
       "R",
       "SR"
     ],
-    "icon": "minecraft:textures/item/wheat_seeds.png",
-    "title": "quest.aegis_ascension.chunk.plant.title",
-    "description": "quest.aegis_ascension.chunk.plant.description",
     "experience": 120,
     "goldRewardMin": 20,
     "goldRewardMax": 60,
@@ -150,9 +135,6 @@
       "minecraft:badlands",
       "minecraft:eroded_badlands"
     ],
-    "icon": "minecraft:textures/item/sand.png",
-    "title": "quest.aegis_ascension.chunk.desert_dig.title",
-    "description": "quest.aegis_ascension.chunk.desert_dig.description",
     "experience": 160,
     "goldRewardMin": 30,
     "goldRewardMax": 80,
@@ -189,9 +171,6 @@
       "minecraft:taiga",
       "minecraft:old_growth_pine_taiga"
     ],
-    "icon": "minecraft:textures/item/stone_axe.png",
-    "title": "quest.aegis_ascension.chunk.forest_timber.title",
-    "description": "quest.aegis_ascension.chunk.forest_timber.description",
     "experience": 150,
     "goldRewardMin": 30,
     "goldRewardMax": 80,
@@ -227,9 +206,6 @@
     "dimensions": [
       "minecraft:the_nether"
     ],
-    "icon": "minecraft:textures/item/blaze_powder.png",
-    "title": "quest.aegis_ascension.chunk.nether_scour.title",
-    "description": "quest.aegis_ascension.chunk.nether_scour.description",
     "experience": 320,
     "goldRewardMin": 80,
     "goldRewardMax": 200,
@@ -269,9 +245,6 @@
       "R",
       "SR"
     ],
-    "icon": "minecraft:textures/item/compass.png",
-    "title": "quest.aegis_ascension.chunk.landmark.title",
-    "description": "quest.aegis_ascension.chunk.landmark.description",
     "experience": 260,
     "goldRewardMin": 50,
     "goldRewardMax": 140,
@@ -309,9 +282,6 @@
       "minecraft:beach",
       "minecraft:river"
     ],
-    "icon": "minecraft:textures/item/kelp.png",
-    "title": "quest.aegis_ascension.chunk.shoreline.title",
-    "description": "quest.aegis_ascension.chunk.shoreline.description",
     "experience": 150,
     "goldRewardMin": 30,
     "goldRewardMax": 80,

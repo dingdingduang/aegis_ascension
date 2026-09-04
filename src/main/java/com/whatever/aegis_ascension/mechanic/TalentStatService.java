@@ -1459,6 +1459,10 @@ public final class TalentStatService {
         return bonus;
     }
 
+    public static double skillEnhancementBonus(PlayerPerkData data, String statKey) {
+        return skillEnhancementCustomStat(data, statKey) + allSkillEnhancementCustomStatBonus(data, statKey);
+    }
+
     private static double skillEnhancementCustomStat(PlayerPerkData data, String statKey) {
         double value = 0.0D;
         for (Map.Entry<SkillEnhancement, Integer> entry

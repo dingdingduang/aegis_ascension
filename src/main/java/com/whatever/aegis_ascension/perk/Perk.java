@@ -10,6 +10,7 @@ import com.whatever.aegis_ascension.perk.talents.MysteriousDoll;
 import com.whatever.aegis_ascension.perk.talents.ShrineMaidenDance;
 import com.whatever.aegis_ascension.platform.AttributeOperation;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.util.CatalogPresentation;
 import com.whatever.aegis_ascension.util.ConfigDescription;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
@@ -38,16 +39,17 @@ public final class Perk {
     }
 
     private static final Gson GSON = new Gson();
+    /** Titles, descriptions, and icons, which never cross the wire. */
+    private static final CatalogPresentation PRESENTATION =
+            CatalogPresentation.of("talents_clientside.json");
     private static final int MAX_CATALOG_ENTRIES = 512;
     private static final int MAX_WIRE_ID_LENGTH = 128;
-    /** Talents contributed by dependent mods, by owning mod id, in registration order. */
-    private static final Map<String, List<TalentJson>> REGISTERED_TALENTS =
-            new LinkedHashMap<>();
+    private static final Map<String, List<TalentJson>> REGISTERED_TALENTS = new LinkedHashMap<>();
     private static final List<AttributeMappingJson> APOTHIC_ATTRIBUTE_MAPPINGS =
-            loadSideTable("apothic_attribute_mappings.json",
+            loadSideTable("apothic_attribute_mappings_serverside.json",
                     ApothicAttributeMappingsFile.class).apothicAttributeMappings;
     private static final List<NearbySpawnBuffJson> NEARBY_SPAWN_BUFFS =
-            loadSideTable("nearby_spawn_buffs.json",
+            loadSideTable("nearby_spawn_buffs_serverside.json",
                     NearbySpawnBuffsFile.class).nearbySpawnBuffs;
     private static final Catalog LOCAL_CATALOG = loadCatalog();
     private static volatile Catalog effectiveCatalog = buildEffectiveCatalog();
@@ -69,9 +71,7 @@ public final class Perk {
         Map<String, Perk> byId = new LinkedHashMap<>();
         for (TalentJson talent : catalog.perks) {
             Objects.requireNonNull(talent, "Null talent entry");
-//            if (RETIRED_TALENT_IDS.contains(talent.id)) {
-//                continue;
-//            }
+
             String id = requireWireId(talent.id, "Talent id");
             if (talent.maxRank < 1) {
                 throw new IllegalStateException("Talent " + id + " has invalid max_rank");
@@ -79,9 +79,6 @@ public final class Perk {
             Perk perk = new Perk(
                     id,
                     Tier.valueOf(requireText(talent.tier, id + " tier")),
-                    requireText(talent.name, id + " name"),
-                    requireText(talent.description, id + " description"),
-                    requireLocation(requireText(talent.icon, id + " icon")),
                     validateStats(talent.stats, id + " stats", false),
                     talent.primaryStatMultipliers == null
                             ? Map.of()
@@ -215,9 +212,6 @@ public final class Perk {
 
     private final String id;
     private final Tier tier;
-    private final String nameKey;
-    private final String descriptionKey;
-    private final ResourceLocation iconTexture;
     private final Map<String, Double> stats;
     private final Map<String, Double> primaryStatMultipliers;
     private final int maxRank;
@@ -229,8 +223,7 @@ public final class Perk {
     private final boolean randomRewardEligible;
     private final int sourceRow;
 
-    private Perk(String id, Tier tier, String nameKey, String descriptionKey,
-                 ResourceLocation iconTexture, Map<String, Double> stats,
+    private Perk(String id, Tier tier, Map<String, Double> stats,
                  Map<String, Double> primaryStatMultipliers,
                  int maxRank, boolean manuallyToggleable,
                  List<String> poolRequiredPerks,
@@ -241,9 +234,6 @@ public final class Perk {
                  int sourceRow) {
         this.id = id;
         this.tier = tier;
-        this.nameKey = nameKey;
-        this.descriptionKey = descriptionKey;
-        this.iconTexture = iconTexture;
         Map<String, Double> effectiveStats = new LinkedHashMap<>(stats);
         this.stats = Collections.unmodifiableMap(effectiveStats);
         Map<String, Double> effectivePrimaryStatMultipliers = new LinkedHashMap<>();
@@ -282,7 +272,7 @@ public final class Perk {
     }
 
     public Component title() {
-        return getTranslatableString(nameKey);
+        return getTranslatableString(PRESENTATION.name(id));
     }
 
     public Component description() {
@@ -300,11 +290,12 @@ public final class Perk {
                 )
         );
         descriptionValues.put("max_rank", (double) maxRank);
-        return ConfigDescription.render(descriptionKey, descriptionValues);
+        return ConfigDescription.render(PRESENTATION.description(id),
+                descriptionValues);
     }
 
     public ResourceLocation iconTexture() {
-        return iconTexture;
+        return PRESENTATION.icon(id);
     }
 
     public Map<String, Double> stats() {
@@ -474,7 +465,7 @@ public final class Perk {
                     "Cannot register talents for a mod that is not loaded: " + namespace
             );
         }
-        String resourcePath = "assets/" + namespace + "/talents.json";
+        String resourcePath = "assets/" + namespace + "/talents_serverside.json";
         Path file = PlatformServices.mods()
                 .findModResource(namespace, resourcePath)
                 .orElseThrow(() -> new IllegalStateException(
@@ -506,6 +497,13 @@ public final class Perk {
         if (localActive) {
             activeSnapshot = rebuilt;
         }
+
+        PlatformServices.mods()
+                .findModResource(namespace,
+                        "assets/" + namespace + "/talents_clientside.json")
+                .ifPresent(presentation -> CatalogPresentation.mergeAddon(
+                        "talents_clientside.json", presentation));
+
         return talents.size();
     }
 
@@ -581,10 +579,6 @@ public final class Perk {
                             + "; expected one of R, SR, SSR"
             );
         }
-        requireAddonField(namespace, talent.id, "name", talent.name);
-        requireAddonField(namespace, talent.id, "description", talent.description);
-        requireAddonField(namespace, talent.id, "icon", talent.icon);
-
         List<String> requiredMods = new ArrayList<>();
         if (talent.requiredMods != null) {
             requiredMods.addAll(talent.requiredMods);
@@ -663,15 +657,15 @@ public final class Perk {
     private static Catalog loadCatalog() {
         Path configPath = PlatformServices.paths()
                 .modConfigDirectory(AegisAscensionMod.MOD_ID)
-                .resolve("talents.json");
+                .resolve("talents_serverside.json");
         try {
             Files.createDirectories(configPath.getParent());
             if (Files.notExists(configPath)) {
                 try (var stream = Perk.class.getResourceAsStream(
-                        "/assets/aegis_ascension/talents.json")) {
+                        "/assets/aegis_ascension/talents_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/talents.json"
+                                "Missing default assets/aegis_ascension/talents_serverside.json"
                         );
                     }
                     Files.copy(stream, configPath);
@@ -748,7 +742,7 @@ public final class Perk {
     }
 
     /**
-     * Reads one of the small tables that live beside talents.json in their own file,
+     * Reads one of the small tables that live beside talents_serverside.json in their own file,
      * copying the bundled default into the config directory on first run exactly as the
      * talent catalogue itself does.
      *
@@ -836,9 +830,6 @@ public final class Perk {
     private static final class TalentJson {
         private String id;
         private String tier;
-        private String name;
-        private String description;
-        private String icon;
         private Map<String, Double> stats = Map.of();
         @SerializedName("primary_stat_multipliers")
         private Map<String, Double> primaryStatMultipliers = Map.of();
@@ -867,13 +858,13 @@ public final class Perk {
         private boolean enabled = true;
     }
 
-    /** The whole of apothic_attribute_mappings.json. */
+    /** The whole of apothic_attribute_mappings_serverside.json. */
     private static final class ApothicAttributeMappingsFile {
         @SerializedName("apothic_attribute_mappings")
         private List<AttributeMappingJson> apothicAttributeMappings;
     }
 
-    /** The whole of nearby_spawn_buffs.json. */
+    /** The whole of nearby_spawn_buffs_serverside.json. */
     private static final class NearbySpawnBuffsFile {
         @SerializedName("nearby_spawn_buffs")
         private List<NearbySpawnBuffJson> nearbySpawnBuffs;

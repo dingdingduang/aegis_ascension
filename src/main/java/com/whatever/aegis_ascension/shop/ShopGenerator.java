@@ -251,7 +251,7 @@ public final class ShopGenerator {
      * Samples real items from the complete live item registry, including mod-owned entries.
      * Candidates are shuffled and consumed without replacement, so one restock cannot show
      * the same item twice. Filters and ordered price/count/tier rules come from
-     * {@code discoveryShop} in shopsetting.json.
+     * {@code discoveryShop} in shop_serverside.json.
      */
     private static List<ShopOffer> rollDiscovery(RandomSource random) {
         ShopConfig.DiscoveryShop config = ShopConfig.get().discoveryShop;

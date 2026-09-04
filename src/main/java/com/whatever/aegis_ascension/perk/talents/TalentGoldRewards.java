@@ -23,7 +23,7 @@ import java.util.Map;
  *
  * <p>Driven by the {@code immediate_gold} and {@code breakthrough_gold_min}/{@code _max}
  * stats rather than by talent id, so a new talent joins by declaring them in
- * talents.json.</p>
+ * talents_serverside.json.</p>
  */
 public final class TalentGoldRewards {
     private TalentGoldRewards() {

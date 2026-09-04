@@ -1,0 +1,577 @@
+{
+  "schema_version": 1,
+  "entries": {
+    "challenge_kill": {
+      "title": "quest.aegis_ascension.challenge.kill.title",
+      "description": "quest.aegis_ascension.challenge.kill.description",
+      "icon": "minecraft:textures/item/diamond_sword.png"
+    },
+    "challenge_walk": {
+      "title": "quest.aegis_ascension.challenge.walk.title",
+      "description": "quest.aegis_ascension.challenge.walk.description",
+      "icon": "minecraft:textures/item/golden_boots.png"
+    },
+    "challenge_chest": {
+      "title": "quest.aegis_ascension.challenge.chest.title",
+      "description": "quest.aegis_ascension.challenge.chest.description",
+      "icon": "minecraft:textures/entity/chest/normal.png"
+    },
+    "challenge_plant": {
+      "title": "quest.aegis_ascension.challenge.plant.title",
+      "description": "quest.aegis_ascension.challenge.plant.description",
+      "icon": "minecraft:textures/item/golden_hoe.png"
+    },
+    "challenge_specific_hunt": {
+      "title": "quest.aegis_ascension.challenge.specific_hunt.title",
+      "description": "quest.aegis_ascension.challenge.specific_hunt.description",
+      "icon": "minecraft:textures/item/bow.png"
+    },
+    "challenge_flawless": {
+      "title": "quest.aegis_ascension.challenge.flawless.title",
+      "description": "quest.aegis_ascension.challenge.flawless.description",
+      "icon": "minecraft:textures/item/totem_of_undying.png"
+    },
+    "challenge_bare_blade": {
+      "title": "quest.aegis_ascension.challenge.bare_blade.title",
+      "description": "quest.aegis_ascension.challenge.bare_blade.description",
+      "icon": "minecraft:textures/item/iron_sword.png"
+    },
+    "challenge_descent": {
+      "title": "quest.aegis_ascension.challenge.descent.title",
+      "description": "quest.aegis_ascension.challenge.descent.description",
+      "icon": "minecraft:textures/item/echo_shard.png"
+    },
+    "chunk_biome": {
+      "title": "quest.aegis_ascension.chunk.biome.title",
+      "description": "quest.aegis_ascension.chunk.biome.description",
+      "icon": "minecraft:textures/item/map.png"
+    },
+    "chunk_chest": {
+      "title": "quest.aegis_ascension.chunk.chest.title",
+      "description": "quest.aegis_ascension.chunk.chest.description",
+      "icon": "minecraft:textures/entity/chest/normal.png"
+    },
+    "chunk_walk": {
+      "title": "quest.aegis_ascension.chunk.walk.title",
+      "description": "quest.aegis_ascension.chunk.walk.description",
+      "icon": "minecraft:textures/item/leather_boots.png"
+    },
+    "chunk_kill": {
+      "title": "quest.aegis_ascension.chunk.kill.title",
+      "description": "quest.aegis_ascension.chunk.kill.description",
+      "icon": "minecraft:textures/item/stone_sword.png"
+    },
+    "chunk_plant": {
+      "title": "quest.aegis_ascension.chunk.plant.title",
+      "description": "quest.aegis_ascension.chunk.plant.description",
+      "icon": "minecraft:textures/item/wheat_seeds.png"
+    },
+    "chunk_desert_dig": {
+      "title": "quest.aegis_ascension.chunk.desert_dig.title",
+      "description": "quest.aegis_ascension.chunk.desert_dig.description",
+      "icon": "minecraft:textures/item/sand.png"
+    },
+    "chunk_forest_timber": {
+      "title": "quest.aegis_ascension.chunk.forest_timber.title",
+      "description": "quest.aegis_ascension.chunk.forest_timber.description",
+      "icon": "minecraft:textures/item/stone_axe.png"
+    },
+    "chunk_nether_scour": {
+      "title": "quest.aegis_ascension.chunk.nether_scour.title",
+      "description": "quest.aegis_ascension.chunk.nether_scour.description",
+      "icon": "minecraft:textures/item/blaze_powder.png"
+    },
+    "chunk_landmark": {
+      "title": "quest.aegis_ascension.chunk.landmark.title",
+      "description": "quest.aegis_ascension.chunk.landmark.description",
+      "icon": "minecraft:textures/item/compass.png"
+    },
+    "chunk_shoreline": {
+      "title": "quest.aegis_ascension.chunk.shoreline.title",
+      "description": "quest.aegis_ascension.chunk.shoreline.description",
+      "icon": "minecraft:textures/item/kelp.png"
+    },
+    "common_kill_10": {
+      "title": "quest.aegis_ascension.common.kill_10.title",
+      "description": "quest.aegis_ascension.common.kill_10.description",
+      "icon": "minecraft:textures/item/golden_sword.png"
+    },
+    "common_kill_50": {
+      "title": "quest.aegis_ascension.common.kill_50.title",
+      "description": "quest.aegis_ascension.common.kill_50.description",
+      "icon": "minecraft:textures/item/golden_sword.png"
+    },
+    "common_kill_100": {
+      "title": "quest.aegis_ascension.common.kill_100.title",
+      "description": "quest.aegis_ascension.common.kill_100.description",
+      "icon": "minecraft:textures/item/golden_sword.png"
+    },
+    "common_plant_10": {
+      "title": "quest.aegis_ascension.common.plant_10.title",
+      "description": "quest.aegis_ascension.common.plant_10.description",
+      "icon": "minecraft:textures/item/wheat_seeds.png"
+    },
+    "common_plant_50": {
+      "title": "quest.aegis_ascension.common.plant_50.title",
+      "description": "quest.aegis_ascension.common.plant_50.description",
+      "icon": "minecraft:textures/item/wheat_seeds.png"
+    },
+    "common_plant_100": {
+      "title": "quest.aegis_ascension.common.plant_100.title",
+      "description": "quest.aegis_ascension.common.plant_100.description",
+      "icon": "minecraft:textures/item/wheat_seeds.png"
+    },
+    "common_walk_10": {
+      "title": "quest.aegis_ascension.common.walk_10.title",
+      "description": "quest.aegis_ascension.common.walk_10.description",
+      "icon": "minecraft:textures/mob_effect/speed.png"
+    },
+    "common_walk_100": {
+      "title": "quest.aegis_ascension.common.walk_100.title",
+      "description": "quest.aegis_ascension.common.walk_100.description",
+      "icon": "minecraft:textures/mob_effect/speed.png"
+    },
+    "common_walk_1000": {
+      "title": "quest.aegis_ascension.common.walk_1000.title",
+      "description": "quest.aegis_ascension.common.walk_1000.description",
+      "icon": "minecraft:textures/mob_effect/speed.png"
+    },
+    "common_walk_5000": {
+      "title": "quest.aegis_ascension.common.walk_5000.title",
+      "description": "quest.aegis_ascension.common.walk_5000.description",
+      "icon": "minecraft:textures/mob_effect/speed.png"
+    },
+    "common_walk_10000": {
+      "title": "quest.aegis_ascension.common.walk_10000.title",
+      "description": "quest.aegis_ascension.common.walk_10000.description",
+      "icon": "minecraft:textures/mob_effect/speed.png"
+    },
+    "common_hunt_endless": {
+      "title": "quest.aegis_ascension.common.hunt_endless.title",
+      "description": "quest.aegis_ascension.common.hunt_endless.description",
+      "icon": "minecraft:textures/item/golden_sword.png"
+    },
+    "common_cultivation_endless": {
+      "title": "quest.aegis_ascension.common.cultivation_endless.title",
+      "description": "quest.aegis_ascension.common.cultivation_endless.description",
+      "icon": "minecraft:textures/item/wheat_seeds.png"
+    },
+    "common_journey_endless": {
+      "title": "quest.aegis_ascension.common.journey_endless.title",
+      "description": "quest.aegis_ascension.common.journey_endless.description",
+      "icon": "minecraft:textures/mob_effect/speed.png"
+    },
+    "common_arrow_25": {
+      "title": "quest.aegis_ascension.common.arrow_25.title",
+      "description": "quest.aegis_ascension.common.arrow_25.description",
+      "icon": "minecraft:textures/item/arrow.png"
+    },
+    "common_arrow_100": {
+      "title": "quest.aegis_ascension.common.arrow_100.title",
+      "description": "quest.aegis_ascension.common.arrow_100.description",
+      "icon": "minecraft:textures/item/bow.png"
+    },
+    "common_arrow_400": {
+      "title": "quest.aegis_ascension.common.arrow_400.title",
+      "description": "quest.aegis_ascension.common.arrow_400.description",
+      "icon": "minecraft:textures/item/crossbow.png"
+    },
+    "common_arrow_1000": {
+      "title": "quest.aegis_ascension.common.arrow_1000.title",
+      "description": "quest.aegis_ascension.common.arrow_1000.description",
+      "icon": "minecraft:textures/item/spectral_arrow.png"
+    },
+    "common_marksman_endless": {
+      "title": "quest.aegis_ascension.common.marksman_endless.title",
+      "description": "quest.aegis_ascension.common.marksman_endless.description",
+      "icon": "minecraft:textures/item/tipped_arrow.png"
+    },
+    "daily_kill": {
+      "title": "quest.aegis_ascension.daily.kill.title",
+      "description": "quest.aegis_ascension.daily.kill.description",
+      "icon": "minecraft:textures/item/golden_sword.png"
+    },
+    "daily_plant": {
+      "title": "quest.aegis_ascension.daily.plant.title",
+      "description": "quest.aegis_ascension.daily.plant.description",
+      "icon": "minecraft:textures/item/wheat_seeds.png"
+    },
+    "daily_walk": {
+      "title": "quest.aegis_ascension.daily.walk.title",
+      "description": "quest.aegis_ascension.daily.walk.description",
+      "icon": "minecraft:textures/mob_effect/speed.png"
+    },
+    "daily_chest": {
+      "title": "quest.aegis_ascension.daily.chest.title",
+      "description": "quest.aegis_ascension.daily.chest.description",
+      "icon": "minecraft:textures/entity/chest/normal.png"
+    },
+    "daily_biome": {
+      "title": "quest.aegis_ascension.daily.biome.title",
+      "description": "quest.aegis_ascension.daily.biome.description",
+      "icon": "minecraft:textures/block/oak_sapling.png"
+    },
+    "daily_hunt_undead": {
+      "title": "quest.aegis_ascension.daily.hunt_undead.title",
+      "description": "quest.aegis_ascension.daily.hunt_undead.description",
+      "icon": "minecraft:textures/item/bone.png"
+    },
+    "daily_trade": {
+      "title": "quest.aegis_ascension.daily.trade.title",
+      "description": "quest.aegis_ascension.daily.trade.description",
+      "icon": "minecraft:textures/item/emerald.png"
+    },
+    "daily_deliver": {
+      "title": "quest.aegis_ascension.daily.deliver.title",
+      "description": "quest.aegis_ascension.daily.deliver.description",
+      "icon": "minecraft:textures/item/iron_ingot.png"
+    },
+    "daily_craft_any": {
+      "title": "quest.aegis_ascension.daily.craft_any.title",
+      "description": "quest.aegis_ascension.daily.craft_any.description",
+      "icon": "aegis_ascension:textures/gui/quest_ui/quest_unknown.png"
+    },
+    "daily_craft_gear": {
+      "title": "quest.aegis_ascension.daily.craft_gear.title",
+      "description": "quest.aegis_ascension.daily.craft_gear.description",
+      "icon": "aegis_ascension:textures/gui/quest_ui/quest_unknown.png"
+    },
+    "daily_mine_stone": {
+      "title": "quest.aegis_ascension.daily.mine_stone.title",
+      "description": "quest.aegis_ascension.daily.mine_stone.description",
+      "icon": "minecraft:textures/item/iron_pickaxe.png"
+    },
+    "daily_mine_ore": {
+      "title": "quest.aegis_ascension.daily.mine_ore.title",
+      "description": "quest.aegis_ascension.daily.mine_ore.description",
+      "icon": "minecraft:textures/item/raw_iron.png"
+    },
+    "daily_chop_log": {
+      "title": "quest.aegis_ascension.daily.chop_log.title",
+      "description": "quest.aegis_ascension.daily.chop_log.description",
+      "icon": "minecraft:textures/item/wooden_axe.png"
+    },
+    "daily_shoot_arrow": {
+      "title": "quest.aegis_ascension.daily.shoot_arrow.title",
+      "description": "quest.aegis_ascension.daily.shoot_arrow.description",
+      "icon": "minecraft:textures/item/arrow.png"
+    },
+    "daily_snipe": {
+      "title": "quest.aegis_ascension.daily.snipe.title",
+      "description": "quest.aegis_ascension.daily.snipe.description",
+      "icon": "minecraft:textures/item/spectral_arrow.png"
+    },
+    "side_farmer_trade": {
+      "title": "quest.aegis_ascension.side.farmer_trade.title",
+      "description": "quest.aegis_ascension.side.farmer_trade.description",
+      "story": "quest.aegis_ascension.side.farmer_trade.story",
+      "icon": "minecraft:textures/item/wheat.png"
+    },
+    "side_fletcher_hunt": {
+      "title": "quest.aegis_ascension.side.fletcher_hunt.title",
+      "description": "quest.aegis_ascension.side.fletcher_hunt.description",
+      "story": "quest.aegis_ascension.side.fletcher_hunt.story",
+      "icon": "minecraft:textures/item/golden_sword.png"
+    },
+    "side_armorer_materials": {
+      "title": "quest.aegis_ascension.side.armorer_materials.title",
+      "description": "quest.aegis_ascension.side.armorer_materials.description",
+      "story": "quest.aegis_ascension.side.armorer_materials.story",
+      "icon": "minecraft:textures/item/iron_chestplate.png"
+    },
+    "side_librarian_trade": {
+      "title": "quest.aegis_ascension.side.librarian_trade.title",
+      "description": "quest.aegis_ascension.side.librarian_trade.description",
+      "story": "quest.aegis_ascension.side.librarian_trade.story",
+      "icon": "minecraft:textures/item/book.png"
+    },
+    "side_weaponsmith_materials": {
+      "title": "quest.aegis_ascension.side.weaponsmith_materials.title",
+      "description": "quest.aegis_ascension.side.weaponsmith_materials.description",
+      "story": "quest.aegis_ascension.side.weaponsmith_materials.story",
+      "icon": "minecraft:textures/item/diamond_sword.png"
+    },
+    "side_fisherman_catch": {
+      "title": "quest.aegis_ascension.side.fisherman_catch.title",
+      "description": "quest.aegis_ascension.side.fisherman_catch.description",
+      "story": "quest.aegis_ascension.side.fisherman_catch.story",
+      "icon": "minecraft:textures/item/cod.png"
+    },
+    "side_shepherd_wool": {
+      "title": "quest.aegis_ascension.side.shepherd_wool.title",
+      "description": "quest.aegis_ascension.side.shepherd_wool.description",
+      "story": "quest.aegis_ascension.side.shepherd_wool.story",
+      "icon": "minecraft:textures/block/white_wool.png"
+    },
+    "side_cartographer_supplies": {
+      "title": "quest.aegis_ascension.side.cartographer_supplies.title",
+      "description": "quest.aegis_ascension.side.cartographer_supplies.description",
+      "story": "quest.aegis_ascension.side.cartographer_supplies.story",
+      "icon": "minecraft:textures/item/map.png"
+    },
+    "side_cleric_hunt": {
+      "title": "quest.aegis_ascension.side.cleric_hunt.title",
+      "description": "quest.aegis_ascension.side.cleric_hunt.description",
+      "story": "quest.aegis_ascension.side.cleric_hunt.story",
+      "icon": "minecraft:textures/item/golden_sword.png"
+    },
+    "side_leatherworker_materials": {
+      "title": "quest.aegis_ascension.side.leatherworker_materials.title",
+      "description": "quest.aegis_ascension.side.leatherworker_materials.description",
+      "story": "quest.aegis_ascension.side.leatherworker_materials.story",
+      "icon": "minecraft:textures/item/leather.png"
+    },
+    "side_toolsmith_materials": {
+      "title": "quest.aegis_ascension.side.toolsmith_materials.title",
+      "description": "quest.aegis_ascension.side.toolsmith_materials.description",
+      "story": "quest.aegis_ascension.side.toolsmith_materials.story",
+      "icon": "minecraft:textures/item/iron_pickaxe.png"
+    },
+    "side_butcher_hunt": {
+      "title": "quest.aegis_ascension.side.butcher_hunt.title",
+      "description": "quest.aegis_ascension.side.butcher_hunt.description",
+      "story": "quest.aegis_ascension.side.butcher_hunt.story",
+      "icon": "minecraft:textures/item/iron_axe.png"
+    },
+    "side_mason_rebuild": {
+      "title": "quest.aegis_ascension.side.mason_rebuild.title",
+      "description": "quest.aegis_ascension.side.mason_rebuild.description",
+      "story": "quest.aegis_ascension.side.mason_rebuild.story",
+      "icon": "minecraft:textures/block/bricks.png"
+    },
+    "side_cleric_nether_hunt": {
+      "title": "quest.aegis_ascension.side.cleric_nether_hunt.title",
+      "description": "quest.aegis_ascension.side.cleric_nether_hunt.description",
+      "story": "quest.aegis_ascension.side.cleric_nether_hunt.story",
+      "icon": "minecraft:textures/item/diamond_sword.png"
+    },
+    "side_fisherman_swamp_bait": {
+      "title": "quest.aegis_ascension.side.fisherman_swamp_bait.title",
+      "description": "quest.aegis_ascension.side.fisherman_swamp_bait.description",
+      "story": "quest.aegis_ascension.side.fisherman_swamp_bait.story",
+      "icon": "minecraft:textures/item/slime_ball.png"
+    },
+    "side_mason_quarry": {
+      "title": "quest.aegis_ascension.side.mason_quarry.title",
+      "description": "quest.aegis_ascension.side.mason_quarry.description",
+      "story": "quest.aegis_ascension.side.mason_quarry.story",
+      "icon": "minecraft:textures/item/stone_pickaxe.png"
+    },
+    "side_toolsmith_forge": {
+      "title": "quest.aegis_ascension.side.toolsmith_forge.title",
+      "description": "quest.aegis_ascension.side.toolsmith_forge.description",
+      "story": "quest.aegis_ascension.side.toolsmith_forge.story",
+      "icon": "minecraft:textures/item/iron_pickaxe.png"
+    },
+    "side_fletcher_marksman": {
+      "title": "quest.aegis_ascension.side.fletcher_marksman.title",
+      "description": "quest.aegis_ascension.side.fletcher_marksman.description",
+      "story": "quest.aegis_ascension.side.fletcher_marksman.story",
+      "icon": "minecraft:textures/item/spectral_arrow.png"
+    },
+    "side_fletcher_timber": {
+      "title": "quest.aegis_ascension.side.fletcher_timber.title",
+      "description": "quest.aegis_ascension.side.fletcher_timber.description",
+      "story": "quest.aegis_ascension.side.fletcher_timber.story",
+      "icon": "minecraft:textures/item/wooden_axe.png"
+    },
+    "side_farmer_provisions": {
+      "title": "quest.aegis_ascension.side.farmer_provisions.title",
+      "description": "quest.aegis_ascension.side.farmer_provisions.description",
+      "story": "quest.aegis_ascension.side.farmer_provisions.story",
+      "icon": "minecraft:textures/item/bread.png"
+    },
+    "side_cleric_reagents": {
+      "title": "quest.aegis_ascension.side.cleric_reagents.title",
+      "description": "quest.aegis_ascension.side.cleric_reagents.description",
+      "story": "quest.aegis_ascension.side.cleric_reagents.story",
+      "icon": "minecraft:textures/item/brewing_stand.png"
+    },
+    "side_armorer_forge": {
+      "title": "quest.aegis_ascension.side.armorer_forge.title",
+      "description": "quest.aegis_ascension.side.armorer_forge.description",
+      "story": "quest.aegis_ascension.side.armorer_forge.story",
+      "icon": "minecraft:textures/item/iron_chestplate.png"
+    },
+    "side_librarian_lapis": {
+      "title": "quest.aegis_ascension.side.librarian_lapis.title",
+      "description": "quest.aegis_ascension.side.librarian_lapis.description",
+      "story": "quest.aegis_ascension.side.librarian_lapis.story",
+      "icon": "minecraft:textures/item/enchanted_book.png"
+    },
+    "side_butcher_cull": {
+      "title": "quest.aegis_ascension.side.butcher_cull.title",
+      "description": "quest.aegis_ascension.side.butcher_cull.description",
+      "story": "quest.aegis_ascension.side.butcher_cull.story",
+      "icon": "minecraft:textures/item/cooked_beef.png"
+    },
+    "side_weaponsmith_ore": {
+      "title": "quest.aegis_ascension.side.weaponsmith_ore.title",
+      "description": "quest.aegis_ascension.side.weaponsmith_ore.description",
+      "story": "quest.aegis_ascension.side.weaponsmith_ore.story",
+      "icon": "minecraft:textures/item/raw_gold.png"
+    },
+    "side_chain_ledger_1": {
+      "title": "quest.aegis_ascension.side.chain_ledger_1.title",
+      "description": "quest.aegis_ascension.side.chain_ledger_1.description",
+      "story": "quest.aegis_ascension.side.chain_ledger_1.story",
+      "icon": "minecraft:textures/item/cod.png"
+    },
+    "side_chain_ledger_2": {
+      "title": "quest.aegis_ascension.side.chain_ledger_2.title",
+      "description": "quest.aegis_ascension.side.chain_ledger_2.description",
+      "story": "quest.aegis_ascension.side.chain_ledger_2.story",
+      "icon": "minecraft:textures/item/writable_book.png"
+    },
+    "side_chain_ledger_3": {
+      "title": "quest.aegis_ascension.side.chain_ledger_3.title",
+      "description": "quest.aegis_ascension.side.chain_ledger_3.description",
+      "story": "quest.aegis_ascension.side.chain_ledger_3.story",
+      "icon": "minecraft:textures/item/stone_pickaxe.png"
+    },
+    "side_chain_forge_1": {
+      "title": "quest.aegis_ascension.side.chain_forge_1.title",
+      "description": "quest.aegis_ascension.side.chain_forge_1.description",
+      "story": "quest.aegis_ascension.side.chain_forge_1.story",
+      "icon": "minecraft:textures/item/iron_ingot.png"
+    },
+    "side_chain_forge_2": {
+      "title": "quest.aegis_ascension.side.chain_forge_2.title",
+      "description": "quest.aegis_ascension.side.chain_forge_2.description",
+      "story": "quest.aegis_ascension.side.chain_forge_2.story",
+      "icon": "minecraft:textures/item/netherite_scrap.png"
+    },
+    "side_chain_aim_1": {
+      "title": "quest.aegis_ascension.side.chain_aim_1.title",
+      "description": "quest.aegis_ascension.side.chain_aim_1.description",
+      "story": "quest.aegis_ascension.side.chain_aim_1.story",
+      "icon": "minecraft:textures/item/arrow.png"
+    },
+    "side_chain_aim_2": {
+      "title": "quest.aegis_ascension.side.chain_aim_2.title",
+      "description": "quest.aegis_ascension.side.chain_aim_2.description",
+      "story": "quest.aegis_ascension.side.chain_aim_2.story",
+      "icon": "minecraft:textures/item/spectral_arrow.png"
+    },
+    "side_fisherman_tide": {
+      "title": "quest.aegis_ascension.side.fisherman_tide.title",
+      "description": "quest.aegis_ascension.side.fisherman_tide.description",
+      "story": "quest.aegis_ascension.side.fisherman_tide.story",
+      "icon": "minecraft:textures/item/tropical_fish.png"
+    },
+    "side_butcher_market": {
+      "title": "quest.aegis_ascension.side.butcher_market.title",
+      "description": "quest.aegis_ascension.side.butcher_market.description",
+      "story": "quest.aegis_ascension.side.butcher_market.story",
+      "icon": "minecraft:textures/item/cooked_porkchop.png"
+    },
+    "side_cartographer_survey": {
+      "title": "quest.aegis_ascension.side.cartographer_survey.title",
+      "description": "quest.aegis_ascension.side.cartographer_survey.description",
+      "story": "quest.aegis_ascension.side.cartographer_survey.story",
+      "icon": "minecraft:textures/item/filled_map.png"
+    },
+    "side_cartographer_ruins": {
+      "title": "quest.aegis_ascension.side.cartographer_ruins.title",
+      "description": "quest.aegis_ascension.side.cartographer_ruins.description",
+      "story": "quest.aegis_ascension.side.cartographer_ruins.story",
+      "icon": "minecraft:textures/item/map.png"
+    },
+    "side_cleric_deepdark": {
+      "title": "quest.aegis_ascension.side.cleric_deepdark.title",
+      "description": "quest.aegis_ascension.side.cleric_deepdark.description",
+      "story": "quest.aegis_ascension.side.cleric_deepdark.story",
+      "icon": "minecraft:textures/item/echo_shard.png"
+    },
+    "side_weaponsmith_bastion": {
+      "title": "quest.aegis_ascension.side.weaponsmith_bastion.title",
+      "description": "quest.aegis_ascension.side.weaponsmith_bastion.description",
+      "story": "quest.aegis_ascension.side.weaponsmith_bastion.story",
+      "icon": "minecraft:textures/item/netherite_scrap.png"
+    },
+    "side_chain_ledger_4": {
+      "title": "quest.aegis_ascension.side.chain_ledger_4.title",
+      "description": "quest.aegis_ascension.side.chain_ledger_4.description",
+      "story": "quest.aegis_ascension.side.chain_ledger_4.story",
+      "icon": "minecraft:textures/item/compass.png"
+    },
+    "side_chain_winter_1": {
+      "title": "quest.aegis_ascension.side.chain_winter_1.title",
+      "description": "quest.aegis_ascension.side.chain_winter_1.description",
+      "story": "quest.aegis_ascension.side.chain_winter_1.story",
+      "icon": "minecraft:textures/item/wheat.png"
+    },
+    "side_chain_winter_2": {
+      "title": "quest.aegis_ascension.side.chain_winter_2.title",
+      "description": "quest.aegis_ascension.side.chain_winter_2.description",
+      "story": "quest.aegis_ascension.side.chain_winter_2.story",
+      "icon": "minecraft:textures/item/white_wool.png"
+    },
+    "side_chain_winter_3": {
+      "title": "quest.aegis_ascension.side.chain_winter_3.title",
+      "description": "quest.aegis_ascension.side.chain_winter_3.description",
+      "story": "quest.aegis_ascension.side.chain_winter_3.story",
+      "icon": "minecraft:textures/item/iron_axe.png"
+    },
+    "side_chain_winter_4": {
+      "title": "quest.aegis_ascension.side.chain_winter_4.title",
+      "description": "quest.aegis_ascension.side.chain_winter_4.description",
+      "story": "quest.aegis_ascension.side.chain_winter_4.story",
+      "icon": "minecraft:textures/item/golden_apple.png"
+    },
+    "side_chain_mine_1": {
+      "title": "quest.aegis_ascension.side.chain_mine_1.title",
+      "description": "quest.aegis_ascension.side.chain_mine_1.description",
+      "story": "quest.aegis_ascension.side.chain_mine_1.story",
+      "icon": "minecraft:textures/item/stone_pickaxe.png"
+    },
+    "side_chain_mine_2": {
+      "title": "quest.aegis_ascension.side.chain_mine_2.title",
+      "description": "quest.aegis_ascension.side.chain_mine_2.description",
+      "story": "quest.aegis_ascension.side.chain_mine_2.story",
+      "icon": "minecraft:textures/item/compass.png"
+    },
+    "side_chain_mine_3": {
+      "title": "quest.aegis_ascension.side.chain_mine_3.title",
+      "description": "quest.aegis_ascension.side.chain_mine_3.description",
+      "story": "quest.aegis_ascension.side.chain_mine_3.story",
+      "icon": "minecraft:textures/item/iron_sword.png"
+    },
+    "side_chain_ash_1": {
+      "title": "quest.aegis_ascension.side.chain_ash_1.title",
+      "description": "quest.aegis_ascension.side.chain_ash_1.description",
+      "story": "quest.aegis_ascension.side.chain_ash_1.story",
+      "icon": "minecraft:textures/item/writable_book.png"
+    },
+    "side_chain_ash_2": {
+      "title": "quest.aegis_ascension.side.chain_ash_2.title",
+      "description": "quest.aegis_ascension.side.chain_ash_2.description",
+      "story": "quest.aegis_ascension.side.chain_ash_2.story",
+      "icon": "minecraft:textures/item/blaze_rod.png"
+    },
+    "side_chain_ash_3": {
+      "title": "quest.aegis_ascension.side.chain_ash_3.title",
+      "description": "quest.aegis_ascension.side.chain_ash_3.description",
+      "story": "quest.aegis_ascension.side.chain_ash_3.story",
+      "icon": "minecraft:textures/item/netherite_scrap.png"
+    },
+    "side_chain_pens_1": {
+      "title": "quest.aegis_ascension.side.chain_pens_1.title",
+      "description": "quest.aegis_ascension.side.chain_pens_1.description",
+      "story": "quest.aegis_ascension.side.chain_pens_1.story",
+      "icon": "minecraft:textures/item/bone.png"
+    },
+    "side_chain_pens_2": {
+      "title": "quest.aegis_ascension.side.chain_pens_2.title",
+      "description": "quest.aegis_ascension.side.chain_pens_2.description",
+      "story": "quest.aegis_ascension.side.chain_pens_2.story",
+      "icon": "minecraft:textures/item/leather.png"
+    },
+    "side_chain_pens_3": {
+      "title": "quest.aegis_ascension.side.chain_pens_3.title",
+      "description": "quest.aegis_ascension.side.chain_pens_3.description",
+      "story": "quest.aegis_ascension.side.chain_pens_3.story",
+      "icon": "minecraft:textures/item/crossbow.png"
+    }
+  }
+}

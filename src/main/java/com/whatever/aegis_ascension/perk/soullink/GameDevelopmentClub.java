@@ -18,7 +18,7 @@ public final class GameDevelopmentClub {
      * inactive or the talent is not one of its members.
      *
      * <p>Membership is read from the Soul Link's own requirements rather than named
-     * here, so the set of talents this boosts follows soul_links.json.</p>
+     * here, so the set of talents this boosts follows soul_links_serverside.json.</p>
      */
     public static double memberGainMultiplier(PlayerPerkData data, Perk perk) {
         if (perk == null || !data.hasActiveSoulLink(SOUL_GAME_DEVELOPMENT_CLUB)) {

@@ -33,6 +33,8 @@ final class ACGScreenContext {
         return screen.addPageWidget(widget);
     }
 
+    ACGCollapsedSections collapsedSections() { return screen.collapsedSections; }
+
     void rebuild() { screen.rebuildContent(); }
     void focus(GuiEventListener listener) { screen.focusPageWidget(listener); }
     GuiEventListener focused() { return screen.focusedPageWidget(); }

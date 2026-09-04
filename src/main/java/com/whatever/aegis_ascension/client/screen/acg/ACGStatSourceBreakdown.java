@@ -20,6 +20,7 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatab
 
 import com.whatever.aegis_ascension.aegis.Aegis;
 import com.whatever.aegis_ascension.aegis.AegisConstants;
+import com.whatever.aegis_ascension.client.SkillEnhancementClientSettings;
 import com.whatever.aegis_ascension.client.ClientPerkState;
 import com.whatever.aegis_ascension.client.screen.collectiontabs.CustomStats;
 import com.whatever.aegis_ascension.client.screen.collectiontabs.CustomStats.Breakdown;
@@ -268,9 +269,9 @@ public final class ACGStatSourceBreakdown {
             if (rank > 0) {
                 addSource(
                         sources,
-                        enhancement.title(),
-                        enhancement.iconTexture(),
-                        enhancement.iconTextureSize(),
+                        SkillEnhancementClientSettings.title(enhancement),
+                        SkillEnhancementClientSettings.icon(enhancement),
+                        SkillEnhancementClientSettings.iconSize(enhancement),
                         enhancement.amount() * rank,
                         enhancement.operation()
                                 == AttributeOperation.ADDITION
@@ -286,9 +287,9 @@ public final class ACGStatSourceBreakdown {
                             .filter(statKey::equals)
                             .ifPresent(ignored -> addSource(
                                     sources,
-                                    enhancement.title(),
-                                    enhancement.iconTexture(),
-                                    enhancement.iconTextureSize(),
+                                    SkillEnhancementClientSettings.title(enhancement),
+                                    SkillEnhancementClientSettings.icon(enhancement),
+                                    SkillEnhancementClientSettings.iconSize(enhancement),
                                     enhancement.amount() * rank,
                                     enhancement.operation()
                                             == AttributeOperation.ADDITION
@@ -667,8 +668,8 @@ public final class ACGStatSourceBreakdown {
                 getTranslatableString(
                         "screen.aegis_ascension.collection.stat.accumulated_primary"
                 ),
-                primary.iconTexture(),
-                primary.iconTextureSize(),
+                SkillEnhancementClientSettings.icon(primary),
+                SkillEnhancementClientSettings.iconSize(primary),
                 value,
                 format
         );

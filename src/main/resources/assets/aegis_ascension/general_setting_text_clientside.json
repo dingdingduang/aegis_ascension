@@ -1,0 +1,11 @@
+{
+  "clientSettings": {
+    "remember_collapsed_tabs": "Restores collapsed drawer groups and settings sections the next time this screen opens. Turning it off leaves the saved state untouched and starts every group expanded.",
+    "instant_discard_all": "Discard deletes the whole selected row in one click. Off by default because discarding is irreversible; with it off, Discard opens the quantity prompt the way Sell does.",
+    "show_jei_overlay": "Leaves JEI a band along the bottom of the Inventory and Crafting screen. With it off, the screen claims the whole viewport and JEI finds no room.",
+    "soul_link_visibility": "Locked Soul Links are hidden by default, so the tab shows what you actually have."
+  },
+  "serverSettings": {
+    "quest_auto_accept": "Applies only to Daily, Common, and Chunk quests. Side and Challenge quests always require manual acceptance. Turning this off does not cancel active quests; newly generated quests remain Available."
+  }
+}

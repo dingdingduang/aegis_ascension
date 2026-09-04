@@ -22,9 +22,9 @@ import java.util.List;
 
 /**
  * Server-side, data-driven configuration for the daily shop, loaded from
- * {@code config/aegis_ascension/shopsetting.json}.
+ * {@code config/aegis_ascension/shop_serverside.json}.
  *
-     * <p>Seeded from the bundled {@code assets/aegis_ascension/shopsetting.json} on first
+     * <p>Seeded from the bundled {@code assets/aegis_ascension/shop_serverside.json} on first
      * run and read back from disk thereafter — the same copy-then-read flow as
      * {@link com.whatever.aegis_ascension.aegis.Aegis}'s catalog. The shipped JSON is the
      * source of truth for the defaults; the field initialisers below only fill in keys a
@@ -41,7 +41,7 @@ public final class ShopConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = PlatformServices.paths()
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
-            .resolve("shopsetting.json");
+            .resolve("shop_serverside.json");
 
     private static ShopConfig instance;
 
@@ -113,7 +113,7 @@ public final class ShopConfig {
     public List<RandomEntry> randomItems = new ArrayList<>();
     /**
      * Chance of each rarity tier per unlockable slot, in the same R/SR/SSR vocabulary as
-     * talents.json. Rolled first; the entry is then picked by {@code weight} from within
+     * talents_serverside.json. Rolled first; the entry is then picked by {@code weight} from within
      * the chosen tier, so an entry's weight competes only against its own tier rather than
      * against the whole pool.
      */
@@ -157,7 +157,7 @@ public final class ShopConfig {
     public static final class RandomEntry {
         /**
          * Rarity band this entry competes in: "R", "SR", or "SSR". Ignored for a virtual
-         * entry, whose tier is declared on the book itself in virtual_item_setting.json so
+         * entry, whose tier is declared on the book itself in virtual_item_serverside.json so
          * a book's rarity travels with the book rather than with each shop listing of it.
          */
         public String tier = "R";
@@ -468,10 +468,10 @@ public final class ShopConfig {
             Files.createDirectories(FILE.getParent());
             if (Files.notExists(FILE)) {
                 try (var stream = ShopConfig.class.getResourceAsStream(
-                        "/assets/aegis_ascension/shopsetting.json")) {
+                        "/assets/aegis_ascension/shop_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/shopsetting.json");
+                                "Missing default assets/aegis_ascension/shop_serverside.json");
                     }
                     Files.copy(stream, FILE);
                 }

@@ -5,6 +5,7 @@ import com.whatever.aegis_ascension.aegis.AegisConstants;
 import com.whatever.aegis_ascension.aegis.DevourAegis;
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
 import com.whatever.aegis_ascension.platform.PlatformServices;
+import com.whatever.aegis_ascension.util.CatalogPresentation;
 import com.whatever.aegis_ascension.util.GeneralCommonMethods;
 import com.whatever.aegis_ascension.util.GeneralTextMethods;
 import com.google.gson.Gson;
@@ -43,6 +44,9 @@ import static com.whatever.aegis_ascension.util.GeneralCommonMethods.formatPerce
  * produced it.</p>
  */
 public final class VirtualItems {
+    /** Titles, descriptions, and icons, which never cross the wire. */
+    private static final CatalogPresentation PRESENTATION =
+            CatalogPresentation.of("virtual_item_clientside.json");
     public static final String SWISS_ROLL = "swiss_roll";
     public static final String DEVOUR_AEGIS_CORE_I = "devour_aegis_core_i";
     public static final String DEVOUR_AEGIS_CORE_II = "devour_aegis_core_ii";
@@ -68,7 +72,7 @@ public final class VirtualItems {
     private static final int MAX_WIRE_ID_LENGTH = 128;
     private static final Path FILE = PlatformServices.paths()
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
-            .resolve("virtual_item_setting.json");
+            .resolve("virtual_item_serverside.json");
 
     private static volatile Map<String, Definition> localDefinitions;
     private static volatile Map<String, Definition> syncedDefinitions;
@@ -127,7 +131,7 @@ public final class VirtualItems {
          */
         public String tier = "SR";
         /**
-         * Whether a shopsetting.json entry is allowed to stock this virtual item. The
+         * Whether a shop_serverside.json entry is allowed to stock this virtual item. The
          * shop entry still controls its weight, count, and price; this is the item's
          * convenient master switch.
          */
@@ -141,7 +145,7 @@ public final class VirtualItems {
          */
         public boolean requiresConfirmation = false;
         /**
-         * Lang key for the display name, following talents.json's convention of naming the
+         * Lang key for the display name, following talents_serverside.json's convention of naming the
          * key explicitly rather than deriving it. Blank falls back to
          * {@code virtual_item.aegis_ascension.<id>.name}.
          */
@@ -160,7 +164,7 @@ public final class VirtualItems {
 
         /** The icon texture, or null when unset/malformed so callers can fall back. */
         public ResourceLocation iconTexture() {
-            return PlatformServices.resources().tryParse(icon == null ? "" : icon.trim());
+            return PRESENTATION.icon(id);
         }
 
         /**
@@ -174,15 +178,11 @@ public final class VirtualItems {
         }
 
         public String nameKey() {
-            return name == null || name.isBlank()
-                    ? "virtual_item.aegis_ascension." + id + ".name"
-                    : name;
+            return PRESENTATION.name(id);
         }
 
         public String descriptionKey() {
-            return description == null || description.isBlank()
-                    ? "virtual_item.aegis_ascension." + id + ".description"
-                    : description;
+            return PRESENTATION.description(id);
         }
 
         /**
@@ -299,10 +299,10 @@ public final class VirtualItems {
             Files.createDirectories(FILE.getParent());
             if (Files.notExists(FILE)) {
                 try (var stream = VirtualItems.class.getResourceAsStream(
-                        "/assets/aegis_ascension/virtual_item_setting.json")) {
+                        "/assets/aegis_ascension/virtual_item_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/virtual_item_setting.json");
+                                "Missing default assets/aegis_ascension/virtual_item_serverside.json");
                     }
                     Files.copy(stream, FILE);
                 }

@@ -17,8 +17,8 @@ import java.nio.file.Path;
  * gameplay values, so it's safe to read/write freely without going through the perk
  * server data sync.
  *
- * <p>Persisted as JSON at {@code config/aegis_ascension/clientsetting.json}, seeded from the
- * bundled {@code assets/aegis_ascension/clientsetting.json} on first run exactly like
+ * <p>Persisted as JSON at {@code config/aegis_ascension/general_clientside.json}, seeded from the
+ * bundled {@code assets/aegis_ascension/general_clientside.json} on first run exactly like
  * {@link com.whatever.aegis_ascension.aegis.Aegis}'s catalog. Unlike that catalog this file is
  * also written back by {@link #save()} whenever a setting changes, but the initial contents
  * always come from the shipped asset rather than from serialising the fields below.</p>
@@ -37,7 +37,12 @@ public final class ClientSettings {
         LIST
     }
 
-    /** Screen corner a HUD element anchors to before its offset is applied. */
+    public enum SoulLinkVisibility {
+        FORMED,
+        RELEVANT,
+        ALL
+    }
+
     public enum HudAnchor {
         TOP_LEFT,
         TOP_RIGHT,
@@ -49,7 +54,7 @@ public final class ClientSettings {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = PlatformServices.paths()
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
-            .resolve("clientsetting.json");
+            .resolve("general_clientside.json");
 
     /** Shared with the settings panel's sliders so the clamp range and the slider range never drift apart. */
     public static final int MIN_CARD_WIDTH = 60;
@@ -94,7 +99,7 @@ public final class ClientSettings {
     public java.util.List<String> scrollModeTabs = new java.util.ArrayList<>();
     /**
      * How the Player Custom Stat tab presents its stats. Kept here rather than in
-     * {@code custom_stat_setting.json} because that file is hand-edited and never written
+     * {@code custom_stat_clientside.json} because that file is hand-edited and never written
      * back, while this one is exactly the place a button-toggled preference is saved.
      */
     public CustomStatView customStatView = CustomStatView.CARDS;
@@ -119,7 +124,7 @@ public final class ClientSettings {
     public boolean showGoldCurrency = true;
 
     /** Locked Soul Links are hidden by default so the tab shows what you actually have. */
-    public boolean showUnformedSoulLinks = false;
+    public SoulLinkVisibility soulLinkVisibility = SoulLinkVisibility.FORMED;
 
     /**
      * Whether the Inventory and Crafting screen leaves JEI a band along the bottom. When
@@ -167,10 +172,10 @@ public final class ClientSettings {
             Files.createDirectories(FILE.getParent());
             if (Files.notExists(FILE)) {
                 try (var stream = ClientSettings.class.getResourceAsStream(
-                        "/assets/aegis_ascension/clientsetting.json")) {
+                        "/assets/aegis_ascension/general_clientside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/clientsetting.json");
+                                "Missing default assets/aegis_ascension/general_clientside.json");
                     }
                     Files.copy(stream, FILE);
                 }
@@ -220,6 +225,9 @@ public final class ClientSettings {
         }
         if (customStatView == null) {
             customStatView = CustomStatView.CARDS;
+        }
+        if (soulLinkVisibility == null) {
+            soulLinkVisibility = SoulLinkVisibility.FORMED;
         }
     }
 }

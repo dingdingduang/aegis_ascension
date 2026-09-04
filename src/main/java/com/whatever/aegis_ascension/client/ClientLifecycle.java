@@ -1,5 +1,7 @@
 package com.whatever.aegis_ascension.client;
 
+import com.whatever.aegis_ascension.util.CatalogPresentation;
+import net.minecraft.client.Minecraft;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.whatever.aegis_ascension.client.screen.ACGInventoryScreen;
 import com.whatever.aegis_ascension.aegis.Aegis;
@@ -76,6 +78,8 @@ public final class ClientLifecycle {
 
     /** Runs once from the active loader's client-setup work queue. */
     public static void initialize() {
+        CatalogPresentation.installTextureCheck(location -> Minecraft.getInstance()
+                .getResourceManager().getResource(location).isPresent());
         ClientSettings.get();
         MiscLocalSettings.get();
         DevourClientSettings.get();

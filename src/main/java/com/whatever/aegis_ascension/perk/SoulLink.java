@@ -1,6 +1,8 @@
 package com.whatever.aegis_ascension.perk;
 
 import com.whatever.aegis_ascension.capability.PlayerPerkData;
+import com.whatever.aegis_ascension.AegisAscensionMod;
+import com.whatever.aegis_ascension.util.CatalogPresentation;
 import com.whatever.aegis_ascension.util.ConfigDescription;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -15,15 +17,15 @@ import static com.whatever.aegis_ascension.util.GeneralTextMethods.getTranslatab
 
 public record SoulLink(
         String id,
-        String nameKey,
-        String descriptionKey,
-        ResourceLocation iconTexture,
         List<String> requirements,
         List<String> rankPerks,
         Map<String, Double> bonusStats,
         boolean enabled,
         int sourceRow
 ) {
+    // Make Titles, descriptions, and icons totally client side
+    private static final CatalogPresentation PRESENTATION = CatalogPresentation.of("soul_links_clientside.json");
+
     public SoulLink {
         requirements = List.copyOf(requirements);
         rankPerks = List.copyOf(rankPerks);
@@ -31,11 +33,16 @@ public record SoulLink(
     }
 
     public Component title() {
-        return getTranslatableString(nameKey);
+        return getTranslatableString(PRESENTATION.name(id));
     }
 
     public Component description() {
-        return ConfigDescription.render(descriptionKey, bonusStats);
+        return ConfigDescription.render(PRESENTATION.description(id),
+                bonusStats);
+    }
+
+    public ResourceLocation iconTexture() {
+        return PRESENTATION.icon(id);
     }
 
     public double bonusStat(String key) {
@@ -76,8 +83,7 @@ public record SoulLink(
 
     public double rankBonus(Predicate<String> ownsTalent) {
         int currentRank = rank(ownsTalent);
-        return currentRank <= 0 ? 0.0D : bonusStat(
-                "level_" + currentRank + "_bonus"
+        return currentRank <= 0 ? 0.0D : bonusStat("level_" + currentRank + "_bonus"
         );
     }
 }

@@ -16,7 +16,7 @@ package com.whatever.aegis_ascension.util;
  * does.</p>
  *
  * <p>Because the source id comes from the catalog JSON rather than from code, talents
- * added or renamed in {@code talents.json} start recording under their own id with no
+ * added or renamed in {@code talents_serverside.json} start recording under their own id with no
  * code change. A record whose id no longer resolves is shown as coming from a removed
  * talent rather than being silently dropped.</p>
  */

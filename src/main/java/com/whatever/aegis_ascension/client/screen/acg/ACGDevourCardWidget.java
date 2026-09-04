@@ -75,7 +75,7 @@ public final class ACGDevourCardWidget extends AbstractButton implements Clippab
                 ACGInventoryStyle.CARD_FRAME_W, ACGInventoryStyle.CARD_FRAME_H,
                 ACGInventoryStyle.CARD_FRAME_TINT);
         // Rarity gem, same palette as the Inventory's — here the tier is read from how many
-        // attributes the item carried, against the thresholds in devour_client_setting.json.
+        // attributes the item carried, against the thresholds in devour_clientside.json.
         ACGInventoryStyle.texSquareTinted(graphics, ACGInventoryStyle.GEM,
                 x + width / 2.0F, y + 8.0F, 6.0F, ACGInventoryStyle.GEM_SIZE,
                 com.whatever.aegis_ascension.client.screen.collectiontabs.DevouredItems

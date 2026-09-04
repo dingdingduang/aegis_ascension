@@ -1,0 +1,110 @@
+{
+  "schema_version": 1,
+  "entries": {
+    "soul_hakugyokurou": {
+      "name": "combination.aegis_ascension.soul_hakugyokurou.name",
+      "description": "combination.aegis_ascension.soul_hakugyokurou.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_hakugyokurou.png"
+    },
+    "soul_logistics_combo": {
+      "name": "combination.aegis_ascension.soul_logistics_combo.name",
+      "description": "combination.aegis_ascension.soul_logistics_combo.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_logistics_combo.png"
+    },
+    "soul_scarlet_devil_mansion_sisters": {
+      "name": "combination.aegis_ascension.soul_scarlet_devil_mansion_sisters.name",
+      "description": "combination.aegis_ascension.soul_scarlet_devil_mansion_sisters.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_scarlet_devil_mansion_sisters.png"
+    },
+    "soul_millennium_echo": {
+      "name": "combination.aegis_ascension.soul_millennium_echo.name",
+      "description": "combination.aegis_ascension.soul_millennium_echo.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_millennium_echo.png"
+    },
+    "soul_trinity_tea_party": {
+      "name": "combination.aegis_ascension.soul_trinity_tea_party.name",
+      "description": "combination.aegis_ascension.soul_trinity_tea_party.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_trinity_tea_party.png"
+    },
+    "soul_death_gods_authority": {
+      "name": "combination.aegis_ascension.soul_death_gods_authority.name",
+      "description": "combination.aegis_ascension.soul_death_gods_authority.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_death_gods_authority.png"
+    },
+    "soul_magician_master_and_apprentice": {
+      "name": "combination.aegis_ascension.soul_magician_master_and_apprentice.name",
+      "description": "combination.aegis_ascension.soul_magician_master_and_apprentice.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_magician_master_and_apprentice.png"
+    },
+    "soul_combo_technique": {
+      "name": "combination.aegis_ascension.soul_combo_technique.name",
+      "description": "combination.aegis_ascension.soul_combo_technique.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_combo_technique.png"
+    },
+    "soul_shittim_chest": {
+      "name": "combination.aegis_ascension.soul_shittim_chest.name",
+      "description": "combination.aegis_ascension.soul_shittim_chest.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_shittim_chest.png"
+    },
+    "soul_love_as_eternal_as_this_moment": {
+      "name": "combination.aegis_ascension.soul_love_as_eternal_as_this_moment.name",
+      "description": "combination.aegis_ascension.soul_love_as_eternal_as_this_moment.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_love_as_eternal_as_this_moment.png"
+    },
+    "soul_plum_blossom_garden": {
+      "name": "combination.aegis_ascension.soul_plum_blossom_garden.name",
+      "description": "combination.aegis_ascension.soul_plum_blossom_garden.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_plum_blossom_garden.png"
+    },
+    "soul_game_development_club": {
+      "name": "combination.aegis_ascension.soul_game_development_club.name",
+      "description": "combination.aegis_ascension.soul_game_development_club.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_game_development_club.png"
+    },
+    "soul_central_control_center": {
+      "name": "combination.aegis_ascension.soul_central_control_center.name",
+      "description": "combination.aegis_ascension.soul_central_control_center.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_central_control_center.png"
+    },
+    "soul_yuzusoft_fan_level": {
+      "name": "combination.aegis_ascension.soul_yuzusoft_fan_level.name",
+      "description": "combination.aegis_ascension.soul_yuzusoft_fan_level.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_yuzusoft_fan_level.png"
+    },
+    "soul_maripatchy_group": {
+      "name": "combination.aegis_ascension.soul_maripatchy_group.name",
+      "description": "combination.aegis_ascension.soul_maripatchy_group.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_maripatchy_group.png"
+    },
+    "soul_team_radiance": {
+      "name": "combination.aegis_ascension.soul_team_radiance.name",
+      "description": "combination.aegis_ascension.soul_team_radiance.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_team_star.png"
+    },
+    "soul_gourmet_guild": {
+      "name": "combination.aegis_ascension.soul_gourmet_guild.name",
+      "description": "combination.aegis_ascension.soul_gourmet_guild.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_gourmet_guild.png"
+    },
+    "soul_misty_lake": {
+      "name": "combination.aegis_ascension.soul_misty_lake.name",
+      "description": "combination.aegis_ascension.soul_misty_lake.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_misty_lake.png"
+    },
+    "soul_shrine_maiden_team": {
+      "name": "combination.aegis_ascension.soul_shrine_maiden_team.name",
+      "description": "combination.aegis_ascension.soul_shrine_maiden_team.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_shrine_maiden_team.png"
+    },
+    "soul_make_up_work_club": {
+      "name": "combination.aegis_ascension.soul_make_up_work_club.name",
+      "description": "combination.aegis_ascension.soul_make_up_work_club.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_make_up_work_club.png"
+    },
+    "soul_madoka_with_homura": {
+      "name": "combination.aegis_ascension.soul_madoka_with_homura.name",
+      "description": "combination.aegis_ascension.soul_madoka_with_homura.description",
+      "icon": "aegis_ascension:textures/gui/soul_links/soul_madoka_with_homura.png"
+    }
+  }
+}

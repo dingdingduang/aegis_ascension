@@ -18,15 +18,30 @@ public final class SoulLinks {
     private SoulLinks() {
     }
 
+    /**
+     * Whether an unformed link is listed. RELEVANT keeps the ones the player has already
+     * started - at least one required talent owned - so the tab shows what is within
+     * reach without listing every combination in the catalogue.
+     */
+    private static boolean listsUnformed(SoulLink soulLink,
+                                         ClientSettings.SoulLinkVisibility visibility) {
+        return switch (visibility) {
+            case ALL -> true;
+            case RELEVANT -> soulLink.requirements().stream().anyMatch(ClientPerkState::owns);
+            case FORMED -> false;
+        };
+    }
+
     public static List<TalentCollectionCard> cards() {
-        boolean showUnformed = ClientSettings.get().showUnformedSoulLinks;
+        ClientSettings.SoulLinkVisibility visibility =
+                ClientSettings.get().soulLinkVisibility;
         List<TalentCollectionCard> cards = new ArrayList<>();
         for (SoulLink soulLink : Perk.soulLinks()) {
             boolean active = ClientPerkState.isSoulLinkActive(soulLink);
             boolean disabled = ClientPerkState.isSoulLinkDisabled(soulLink);
             // Neither active nor disabled means the required talents are not all
-            // owned: the link is not formed, and is hidden unless asked for.
-            if (!active && !disabled && !showUnformed) {
+            // owned, so the link is unformed and only some modes list it.
+            if (!active && !disabled && !listsUnformed(soulLink, visibility)) {
                 continue;
             }
             Component status;

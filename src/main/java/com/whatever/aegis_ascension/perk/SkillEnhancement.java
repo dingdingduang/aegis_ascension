@@ -24,7 +24,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -74,16 +73,11 @@ public final class SkillEnhancement {
 
             SkillEnhancement enhancement = new SkillEnhancement(
                     id,
-                    requireText(definition.name, id + " name"),
-                    requireText(definition.description, id + " description"),
-                    requireLocation(definition.icon, "icon"),
-                    Math.max(1, definition.iconTextureSize),
                     attributeId,
                     customStat,
                     definition.amount,
                     attributeId == null ? AttributeOperation.ADDITION
                             : requireOperation(definition.operation),
-                    DisplayFormat.fromJson(definition.displayFormat),
                     definition.affectedByAllSkillEnhancementAttribute == null
                             || definition.affectedByAllSkillEnhancementAttribute
             );
@@ -104,34 +98,23 @@ public final class SkillEnhancement {
     }
 
     private final String id;
-    private final String nameKey;
-    private final String descriptionKey;
-    private final ResourceLocation iconTexture;
-    private final int iconTextureSize;
     private final ResourceLocation attributeId;
     private final String customStat;
     private final double amount;
     private final AttributeOperation operation;
-    private final DisplayFormat displayFormat;
     private final boolean affectedByAllSkillEnhancementAttribute;
     private final UUID modifierId;
     private final UUID allSkillEnhancementAttributeModifierId;
 
-    private SkillEnhancement(String id, String nameKey, String descriptionKey,
-                             ResourceLocation iconTexture, int iconTextureSize,
+    private SkillEnhancement(String id,
                              ResourceLocation attributeId, String customStat, double amount,
-                             AttributeOperation operation, DisplayFormat displayFormat,
+                             AttributeOperation operation,
                              boolean affectedByAllSkillEnhancementAttribute) {
         this.id = id;
-        this.nameKey = nameKey;
-        this.descriptionKey = descriptionKey;
-        this.iconTexture = iconTexture;
-        this.iconTextureSize = iconTextureSize;
         this.attributeId = attributeId;
         this.customStat = customStat;
         this.amount = amount;
         this.operation = operation;
-        this.displayFormat = displayFormat;
         this.affectedByAllSkillEnhancementAttribute =
                 affectedByAllSkillEnhancementAttribute;
         this.modifierId = AegisModifiers.mint(SKILL_ENHANCEMENT + GeneralConstants.SLASH + id);
@@ -141,22 +124,6 @@ public final class SkillEnhancement {
 
     public String id() {
         return id;
-    }
-
-    public Component title() {
-        return getTranslatableString(nameKey);
-    }
-
-    public Component description() {
-        return getTranslatableString(descriptionKey, formattedAmount());
-    }
-
-    public ResourceLocation iconTexture() {
-        return iconTexture;
-    }
-
-    public int iconTextureSize() {
-        return iconTextureSize;
     }
 
     public Optional<Attribute> attribute() {
@@ -224,30 +191,18 @@ public final class SkillEnhancement {
         ));
     }
 
-    private String formattedAmount() {
-        double displayed = displayFormat == DisplayFormat.PERCENT ? amount * 100.0D : amount;
-        if (Math.abs(displayed - Math.rint(displayed)) < 1.0E-9D) {
-            return String.format(Locale.ROOT, "%.0f%s", displayed,
-                    displayFormat == DisplayFormat.PERCENT ? "%" : "");
-        }
-        return String.format(Locale.ROOT, "%.2f%s", displayed,
-                        displayFormat == DisplayFormat.PERCENT ? "%" : "")
-                .replaceAll("0+(%?)$", "$1")
-                .replaceAll("\\.(%?)$", "$1");
-    }
-
     private static Catalog loadCatalog() {
         Path configPath = PlatformServices.paths()
                 .modConfigDirectory(AegisAscensionMod.MOD_ID)
-                .resolve("skill_enhancements.json");
+                .resolve("skill_enhancement_serverside.json");
         try {
             Files.createDirectories(configPath.getParent());
             if (Files.notExists(configPath)) {
                 try (var stream = SkillEnhancement.class.getResourceAsStream(
-                        "/assets/aegis_ascension/skill_enhancements.json")) {
+                        "/assets/aegis_ascension/skill_enhancement_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/skill_enhancements.json"
+                                "Missing default assets/aegis_ascension/skill_enhancement_serverside.json"
                         );
                     }
                     Files.copy(stream, configPath);
@@ -317,10 +272,10 @@ public final class SkillEnhancement {
 
     private static JsonObject loadBundledCatalogJson() throws Exception {
         try (var stream = SkillEnhancement.class.getResourceAsStream(
-                "/assets/aegis_ascension/skill_enhancements.json")) {
+                "/assets/aegis_ascension/skill_enhancement_serverside.json")) {
             if (stream == null) {
                 throw new IllegalStateException(
-                        "Missing default assets/aegis_ascension/skill_enhancements.json"
+                        "Missing default assets/aegis_ascension/skill_enhancement_serverside.json"
                 );
             }
             try (var reader = new java.io.InputStreamReader(
@@ -357,39 +312,17 @@ public final class SkillEnhancement {
         };
     }
 
-    private enum DisplayFormat {
-        NUMBER,
-        PERCENT;
-
-        private static DisplayFormat fromJson(String value) {
-            return switch (Objects.requireNonNull(value, "Missing display_format")) {
-                case "number" -> NUMBER;
-                case "percent" -> PERCENT;
-                default -> throw new IllegalStateException(
-                        "Unknown skill enhancement display_format: " + value
-                );
-            };
-        }
-    }
-
     private static final class Catalog {
         private List<EnhancementJson> enhancements = List.of();
     }
 
     private static final class EnhancementJson {
         private String id;
-        private String name;
-        private String description;
-        private String icon;
-        @SerializedName("icon_texture_size")
-        private int iconTextureSize = 16;
         private String attribute;
         @SerializedName("custom_stat")
         private String customStat;
         private double amount;
         private String operation = "addition";
-        @SerializedName("display_format")
-        private String displayFormat = "number";
         @SerializedName("affected_by_all_skill_enhancement_attribute")
         private Boolean affectedByAllSkillEnhancementAttribute;
     }

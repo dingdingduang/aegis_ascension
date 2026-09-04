@@ -1,9 +1,6 @@
 {
-  "schema_version": 38,
+  "schema_version": 39,
   "source": "Illusion Poem",
-  "value_conventions": {
-    "moved_tables": "apothic_attribute_mappings and nearby_spawn_buffs now live in their own files of the same name, next to this one."
-  },
   "rarity_weights": {
     "R": 90,
     "SR": 8,
@@ -13,9 +10,6 @@
     {
       "id": "perk_healing_magic",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_healing_magic.name",
-      "description": "perk.aegis_ascension.perk_healing_magic.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_healing_magic.png",
       "stats": {
         "health_restore_per_second": 0.02,
         "mana_restore_per_second": 0.02,
@@ -28,9 +22,6 @@
     {
       "id": "perk_mundane_stroll",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_mundane_stroll.name",
-      "description": "perk.aegis_ascension.perk_mundane_stroll.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_mundane_stroll.png",
       "stats": {
         "movement_speed_multiplier": 0.1,
         "distance_per_stack": 500,
@@ -44,9 +35,6 @@
     {
       "id": "perk_lucky_arrow",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_lucky_arrow.name",
-      "description": "perk.aegis_ascension.perk_lucky_arrow.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_lucky_arrow.png",
       "stats": {
         "shield_per_stack": 200,
         "lucky_strike_per_stack": 0.01,
@@ -59,9 +47,6 @@
     {
       "id": "perk_ink_dyed_sakura",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_ink_dyed_sakura.name",
-      "description": "perk.aegis_ascension.perk_ink_dyed_sakura.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_ink_dyed_sakura.png",
       "stats": {
         "critical_chance": 0.2
       },
@@ -72,9 +57,6 @@
     {
       "id": "perk_half_human_half_phantom_gardener",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_half_human_half_phantom_gardener.name",
-      "description": "perk.aegis_ascension.perk_half_human_half_phantom_gardener.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_half_human_half_phantom_gardener.png",
       "stats": {
         "breakthrough_critical_damage": 0.1
       },
@@ -85,9 +67,6 @@
     {
       "id": "perk_crimson_young_moon",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_crimson_young_moon.name",
-      "description": "perk.aegis_ascension.perk_crimson_young_moon.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_crimson_young_moon.png",
       "stats": {
         "max_health_multiplier": 0.5,
         "damage_reduction": -0.5,
@@ -101,9 +80,6 @@
     {
       "id": "perk_laevatein",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_laevatein.name",
-      "description": "perk.aegis_ascension.perk_laevatein.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_laevatein.png",
       "stats": {
         "max_health_flat_per_damage": 0.1,
         "max_trigger_count": 500
@@ -115,9 +91,6 @@
     {
       "id": "perk_cirno",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_cirno.name",
-      "description": "perk.aegis_ascension.perk_cirno.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_cirno.png",
       "stats": {
         "breakthrough_primary_attribute_flat": 2
       },
@@ -128,9 +101,6 @@
     {
       "id": "perk_nagisa_leisure_time",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_nagisa_leisure_time.name",
-      "description": "perk.aegis_ascension.perk_nagisa_leisure_time.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_nagisa_leisure_time.png",
       "stats": {
         "lucky_strike": 0.2
       },
@@ -141,9 +111,6 @@
     {
       "id": "perk_lunar_goddesss_blessing",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_lunar_goddesss_blessing.name",
-      "description": "perk.aegis_ascension.perk_lunar_goddesss_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_lunar_goddesss_blessing.png",
       "stats": {
         "kill_trigger_chance": 0.1,
         "physical_damage_amplification_per_trigger": 0.01,
@@ -156,9 +123,6 @@
     {
       "id": "perk_alya",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_alya.name",
-      "description": "perk.aegis_ascension.perk_alya.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_alya.png",
       "stats": {
         "fixed_max_health": 1,
         "shield_gain_multiplier": 2
@@ -170,9 +134,6 @@
     {
       "id": "perk_boundary_of_life_and_death",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_boundary_of_life_and_death.name",
-      "description": "perk.aegis_ascension.perk_boundary_of_life_and_death.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_boundary_of_life_and_death.png",
       "stats": {
         "revive_uses": 2,
         "lucky_strike_per_revive": 0.1,
@@ -186,9 +147,6 @@
     {
       "id": "perk_flickering_light",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_flickering_light.name",
-      "description": "perk.aegis_ascension.perk_flickering_light.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_flickering_light.png",
       "stats": {
         "armor_penetration_percentage": 0.3
       },
@@ -199,9 +157,6 @@
     {
       "id": "perk_white_star_obsidian",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_white_star_obsidian.name",
-      "description": "perk.aegis_ascension.perk_white_star_obsidian.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_white_star_obsidian.png",
       "stats": {
         "skill_enhancement_option_bonus": 1,
         "perk_refresh_charge_per_charge": 1
@@ -213,9 +168,6 @@
     {
       "id": "perk_alice",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_alice.name",
-      "description": "perk.aegis_ascension.perk_alice.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_alice.png",
       "stats": {
         "luck_threshold": 2,
         "luck_flat_if_above": 1,
@@ -234,9 +186,6 @@
     {
       "id": "perk_shiroko",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_shiroko.name",
-      "description": "perk.aegis_ascension.perk_shiroko.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_shiroko.png",
       "stats": {
         "attack_multiplier": 0.05,
         "attack_speed_multiplier": 0.2,
@@ -253,9 +202,6 @@
     {
       "id": "perk_hayase_yuka",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_hayase_yuka.name",
-      "description": "perk.aegis_ascension.perk_hayase_yuka.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_hayase_yuka.png",
       "stats": {
         "breakthrough_independent_skill_damage": 0.04
       },
@@ -266,9 +212,6 @@
     {
       "id": "perk_otogi_noah",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_otogi_noah.name",
-      "description": "perk.aegis_ascension.perk_otogi_noah.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_otogi_noah.png",
       "stats": {
         "breakthrough_independent_skill_area": 0.04
       },
@@ -279,9 +222,6 @@
     {
       "id": "perk_skill_damage_conversion",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_skill_damage_conversion.name",
-      "description": "perk.aegis_ascension.perk_skill_damage_conversion.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_skill_damage_conversion.png",
       "stats": {
         "breakthrough_true_damage": 0.2
       },
@@ -292,9 +232,6 @@
     {
       "id": "perk_cashback",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_cashback.name",
-      "description": "perk.aegis_ascension.perk_cashback.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_cashback.png",
       "stats": {
         "trade_material_refund_fraction": 0.25
       },
@@ -305,9 +242,6 @@
     {
       "id": "perk_silent_dawn",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_silent_dawn.name",
-      "description": "perk.aegis_ascension.perk_silent_dawn.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_silent_dawn.png",
       "stats": {
         "selection_charges_granted": 2
       },
@@ -318,9 +252,6 @@
     {
       "id": "perk_tsukiyuki_miyako",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_tsukiyuki_miyako.name",
-      "description": "perk.aegis_ascension.perk_tsukiyuki_miyako.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_tsukiyuki_miyako.png",
       "stats": {
         "damage_bonus": 0.1,
         "movement_speed_multiplier": 0.1,
@@ -333,9 +264,6 @@
     {
       "id": "perk_told_you_its_magic",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_told_you_its_magic.name",
-      "description": "perk.aegis_ascension.perk_told_you_its_magic.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_told_you_its_magic.png",
       "stats": {
         "breakthrough_critical_chance_per_rank": 0.33,
         "fixed_critical_damage": 1.5
@@ -347,9 +275,6 @@
     {
       "id": "perk_noelle",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_noelle.name",
-      "description": "perk.aegis_ascension.perk_noelle.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_noelle.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.05,
         "breakthrough_summon_power": 0.1,
@@ -364,9 +289,6 @@
     {
       "id": "perk_arona",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_arona.name",
-      "description": "perk.aegis_ascension.perk_arona.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_arona.png",
       "stats": {
         "primary_attribute_multiplier": 0.05,
         "breakthrough_primary_attribute_flat": 1
@@ -384,9 +306,6 @@
     {
       "id": "perk_matter_to_magic_conversion",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_matter_to_magic_conversion.name",
-      "description": "perk.aegis_ascension.perk_matter_to_magic_conversion.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_matter_to_magic_conversion.png",
       "stats": {
         "unlocks_primary_skill_enhancement_conversion": 1
       },
@@ -397,9 +316,6 @@
     {
       "id": "perk_mysterious_doll",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_mysterious_doll.name",
-      "description": "perk.aegis_ascension.perk_mysterious_doll.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_mysterious_doll.png",
       "stats": {},
       "maxRank": 1,
       "manualToggle": false,
@@ -408,9 +324,6 @@
     {
       "id": "perk_clear_mind_state",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_clear_mind_state.name",
-      "description": "perk.aegis_ascension.perk_clear_mind_state.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_clear_mind_state.png",
       "stats": {
         "dodge_chance": 0.05,
         "primary_attribute_multiplier": 0.05,
@@ -424,9 +337,6 @@
     {
       "id": "perk_magic_conversion",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_magic_conversion.name",
-      "description": "perk.aegis_ascension.perk_magic_conversion.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_magic_conversion.png",
       "stats": {
         "max_mana_flat_per_damage": 1,
         "max_health_per_max_mana": 0.05,
@@ -439,9 +349,6 @@
     {
       "id": "perk_kokona",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_kokona.name",
-      "description": "perk.aegis_ascension.perk_kokona.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_kokona.png",
       "stats": {
         "final_damage_per_owned_talent": 0.01
       },
@@ -452,9 +359,6 @@
     {
       "id": "perk_sunohara_shun",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_sunohara_shun.name",
-      "description": "perk.aegis_ascension.perk_sunohara_shun.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_sunohara_shun.png",
       "stats": {
         "additional_random_talent_chance": 0.33,
         "additional_random_one_talent_weight": 0.8,
@@ -471,9 +375,6 @@
     {
       "id": "perk_magic_blade",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_magic_blade.name",
-      "description": "perk.aegis_ascension.perk_magic_blade.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_magic_blade.png",
       "stats": {
         "max_mana_restore_per_attack": 0.1,
         "restore_cooldown_seconds": 0.5,
@@ -486,9 +387,6 @@
     {
       "id": "perk_barrage_control_magic",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_barrage_control_magic.name",
-      "description": "perk.aegis_ascension.perk_barrage_control_magic.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_barrage_control_magic.png",
       "requires_mod": "myweirdironspellbookaddon",
       "stats": {
         "barrage_damage_multiplier": 1.0,
@@ -502,9 +400,6 @@
     {
       "id": "perk_momo",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_momo.name",
-      "description": "perk.aegis_ascension.perk_momo.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_momo.png",
       "stats": {
         "kill_trigger_chance": 0.025,
         "arrow_damage_per_trigger": 0.025,
@@ -519,9 +414,6 @@
     {
       "id": "perk_midori",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_midori.name",
-      "description": "perk.aegis_ascension.perk_midori.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_midori.png",
       "stats": {
         "kill_trigger_chance": 0.025,
         "arrow_velocity_per_trigger": 0.01,
@@ -536,9 +428,6 @@
     {
       "id": "perk_hikari",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_hikari.name",
-      "description": "perk.aegis_ascension.perk_hikari.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_hikari.png",
       "stats": {
         "lucky_strike_threshold": 1.5,
         "lucky_strike_overflow_step": 0.1,
@@ -551,9 +440,6 @@
     {
       "id": "perk_nozomi",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_nozomi.name",
-      "description": "perk.aegis_ascension.perk_nozomi.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_nozomi.png",
       "stats": {
         "final_damage_step": 0.1,
         "lucky_strike_per_step": 0.02
@@ -565,9 +451,6 @@
     {
       "id": "perk_congyu_ciallo",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_congyu_ciallo.name",
-      "description": "perk.aegis_ascension.perk_congyu_ciallo.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_congyu_ciallo.png",
       "stats": {
         "breakthrough_max_health_multiplier": 0.02,
         "breakthrough_physical_damage_amplification": 0.03,
@@ -580,9 +463,6 @@
     {
       "id": "perk_yoshino_ciallo",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_yoshino_ciallo.name",
-      "description": "perk.aegis_ascension.perk_yoshino_ciallo.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_yoshino_ciallo.png",
       "stats": {
         "breakthrough_attack_multiplier": 0.05
       },
@@ -596,9 +476,6 @@
     {
       "id": "perk_shizuru_ciallo",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_shizuru_ciallo.name",
-      "description": "perk.aegis_ascension.perk_shizuru_ciallo.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_shizuru_ciallo.png",
       "stats": {
         "breakthrough_final_damage": 0.02
       },
@@ -612,9 +489,6 @@
     {
       "id": "perk_ningning_ciallo",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_ningning_ciallo.name",
-      "description": "perk.aegis_ascension.perk_ningning_ciallo.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_ningning_ciallo.png",
       "stats": {
         "breakthrough_cooldown_reduction": 0.02
       },
@@ -628,9 +502,6 @@
     {
       "id": "perk_nanami_ciallo",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_nanami_ciallo.name",
-      "description": "perk.aegis_ascension.perk_nanami_ciallo.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_nanami_ciallo.png",
       "stats": {
         "breakthrough_luck_flat": 0.1
       },
@@ -644,9 +515,6 @@
     {
       "id": "perk_rolling_in_wealth",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_rolling_in_wealth.name",
-      "description": "perk.aegis_ascension.perk_rolling_in_wealth.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_rolling_in_wealth.png",
       "stats": {
         "aegis_option_bonus": 1,
         "gold_per_stack": 1000,
@@ -660,9 +528,6 @@
     {
       "id": "perk_enigma",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_enigma.name",
-      "description": "perk.aegis_ascension.perk_enigma.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_enigma.png",
       "stats": {
         "enigma_trigger_chance": 0.5,
         "enigma_trigger_multiplier": 3,
@@ -675,9 +540,6 @@
     {
       "id": "perk_master_spark",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_master_spark.name",
-      "description": "perk.aegis_ascension.perk_master_spark.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_master_spark.png",
       "stats": {
         "movement_speed_multiplier": 0.1,
         "breakthrough_true_damage": 0.2
@@ -689,9 +551,6 @@
     {
       "id": "perk_focused_shot",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_focused_shot.name",
-      "description": "perk.aegis_ascension.perk_focused_shot.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_focused_shot.png",
       "stats": {
         "critical_chance": 0.2,
         "critical_damage": 0.4,
@@ -705,9 +564,6 @@
     {
       "id": "perk_meteor_sparkle",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_meteor_sparkle.name",
-      "description": "perk.aegis_ascension.perk_meteor_sparkle.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_meteor_sparkle.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.05,
         "lucky_strike": 0.1,
@@ -720,9 +576,6 @@
     {
       "id": "perk_beater",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_beater.name",
-      "description": "perk.aegis_ascension.perk_beater.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_beater.png",
       "stats": {
         "max_health_multiplier": 0.2,
         "damage_reduction": 0.1,
@@ -737,9 +590,6 @@
     {
       "id": "perk_yurizono_seia",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_yurizono_seia.name",
-      "description": "perk.aegis_ascension.perk_yurizono_seia.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_yurizono_seia.png",
       "stats": {
         "immediate_level_gain": 2,
         "breakthrough_level_gain": 1
@@ -751,9 +601,6 @@
     {
       "id": "perk_frieren",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_frieren.name",
-      "description": "perk.aegis_ascension.perk_frieren.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_frieren.png",
       "stats": {
         "primary_attribute_multiplier": 0.1,
         "skill_enhancement_option_bonus": 1,
@@ -766,9 +613,6 @@
     {
       "id": "perk_fern",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_fern.name",
-      "description": "perk.aegis_ascension.perk_fern.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_fern.png",
       "stats": {
         "magic_damage_trigger_chance": 0.15,
         "final_damage_on_trigger": 1
@@ -780,9 +624,6 @@
     {
       "id": "perk_wind_arrow",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_wind_arrow.name",
-      "description": "perk.aegis_ascension.perk_wind_arrow.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_wind_arrow.png",
       "stats": {
         "attack_range_flat": 2,
         "breakthrough_attack_range_flat": 0.2,
@@ -796,9 +637,6 @@
     {
       "id": "perk_princess_of_egret",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_princess_of_egret.name",
-      "description": "perk.aegis_ascension.perk_princess_of_egret.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_princess_of_egret.png",
       "stats": {
         "attack_multiplier": 0.1,
         "attack_speed_flat": 0.1,
@@ -812,9 +650,6 @@
     {
       "id": "perk_i_shall_interpret_the_radiance",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_i_shall_interpret_the_radiance.name",
-      "description": "perk.aegis_ascension.perk_i_shall_interpret_the_radiance.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_i_shall_interpret_the_radiance.png",
       "stats": {
         "damage_bonus": 0.05,
         "damage_bonus_per_kill": 0.01,
@@ -828,9 +663,6 @@
     {
       "id": "perk_righteous_knight",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_righteous_knight.name",
-      "description": "perk.aegis_ascension.perk_righteous_knight.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_righteous_knight.png",
       "stats": {
         "attack_multiplier": 0.05,
         "attack_damage_amplification": 0.05,
@@ -847,9 +679,6 @@
     {
       "id": "perk_blazing_feather_starweaver",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_blazing_feather_starweaver.name",
-      "description": "perk.aegis_ascension.perk_blazing_feather_starweaver.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_blazing_feather_starweaver.png",
       "stats": {
         "critical_chance": 0.05,
         "critical_damage": 0.1,
@@ -866,9 +695,6 @@
     {
       "id": "perk_necromancer",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_necromancer.name",
-      "description": "perk.aegis_ascension.perk_necromancer.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_necromancer.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.05,
         "final_damage": 0.05,
@@ -883,9 +709,6 @@
     {
       "id": "perk_grim_reapers_contract",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_grim_reapers_contract.name",
-      "description": "perk.aegis_ascension.perk_grim_reapers_contract.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_grim_reapers_contract.png",
       "stats": {
         "max_health_multiplier": -0.8,
         "final_damage": 0.75
@@ -897,9 +720,6 @@
     {
       "id": "perk_koharu_sprite",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_koharu_sprite.name",
-      "description": "perk.aegis_ascension.perk_koharu_sprite.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_koharu_sprite.png",
       "stats": {
         "primary_attribute_multiplier": 0.1,
         "interval_seconds": 2,
@@ -919,9 +739,6 @@
     {
       "id": "perk_mika",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_mika.name",
-      "description": "perk.aegis_ascension.perk_mika.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_mika.png",
       "stats": {
         "critical_chance": 1.0,
         "damage_bonus": 0.25,
@@ -934,9 +751,6 @@
     {
       "id": "perk_fair_trade",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_fair_trade.name",
-      "description": "perk.aegis_ascension.perk_fair_trade.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_fair_trade.png",
       "stats": {
         "damage_bonus_per_trade": 0.02,
         "damage_bonus_cap": 5.0
@@ -948,9 +762,6 @@
     {
       "id": "perk_glass_cannon",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_glass_cannon.name",
-      "description": "perk.aegis_ascension.perk_glass_cannon.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_glass_cannon.png",
       "stats": {
         "damage_reduction": -0.75,
         "final_damage": 0.25
@@ -962,9 +773,6 @@
     {
       "id": "perk_collector",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_collector.name",
-      "description": "perk.aegis_ascension.perk_collector.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_collector.png",
       "stats": {
         "physical_damage_amplification_per_soul_link": 0.05,
         "magic_damage_amplification_per_soul_link": 0.05
@@ -976,9 +784,6 @@
     {
       "id": "perk_flower_fairy",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_flower_fairy.name",
-      "description": "perk.aegis_ascension.perk_flower_fairy.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_flower_fairy.png",
       "stats": {
         "talent_option_bonus": -1,
         "breakthrough_skill_enhancement_charges": 2
@@ -990,9 +795,6 @@
     {
       "id": "perk_shared_fortune",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_shared_fortune.name",
-      "description": "perk.aegis_ascension.perk_shared_fortune.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_shared_fortune.png",
       "stats": {
         "copy_talent_chance": 0.5,
         "fallback_skill_enhancement_charges": 1,
@@ -1005,9 +807,6 @@
     {
       "id": "perk_great_fairy",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_great_fairy.name",
-      "description": "perk.aegis_ascension.perk_great_fairy.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_great_fairy.png",
       "stats": {
         "attack_multiplier_per_owned_talent": 0.05,
         "skill_damage_per_owned_talent": 0.05
@@ -1019,9 +818,6 @@
     {
       "id": "perk_sacred_elf",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_sacred_elf.name",
-      "description": "perk.aegis_ascension.perk_sacred_elf.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_sacred_elf.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.1,
         "invulnerability_duration_seconds": 5,
@@ -1034,9 +830,6 @@
     {
       "id": "perk_butterflys_gentle_touch",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_butterflys_gentle_touch.name",
-      "description": "perk.aegis_ascension.perk_butterflys_gentle_touch.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_butterflys_gentle_touch.png",
       "stats": {
         "breakthrough_selection_charges": 1
       },
@@ -1047,9 +840,6 @@
     {
       "id": "perk_ripples_of_the_past",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_ripples_of_the_past.name",
-      "description": "perk.aegis_ascension.perk_ripples_of_the_past.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_ripples_of_the_past.png",
       "stats": {
         "luck_flat": 1,
         "breakthrough_effect_multiplier_bonus": 0.25,
@@ -1062,9 +852,6 @@
     {
       "id": "perk_commander",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_commander.name",
-      "description": "perk.aegis_ascension.perk_commander.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_commander.png",
       "stats": {
         "max_health_to_base_damage": 0.2
       },
@@ -1075,9 +862,6 @@
     {
       "id": "perk_plana",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_plana.name",
-      "description": "perk.aegis_ascension.perk_plana.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_plana.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.05,
         "breakthrough_effect_multiplier_bonus": 0.5,
@@ -1090,9 +874,6 @@
     {
       "id": "perk_zephyrs_care",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_zephyrs_care.name",
-      "description": "perk.aegis_ascension.perk_zephyrs_care.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_zephyrs_care.png",
       "stats": {
         "breakthrough_all_skill_enhancement_attribute": 0.01,
         "breakthrough_experience": 500
@@ -1104,9 +885,6 @@
     {
       "id": "perk_illusion_bubble",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_illusion_bubble.name",
-      "description": "perk.aegis_ascension.perk_illusion_bubble.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_illusion_bubble.png",
       "stats": {
         "breakthrough_primary_attribute_flat": 2
       },
@@ -1117,9 +895,6 @@
     {
       "id": "perk_twin_magic_mirror",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_twin_magic_mirror.name",
-      "description": "perk.aegis_ascension.perk_twin_magic_mirror.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_twin_magic_mirror.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.06,
         "lucky_strike": 0.08,
@@ -1132,9 +907,6 @@
     {
       "id": "perk_swiss_roll_moment",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_swiss_roll_moment.name",
-      "description": "perk.aegis_ascension.perk_swiss_roll_moment.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_swiss_roll_moment.png",
       "stats": {
         "one_extra_roll_chance": 0.75,
         "one_extra_roll_count": 1,
@@ -1151,9 +923,6 @@
     {
       "id": "perk_innate_dream",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_innate_dream.name",
-      "description": "perk.aegis_ascension.perk_innate_dream.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_innate_dream.png",
       "stats": {
         "base_trigger_chance": 0.1,
         "trigger_chance_per_breakthrough": 0.01,
@@ -1173,9 +942,6 @@
     {
       "id": "perk_seven_colored_magician",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_seven_colored_magician.name",
-      "description": "perk.aegis_ascension.perk_seven_colored_magician.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_seven_colored_magician.png",
       "stats": {
         "true_damage": 0.4,
         "breakthrough_true_damage": 0.2,
@@ -1191,9 +957,6 @@
     {
       "id": "perk_firefly_flame",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_firefly_flame.name",
-      "description": "perk.aegis_ascension.perk_firefly_flame.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_firefly_flame.png",
       "stats": {
         "lucky_strike": 1.2,
         "lucky_strike_threshold": 3,
@@ -1206,9 +969,6 @@
     {
       "id": "perk_peerless_calculation",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_peerless_calculation.name",
-      "description": "perk.aegis_ascension.perk_peerless_calculation.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_peerless_calculation.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.12,
         "lucky_strike": 0.2,
@@ -1221,9 +981,6 @@
     {
       "id": "perk_starlight_intertwined_benediction",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_starlight_intertwined_benediction.name",
-      "description": "perk.aegis_ascension.perk_starlight_intertwined_benediction.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_starlight_intertwined_benediction.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.1,
         "lucky_strike": 0.2,
@@ -1239,9 +996,6 @@
     {
       "id": "perk_law_of_the_cycle",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_law_of_the_cycle.name",
-      "description": "perk.aegis_ascension.perk_law_of_the_cycle.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_law_of_the_cycle.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.1,
         "lucky_strike": 0.2,
@@ -1254,9 +1008,6 @@
     {
       "id": "perk_because_you_exist_as_i_write",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_because_you_exist_as_i_write.name",
-      "description": "perk.aegis_ascension.perk_because_you_exist_as_i_write.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_because_you_exist_as_i_write.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.1,
         "damage_bonus": 0.2,
@@ -1269,9 +1020,6 @@
     {
       "id": "perk_longhua_feixiao",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_longhua_feixiao.name",
-      "description": "perk.aegis_ascension.perk_longhua_feixiao.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_longhua_feixiao.png",
       "stats": {
         "luck_flat": 2,
         "lucky_strike": 0.4,
@@ -1284,9 +1032,6 @@
     {
       "id": "perk_top_player",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_top_player.name",
-      "description": "perk.aegis_ascension.perk_top_player.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_top_player.png",
       "stats": {
         "all_skill_enhancement_attribute": 0.1,
         "lucky_strike": 0.2,
@@ -1303,9 +1048,6 @@
     {
       "id": "perk_blessing_of_the_world_tree",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_blessing_of_the_world_tree.name",
-      "description": "perk.aegis_ascension.perk_blessing_of_the_world_tree.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_blessing_of_the_world_tree.png",
       "stats": {
         "primary_attribute_multiplier": 0.2,
         "breakthrough_healing_power": 0.05,
@@ -1318,9 +1060,6 @@
     {
       "id": "perk_plateau_witch",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_plateau_witch.name",
-      "description": "perk.aegis_ascension.perk_plateau_witch.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_plateau_witch.png",
       "stats": {
         "summon_count": 2,
         "breakthrough_summon_power": 0.1
@@ -1332,9 +1071,6 @@
     {
       "id": "perk_teacher_fox",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_teacher_fox.name",
-      "description": "perk.aegis_ascension.perk_teacher_fox.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_teacher_fox.png",
       "stats": {
         "primary_attribute_multiplier": 0.2,
         "max_health_multiplier": 0.5,
@@ -1347,9 +1083,6 @@
     {
       "id": "perk_world_is_mine",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_world_is_mine.name",
-      "description": "perk.aegis_ascension.perk_world_is_mine.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_world_is_mine.png",
       "stats": {
         "skill_enhancement_option_bonus": 2,
         "breakthrough_experience": 1000,
@@ -1362,9 +1095,6 @@
     {
       "id": "perk_reinhardt",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_reinhardt.name",
-      "description": "perk.aegis_ascension.perk_reinhardt.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_reinhardt.png",
       "stats": {
         "random_aegis_count": 1
       },
@@ -1375,9 +1105,6 @@
     {
       "id": "perk_divine_sakura_power",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_divine_sakura_power.name",
-      "description": "perk.aegis_ascension.perk_divine_sakura_power.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_divine_sakura_power.png",
       "stats": {
         "constellation_xp_cost": 10000,
         "max_constellations": 6,
@@ -1396,9 +1123,6 @@
     {
       "id": "perk_aquas_blessing",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_aquas_blessing.name",
-      "description": "perk.aegis_ascension.perk_aquas_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_aquas_blessing.png",
       "stats": {
         "max_health_multiplier": -0.5,
         "experience_gained": 2.0,
@@ -1414,9 +1138,6 @@
     {
       "id": "perk_golden_rule",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_golden_rule.name",
-      "description": "perk.aegis_ascension.perk_golden_rule.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_golden_rule.png",
       "stats": {
         "selection_charges_granted": 1,
         "immediate_gold": 2000,
@@ -1430,9 +1151,6 @@
     {
       "id": "perk_est",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_est.name",
-      "description": "perk.aegis_ascension.perk_est.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_est.png",
       "stats": {
         "attack_speed_flat": 2,
         "armor_penetration_percentage": 0.5,
@@ -1445,9 +1163,6 @@
     {
       "id": "perk_et_omnia_vanitas",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_et_omnia_vanitas.name",
-      "description": "perk.aegis_ascension.perk_et_omnia_vanitas.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_et_omnia_vanitas.png",
       "stats": {
         "critical_chance": 0.3,
         "critical_damage": 1.0,
@@ -1460,9 +1175,6 @@
     {
       "id": "perk_shrine_maiden_dance",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_shrine_maiden_dance.name",
-      "description": "perk.aegis_ascension.perk_shrine_maiden_dance.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_shrine_maiden_dance.png",
       "stats": {},
       "maxRank": 1,
       "manualToggle": false,
@@ -1471,9 +1183,6 @@
     {
       "id": "perk_frenzy",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_frenzy.name",
-      "description": "perk.aegis_ascension.perk_frenzy.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_frenzy.png",
       "stats": {
         "critical_damage": 0.6,
         "selection_charges_granted": 1,
@@ -1487,9 +1196,6 @@
     {
       "id": "perk_ganyus_blessing",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_ganyus_blessing.name",
-      "description": "perk.aegis_ascension.perk_ganyus_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_ganyus_blessing.png",
       "stats": {
         "minimum_damage_distance": 6.0,
         "distance_damage_offset": 5.0,
@@ -1502,9 +1208,6 @@
     {
       "id": "perk_hanakos_blessing",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_hanakos_blessing.name",
-      "description": "perk.aegis_ascension.perk_hanakos_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_hanakos_blessing.png",
       "stats": {
         "armor_penetration_percentage": 0.15
       },
@@ -1515,9 +1218,6 @@
     {
       "id": "perk_homuras_blessing",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_homuras_blessing.name",
-      "description": "perk.aegis_ascension.perk_homuras_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_homuras_blessing.png",
       "requires_mod": "irons_spellbooks",
       "stats": {
         "reset_spell_cooldown_chance": 0.5
@@ -1529,9 +1229,6 @@
     {
       "id": "perk_karyls_blessing",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_karyls_blessing.name",
-      "description": "perk.aegis_ascension.perk_karyls_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_karyls_blessing.png",
       "stats": {
         "magic_damage_amplification": 0.1,
         "breakthrough_magic_damage_amplification": 0.02
@@ -1543,9 +1240,6 @@
     {
       "id": "perk_kisakis_blessing",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_kisakis_blessing.name",
-      "description": "perk.aegis_ascension.perk_kisakis_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_kisakis_blessing.png",
       "stats": {
         "aegis_option_bonus": 2
       },
@@ -1556,9 +1250,6 @@
     {
       "id": "perk_koharus_blessing",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_koharus_blessing.name",
-      "description": "perk.aegis_ascension.perk_koharus_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_koharus_blessing.png",
       "stats": {
         "critical_chance": -0.4,
         "lucky_strike": 0.4
@@ -1570,9 +1261,6 @@
     {
       "id": "perk_kokkoros_blessing",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_kokkoros_blessing.name",
-      "description": "perk.aegis_ascension.perk_kokkoros_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_kokkoros_blessing.png",
       "stats": {
         "physical_damage_amplification": 0.1,
         "breakthrough_physical_damage_amplification": 0.02
@@ -1584,9 +1272,6 @@
     {
       "id": "perk_konatas_blessing",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_konatas_blessing.name",
-      "description": "perk.aegis_ascension.perk_konatas_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_konatas_blessing.png",
       "stats": {
         "luck_flat": 1.0,
         "lucky_strike": 0.6
@@ -1598,9 +1283,6 @@
     {
       "id": "perk_murasames_blessing",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_murasames_blessing.name",
-      "description": "perk.aegis_ascension.perk_murasames_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_murasames_blessing.png",
       "stats": {
         "attack_range_flat": 2.0
       },
@@ -1611,9 +1293,6 @@
     {
       "id": "perk_pecorines_blessing",
       "tier": "SR",
-      "name": "perk.aegis_ascension.perk_pecorines_blessing.name",
-      "description": "perk.aegis_ascension.perk_pecorines_blessing.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_pecorines_blessing.png",
       "stats": {
         "full_health_final_damage": 0.25
       },
@@ -1624,9 +1303,6 @@
     {
       "id": "perk_perfect_and_elegant_servant",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_perfect_and_elegant_servant.name",
-      "description": "perk.aegis_ascension.perk_perfect_and_elegant_servant.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_perfect_and_elegant_servant.png",
       "stats": {
         "perfection_max_stacks": 20,
         "perfection_duration_seconds": 5,
@@ -1641,9 +1317,6 @@
     {
       "id": "perk_dominus_lapidis",
       "tier": "SSR",
-      "name": "perk.aegis_ascension.perk_dominus_lapidis.name",
-      "description": "perk.aegis_ascension.perk_dominus_lapidis.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_dominus_lapidis.png",
       "stats": {
         "shield_gain_multiplier": 1.5,
         "shield_damage_bonus_interval_seconds": 3,
@@ -1657,9 +1330,6 @@
     {
       "id": "perk_suspension_of_disbelief",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_suspension_of_disbelief.name",
-      "description": "perk.aegis_ascension.perk_suspension_of_disbelief.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_suspension_of_disbelief.png",
       "stats": {
         "random_perk_min": 1,
         "random_perk_max": 3
@@ -1672,9 +1342,6 @@
     {
       "id": "perk_team_star",
       "tier": "R",
-      "name": "perk.aegis_ascension.perk_team_star.name",
-      "description": "perk.aegis_ascension.perk_team_star.description",
-      "icon": "aegis_ascension:textures/gui/talents/perk_team_star.png",
       "stats": {
         "team_damage_bonus": 0.1,
         "team_damage_bonus_max_stacks": 5

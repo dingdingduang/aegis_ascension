@@ -11,9 +11,9 @@ import java.nio.file.Path;
 
 /**
  * Server-side settings for the virtual storage, at
- * {@code config/aegis_ascension/storagesetting.json}.
+ * {@code config/aegis_ascension/storage_serverside.json}.
  *
-     * <p>Seeded from the bundled {@code assets/aegis_ascension/storagesetting.json} on first
+     * <p>Seeded from the bundled {@code assets/aegis_ascension/storage_serverside.json} on first
      * run and read back from disk thereafter — the same copy-then-read flow as
      * {@link com.whatever.aegis_ascension.aegis.Aegis}'s catalog. The shipped JSON is the
      * source of truth for the defaults; the field initialisers below only fill in keys a
@@ -24,7 +24,7 @@ public final class StorageConfig {
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static final Path FILE = PlatformServices.paths()
             .modConfigDirectory(AegisAscensionMod.MOD_ID)
-            .resolve("storagesetting.json");
+            .resolve("storage_serverside.json");
 
     private static StorageConfig instance;
 
@@ -57,10 +57,10 @@ public final class StorageConfig {
             Files.createDirectories(FILE.getParent());
             if (Files.notExists(FILE)) {
                 try (var stream = StorageConfig.class.getResourceAsStream(
-                        "/assets/aegis_ascension/storagesetting.json")) {
+                        "/assets/aegis_ascension/storage_serverside.json")) {
                     if (stream == null) {
                         throw new IllegalStateException(
-                                "Missing default assets/aegis_ascension/storagesetting.json");
+                                "Missing default assets/aegis_ascension/storage_serverside.json");
                     }
                     Files.copy(stream, FILE);
                 }

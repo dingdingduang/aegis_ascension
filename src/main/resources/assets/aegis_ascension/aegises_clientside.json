@@ -1,0 +1,100 @@
+{
+  "schema_version": 1,
+  "entries": {
+    "fortune_aegis": {
+      "name": "aegis.aegis_ascension.fortune_aegis.name",
+      "description": "aegis.aegis_ascension.fortune_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/fortune.png"
+    },
+    "bliss_aegis": {
+      "name": "aegis.aegis_ascension.bliss_aegis.name",
+      "description": "aegis.aegis_ascension.bliss_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/bliss.png"
+    },
+    "flame_aegis": {
+      "name": "aegis.aegis_ascension.flame_aegis.name",
+      "description": "aegis.aegis_ascension.flame_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/flame.png"
+    },
+    "angels_aegis": {
+      "name": "aegis.aegis_ascension.angels_aegis.name",
+      "description": "aegis.aegis_ascension.angels_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/angel.png"
+    },
+    "authority_aegis": {
+      "name": "aegis.aegis_ascension.authority_aegis.name",
+      "description": "aegis.aegis_ascension.authority_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/authority.png"
+    },
+    "water_aegis": {
+      "name": "aegis.aegis_ascension.water_aegis.name",
+      "description": "aegis.aegis_ascension.water_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/water.png"
+    },
+    "frost_moon_aegis": {
+      "name": "aegis.aegis_ascension.frost_moon_aegis.name",
+      "description": "aegis.aegis_ascension.frost_moon_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/frost_moon.png"
+    },
+    "healing_aegis": {
+      "name": "aegis.aegis_ascension.healing_aegis.name",
+      "description": "aegis.aegis_ascension.healing_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/healing.png"
+    },
+    "wisdom_aegis": {
+      "name": "aegis.aegis_ascension.wisdom_aegis.name",
+      "description": "aegis.aegis_ascension.wisdom_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/wisdom.png"
+    },
+    "holy_blessing_aegis": {
+      "name": "aegis.aegis_ascension.holy_blessing_aegis.name",
+      "description": "aegis.aegis_ascension.holy_blessing_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/holy_blessing.png"
+    },
+    "stellar_aegis": {
+      "name": "aegis.aegis_ascension.stellar_aegis.name",
+      "description": "aegis.aegis_ascension.stellar_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/stellar.png"
+    },
+    "lucky_aegis": {
+      "name": "aegis.aegis_ascension.lucky_aegis.name",
+      "description": "aegis.aegis_ascension.lucky_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/lucky.png"
+    },
+    "miracle_aegis": {
+      "name": "aegis.aegis_ascension.miracle_aegis.name",
+      "description": "aegis.aegis_ascension.miracle_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/miracle.png"
+    },
+    "destruction_aegis": {
+      "name": "aegis.aegis_ascension.destruction_aegis.name",
+      "description": "aegis.aegis_ascension.destruction_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/destruction.png"
+    },
+    "harmony_aegis": {
+      "name": "aegis.aegis_ascension.harmony_aegis.name",
+      "description": "aegis.aegis_ascension.harmony_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/harmony.png"
+    },
+    "fox_gods_aegis": {
+      "name": "aegis.aegis_ascension.fox_gods_aegis.name",
+      "description": "aegis.aegis_ascension.fox_gods_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/fox_god.png"
+    },
+    "blessing_aegis": {
+      "name": "aegis.aegis_ascension.blessing_aegis.name",
+      "description": "aegis.aegis_ascension.blessing_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/blessing.png"
+    },
+    "arcane_aegis": {
+      "name": "aegis.aegis_ascension.arcane_aegis.name",
+      "description": "aegis.aegis_ascension.arcane_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/arcane.png"
+    },
+    "devour_aegis": {
+      "name": "aegis.aegis_ascension.devour_aegis.name",
+      "description": "aegis.aegis_ascension.devour_aegis.description",
+      "icon": "aegis_ascension:textures/gui/aegis/devour.png"
+    }
+  }
+}
